@@ -1,4 +1,12 @@
 {
+  "composer/Piwik": {
+    "url": "https://github.com/DaSchTour/piwik-mediawiki-extension.git",
+    "remote": "master/braid/composer/Piwik",
+    "branch": "master",
+    "squashed": true,
+    "revision": "e3fd9793b89a30d8385969f76de37e1c637803e5",
+    "lock": "e3fd9793b89a30d8385969f76de37e1c637803e5"
+  },
   "extensions/AdminLinks": {
     "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
     "remote": "master/braid/extensions/AdminLinks",
