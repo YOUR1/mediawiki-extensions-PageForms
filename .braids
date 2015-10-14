@@ -1,4 +1,12 @@
 {
+  "extensions/AdminLinks": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
+    "remote": "master/braid/extensions/AdminLinks",
+    "branch": "master",
+    "squashed": true,
+    "revision": "a5543c40bf29d74d60fed5ef7ac6e022d3f9dbf4",
+    "lock": "a5543c40bf29d74d60fed5ef7ac6e022d3f9dbf4"
+  },
   "extensions/ApprovedRevs": {
     "url": "https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git",
     "remote": "master/braid/extensions/ApprovedRevs",
