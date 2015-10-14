@@ -14,13 +14,6 @@
     "squashed": true,
     "revision": "5e799891cbb56e06b84066e77835e87e2c4516e6"
   },
-  "subsplit/SemanticDrillDown": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticDrilldown.git",
-    "remote": "master/braid/subsplit/SemanticDrillDown",
-    "branch": "master",
-    "squashed": true,
-    "revision": "b892ebf3922d9008d4a96b0b20bf1d4e81022d17"
-  },
   "subsplit/SemanticResultFormats": {
     "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
     "remote": "master/braid/subsplit/SemanticResultFormats",
