@@ -6,12 +6,5 @@
     "squashed": true,
     "revision": "2619ed9beede0017f50ed08b20f6ea3a5200a838",
     "lock": "2619ed9beede0017f50ed08b20f6ea3a5200a838"
-  },
-  "extensions/ApprovedRevs": {
-    "url": "https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git",
-    "remote": "master/braid/extensions/ApprovedRevs",
-    "branch": "master",
-    "squashed": true,
-    "revision": "5e799891cbb56e06b84066e77835e87e2c4516e6"
   }
 }
