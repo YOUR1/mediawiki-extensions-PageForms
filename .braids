@@ -1,7 +1,7 @@
 {
-  "extensions/ApprovedRevs": {
+  "subsplit/ApprovedRevs": {
     "url": "https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git",
-    "remote": "master/braid/extensions/ApprovedRevs",
+    "remote": "master/braid/subsplit/ApprovedRevs",
     "branch": "master",
     "squashed": true,
     "revision": "5e799891cbb56e06b84066e77835e87e2c4516e6"
