@@ -24,7 +24,7 @@ $specialPageAliases['ar'] = array(
 	'AdminLinks' => array( 'وصلات_الإدارة' ),
 );
 
-/** Egyptian Spoken Arabic (مصرى) */
+/** Egyptian Arabic (مصرى) */
 $specialPageAliases['arz'] = array(
 	'AdminLinks' => array( 'لينكات_الاداره' ),
 );
@@ -32,6 +32,11 @@ $specialPageAliases['arz'] = array(
 /** Assamese (অসমীয়া) */
 $specialPageAliases['as'] = array(
 	'AdminLinks' => array( 'প্ৰশাসনিক_সংযোগ' ),
+);
+
+/** Western Balochi (بلوچی رخشانی) */
+$specialPageAliases['bgn'] = array(
+	'AdminLinks' => array( 'مدیر_ئی_لینکان' ),
 );
 
 /** Banjar (Bahasa Banjar) */
@@ -56,7 +61,7 @@ $specialPageAliases['de'] = array(
 
 /** Zazaki (Zazaki) */
 $specialPageAliases['diq'] = array(
-	'AdminLinks' => array( 'GreyéAdminan' ),
+	'AdminLinks' => array( 'Gıreyêİdarekeran' ),
 );
 
 /** Greek (Ελληνικά) */
@@ -92,6 +97,11 @@ $specialPageAliases['gl'] = array(
 /** Swiss German (Alemannisch) */
 $specialPageAliases['gsw'] = array(
 	'AdminLinks' => array( 'Ammane-Links' ),
+);
+
+/** Gujarati (ગુજરાતી) */
+$specialPageAliases['gu'] = array(
+	'AdminLinks' => array( 'પ્રબંધકડીઓ' ),
 );
 
 /** Hawaiian (Hawai`i) */
@@ -162,6 +172,11 @@ $specialPageAliases['lad'] = array(
 /** Luxembourgish (Lëtzebuergesch) */
 $specialPageAliases['lb'] = array(
 	'AdminLinks' => array( 'Linke_fir_Administrateuren' ),
+);
+
+/** Northern Luri (لۊری شومالی) */
+$specialPageAliases['lrc'] = array(
+	'AdminLinks' => array( 'ھوم_پئیڤأندیا_دیڤوٙنیار' ),
 );
 
 /** Malagasy (Malagasy) */

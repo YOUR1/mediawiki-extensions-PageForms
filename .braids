@@ -4,8 +4,8 @@
     "remote": "master/braid/extensions/AdminLinks",
     "branch": "master",
     "squashed": true,
-    "revision": "a5543c40bf29d74d60fed5ef7ac6e022d3f9dbf4",
-    "lock": "a5543c40bf29d74d60fed5ef7ac6e022d3f9dbf4"
+    "revision": "2619ed9beede0017f50ed08b20f6ea3a5200a838",
+    "lock": "2619ed9beede0017f50ed08b20f6ea3a5200a838"
   },
   "extensions/ApprovedRevs": {
     "url": "https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git",
