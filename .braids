@@ -13,12 +13,5 @@
     "branch": "master",
     "squashed": true,
     "revision": "5e799891cbb56e06b84066e77835e87e2c4516e6"
-  },
-  "subsplit/SemanticResultFormats": {
-    "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
-    "remote": "master/braid/subsplit/SemanticResultFormats",
-    "branch": "master",
-    "squashed": true,
-    "revision": "f7cc4a2f41f6062196a6582468eba57e0ea7b7e2"
   }
 }
