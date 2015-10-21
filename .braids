@@ -85,5 +85,13 @@
     "squashed": true,
     "revision": "65d3ba94161710b28c7d386298735c9af39fa9d8",
     "lock": "65d3ba94161710b28c7d386298735c9af39fa9d8"
+  },
+  "extensions/GoogleAnalytics": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/googleAnalytics.git",
+    "remote": "master/braid/extensions/GoogleAnalytics",
+    "branch": "master",
+    "squashed": true,
+    "revision": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323",
+    "lock": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323"
   }
 }
