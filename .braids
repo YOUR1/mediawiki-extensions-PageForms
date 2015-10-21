@@ -173,5 +173,13 @@
     "squashed": true,
     "revision": "499d2ee92acbf102d8b487738731f704d6c38f93",
     "lock": "499d2ee92acbf102d8b487738731f704d6c38f93"
+  },
+  "extensions/PdfBook": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/PdfBook.git",
+    "remote": "master/braid/extensions/PdfBook",
+    "branch": "master",
+    "squashed": true,
+    "revision": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb",
+    "lock": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb"
   }
 }
