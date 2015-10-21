@@ -149,5 +149,13 @@
     "squashed": true,
     "revision": "c7625623c9db02ff81900ba5e8abedb209dfd76b",
     "lock": "c7625623c9db02ff81900ba5e8abedb209dfd76b"
+  },
+  "extensions/MagicNoCache": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/MagicNoCache.git",
+    "remote": "master/braid/extensions/MagicNoCache",
+    "branch": "master",
+    "squashed": true,
+    "revision": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e",
+    "lock": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e"
   }
 }
