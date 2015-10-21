@@ -1,0 +1,18 @@
+{
+	"@metadata": {
+		"authors": [
+			"Toniher"
+		]
+	},
+	"semanticformsinputs-desc": "Tipus d'entrada addicionals per al [https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:Semantic_Forms Semantic Forms]",
+	"semanticformsinputs-wrongformat": "Format incorrecte.",
+	"semanticformsinputs-close": "Tanca",
+	"semanticformsinputs-prev": "Anterior",
+	"semanticformsinputs-next": "Següent",
+	"semanticformsinputs-today": "Avui",
+	"semanticformsinputs-malformedregexp": "Expressió regular mal formada ($1).",
+	"semanticformsinputs-datepicker-weekstart": "El primer dia de la setmana (0 - diumenge, 1 - dilluns, ...).",
+	"semanticformsinputs-timepicker-interval": "Interval entre minuts. Nombre entre 1 i 60.",
+	"semanticformsinputs-menuselect-structure": "L'estructura de menú com una llista no ordenada.",
+	"semanticformsinputs-menuselect-enableinputfield": "L'usuari hauria de poder emplenar el camp d'entrada directament?"
+}

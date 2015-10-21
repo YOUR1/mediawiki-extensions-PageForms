@@ -213,5 +213,13 @@
     "squashed": true,
     "revision": "e0f15961c5479413d99b5bbc50609a3a9ef7da8f",
     "lock": "e0f15961c5479413d99b5bbc50609a3a9ef7da8f"
+  },
+  "extensions/SemanticFormsInputs": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticFormsInputs.git",
+    "remote": "master/braid/extensions/SemanticFormsInputs",
+    "branch": "master",
+    "squashed": true,
+    "revision": "fc7d604b51be88383cf03c45d4e0b441c24e02fa",
+    "lock": "fc7d604b51be88383cf03c45d4e0b441c24e02fa"
   }
 }
