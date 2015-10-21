@@ -269,5 +269,13 @@
     "squashed": true,
     "revision": "d8bca97c9b111ee724faca7644b66da410a90031",
     "lock": "d8bca97c9b111ee724faca7644b66da410a90031"
+  },
+  "extensions/Widgets": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Widgets.git",
+    "remote": "master/braid/extensions/Widgets",
+    "branch": "master",
+    "squashed": true,
+    "revision": "0338885c6fd759eb6545296333373bc69b6bd1da",
+    "lock": "0338885c6fd759eb6545296333373bc69b6bd1da"
   }
 }
