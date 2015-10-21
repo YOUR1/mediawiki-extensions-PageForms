@@ -245,5 +245,13 @@
     "squashed": true,
     "revision": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108",
     "lock": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108"
+  },
+  "extensions/UrlGetParameters": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/UrlGetParameters.git",
+    "remote": "master/braid/extensions/UrlGetParameters",
+    "branch": "master",
+    "squashed": true,
+    "revision": "c18937c6c62afad5f1fee09a91507d27be897433",
+    "lock": "c18937c6c62afad5f1fee09a91507d27be897433"
   }
 }
