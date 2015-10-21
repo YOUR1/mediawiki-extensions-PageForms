@@ -54,5 +54,13 @@
     "squashed": true,
     "revision": "8d7de84017d3f8efb6bfb5265665aa4907767cde",
     "lock": "8d7de84017d3f8efb6bfb5265665aa4907767cde"
+  },
+  "extensions/DataTransfer": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DataTransfer.git",
+    "remote": "master/braid/extensions/DataTransfer",
+    "branch": "master",
+    "squashed": true,
+    "revision": "b6645aac78bcab8c8e8fe251e968adf643d609ba",
+    "lock": "b6645aac78bcab8c8e8fe251e968adf643d609ba"
   }
 }
