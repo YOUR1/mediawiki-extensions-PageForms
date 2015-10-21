@@ -101,5 +101,13 @@
     "squashed": true,
     "revision": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323",
     "lock": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323"
+  },
+  "extensions/HeaderTabs": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/HeaderTabs.git",
+    "remote": "master/braid/extensions/HeaderTabs",
+    "branch": "master",
+    "squashed": true,
+    "revision": "29d694f645ed21815c05299075eff73c8989a3eb",
+    "lock": "29d694f645ed21815c05299075eff73c8989a3eb"
   }
 }
