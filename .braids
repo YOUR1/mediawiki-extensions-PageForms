@@ -157,5 +157,13 @@
     "squashed": true,
     "revision": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e",
     "lock": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e"
+  },
+  "extensions/MediaFunctions": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/MediaFunctions.git",
+    "remote": "master/braid/extensions/MediaFunctions",
+    "branch": "master",
+    "squashed": true,
+    "revision": "5e142961d53332162e339c8573a8da6eb5032491",
+    "lock": "5e142961d53332162e339c8573a8da6eb5032491"
   }
 }
