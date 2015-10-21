@@ -62,5 +62,13 @@
     "squashed": true,
     "revision": "b6645aac78bcab8c8e8fe251e968adf643d609ba",
     "lock": "b6645aac78bcab8c8e8fe251e968adf643d609ba"
+  },
+  "extensions/DeleteBatch": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DeleteBatch.git",
+    "remote": "master/braid/extensions/DeleteBatch",
+    "branch": "master",
+    "squashed": true,
+    "revision": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0",
+    "lock": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
   }
 }
