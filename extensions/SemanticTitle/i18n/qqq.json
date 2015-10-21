@@ -1,0 +1,12 @@
+{
+	"@metadata": {
+		"authors": [
+			"Purodha",
+			"Shirayuki",
+			"Liuxinyu970226",
+			"Umherirrender"
+		]
+	},
+	"semantictitle-desc": "{{desc|name=Semantic Title|url=https://www.mediawiki.org/wiki/Extension:SemanticTitle}}",
+	"semantictitle-talkpagetitle": "Format string for the title of a talk page; $1 is the semantic title of the subject page corresponding to the talk page.\n{{Identical|Discuss}}"
+}

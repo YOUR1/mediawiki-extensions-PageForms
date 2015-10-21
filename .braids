@@ -237,5 +237,13 @@
     "squashed": true,
     "revision": "1e936bd3c544e19ea435e1bb99041b8a7cb99522",
     "lock": "1e936bd3c544e19ea435e1bb99041b8a7cb99522"
+  },
+  "extensions/SemanticTitle": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticTitle.git",
+    "remote": "master/braid/extensions/SemanticTitle",
+    "branch": "master",
+    "squashed": true,
+    "revision": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108",
+    "lock": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108"
   }
 }

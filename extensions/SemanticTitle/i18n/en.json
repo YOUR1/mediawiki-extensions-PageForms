@@ -1,0 +1,10 @@
+{
+	"@metadata": {
+		"authors": [
+			"Cindy Cicalese",
+			"Van de Bugger"
+		]
+	},
+	"semantictitle-desc": "Sets visible page title to value of a semantic property",
+	"semantictitle-talkpagetitle": "Discuss $1"
+}

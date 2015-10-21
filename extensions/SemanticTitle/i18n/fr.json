@@ -1,0 +1,10 @@
+{
+	"@metadata": {
+		"authors": [
+			"DavidL",
+			"Wladek92"
+		]
+	},
+	"semantictitle-desc": "Définir le titre visible de la page à la valeur d'une propriété sémantique",
+	"semantictitle-talkpagetitle": "Discuter de $1"
+}

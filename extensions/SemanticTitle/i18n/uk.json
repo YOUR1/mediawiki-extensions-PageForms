@@ -1,0 +1,10 @@
+{
+	"@metadata": {
+		"authors": [
+			"Base",
+			"Ата"
+		]
+	},
+	"semantictitle-desc": "Заміняє заголовок сторінки на значення семантичної властивості",
+	"semantictitle-talkpagetitle": "Обговорення $1"
+}

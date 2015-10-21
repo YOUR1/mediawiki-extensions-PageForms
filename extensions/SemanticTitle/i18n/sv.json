@@ -1,0 +1,10 @@
+{
+	"@metadata": {
+		"authors": [
+			"Martinwiss",
+			"Lokal Profil"
+		]
+	},
+	"semantictitle-desc": "Sätter den synliga titeln för en sida till värdet hos en semantisk egenskap",
+	"semantictitle-talkpagetitle": "Diskutera $1"
+}
