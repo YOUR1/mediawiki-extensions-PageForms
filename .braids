@@ -229,5 +229,13 @@
     "squashed": true,
     "revision": "fc7d604b51be88383cf03c45d4e0b441c24e02fa",
     "lock": "fc7d604b51be88383cf03c45d4e0b441c24e02fa"
+  },
+  "extensions/SemanticInternalObjects": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticInternalObjects",
+    "remote": "master/braid/extensions/SemanticInternalObjects",
+    "branch": "master",
+    "squashed": true,
+    "revision": "1e936bd3c544e19ea435e1bb99041b8a7cb99522",
+    "lock": "1e936bd3c544e19ea435e1bb99041b8a7cb99522"
   }
 }
