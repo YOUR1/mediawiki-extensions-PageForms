@@ -181,5 +181,13 @@
     "squashed": true,
     "revision": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb",
     "lock": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb"
+  },
+  "extensions/ReplaceText": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ReplaceText.git",
+    "remote": "master/braid/extensions/ReplaceText",
+    "branch": "master",
+    "squashed": true,
+    "revision": "d1805b8abbac0ef0b1812a1e17a939b06e3e0868",
+    "lock": "d1805b8abbac0ef0b1812a1e17a939b06e3e0868"
   }
 }
