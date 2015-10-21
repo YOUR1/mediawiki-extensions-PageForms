@@ -46,5 +46,13 @@
     "squashed": true,
     "revision": "d1c8feb4568d49661839afece95a6bbbdbf0f96f",
     "lock": "d1c8feb4568d49661839afece95a6bbbdbf0f96f"
+  },
+  "extensions/CategoryTree": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/CategoryTree.git",
+    "remote": "master/braid/extensions/CategoryTree",
+    "branch": "master",
+    "squashed": true,
+    "revision": "8d7de84017d3f8efb6bfb5265665aa4907767cde",
+    "lock": "8d7de84017d3f8efb6bfb5265665aa4907767cde"
   }
 }
