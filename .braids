@@ -31,6 +31,14 @@
     "revision": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a",
     "lock": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a"
   },
+  "composer/SemanticMediaWiki-2.2.x": {
+    "url": "https://github.com/SemanticMediaWiki/SemanticMediaWiki.git",
+    "remote": "2.2.x/braid/composer/SemanticMediaWiki-2.2.x",
+    "branch": "2.2.x",
+    "squashed": true,
+    "revision": "17831fbeeef8a7321887527ec6fc1ef218546a32",
+    "lock": "17831fbeeef8a7321887527ec6fc1ef218546a32"
+  },
   "extensions/AdminLinks": {
     "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
     "remote": "master/braid/extensions/AdminLinks",
