@@ -39,6 +39,14 @@
     "revision": "17831fbeeef8a7321887527ec6fc1ef218546a32",
     "lock": "17831fbeeef8a7321887527ec6fc1ef218546a32"
   },
+  "composer/SemanticResultFormats": {
+    "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
+    "remote": "master/braid/composer/SemanticResultFormats",
+    "branch": "master",
+    "squashed": true,
+    "revision": "885e76ed60d9df401bf01ed10598f29f212f70bc",
+    "lock": "885e76ed60d9df401bf01ed10598f29f212f70bc"
+  },
   "extensions/AdminLinks": {
     "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
     "remote": "master/braid/extensions/AdminLinks",
