@@ -31,6 +31,14 @@
     "revision": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a",
     "lock": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a"
   },
+  "composer/SemanticMaps": {
+    "url": "https://github.com/SemanticMediaWiki/SemanticMaps.git",
+    "remote": "master/braid/composer/SemanticMaps",
+    "branch": "master",
+    "squashed": true,
+    "revision": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc",
+    "lock": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc"
+  },
   "composer/SemanticMediaWiki-2.2.x": {
     "url": "https://github.com/SemanticMediaWiki/SemanticMediaWiki.git",
     "remote": "2.2.x/braid/composer/SemanticMediaWiki-2.2.x",
