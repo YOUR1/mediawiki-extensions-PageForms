@@ -23,6 +23,14 @@
     "revision": "e3fd9793b89a30d8385969f76de37e1c637803e5",
     "lock": "e3fd9793b89a30d8385969f76de37e1c637803e5"
   },
+  "composer/SemanticGlossary": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticGlossary.git",
+    "remote": "master/braid/composer/SemanticGlossary",
+    "branch": "master",
+    "squashed": true,
+    "revision": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a",
+    "lock": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a"
+  },
   "extensions/AdminLinks": {
     "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
     "remote": "master/braid/extensions/AdminLinks",
