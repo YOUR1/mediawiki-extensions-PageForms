@@ -1,4 +1,12 @@
 {
+  "composer/GraphViz": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/GraphViz.git",
+    "remote": "master/braid/composer/GraphViz",
+    "branch": "master",
+    "squashed": true,
+    "revision": "7898ab4be9bb0c52a547f8308a025f6876e8102f",
+    "lock": "7898ab4be9bb0c52a547f8308a025f6876e8102f"
+  },
   "composer/Piwik": {
     "url": "https://github.com/DaSchTour/piwik-mediawiki-extension.git",
     "remote": "master/braid/composer/Piwik",
