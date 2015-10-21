@@ -70,5 +70,12 @@
     "squashed": true,
     "revision": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0",
     "lock": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
+  },
+  "extensions/DynamicPageList": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DynamicPageList.git",
+    "remote": "REL1_23/braid/extensions/DynamicPageList",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "840a4a6048c42a31ac2020f588b54ffca571b833"
   }
 }
