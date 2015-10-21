@@ -7,6 +7,14 @@
     "revision": "7898ab4be9bb0c52a547f8308a025f6876e8102f",
     "lock": "7898ab4be9bb0c52a547f8308a025f6876e8102f"
   },
+  "composer/Lingo": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Lingo.git",
+    "remote": "master/braid/composer/Lingo",
+    "branch": "master",
+    "squashed": true,
+    "revision": "42e98a6339f7ae85fdb7668d335dc70bb94c39bc",
+    "lock": "42e98a6339f7ae85fdb7668d335dc70bb94c39bc"
+  },
   "composer/Piwik": {
     "url": "https://github.com/DaSchTour/piwik-mediawiki-extension.git",
     "remote": "master/braid/composer/Piwik",
