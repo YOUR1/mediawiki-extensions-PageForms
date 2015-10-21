@@ -38,5 +38,13 @@
     "squashed": true,
     "revision": "22eebdcaaa165fd3896305b198d63416ccf78f75",
     "lock": "22eebdcaaa165fd3896305b198d63416ccf78f75"
+  },
+  "extensions/BreadCrumbs2": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/BreadCrumbs2.git",
+    "remote": "master/braid/extensions/BreadCrumbs2",
+    "branch": "master",
+    "squashed": true,
+    "revision": "d1c8feb4568d49661839afece95a6bbbdbf0f96f",
+    "lock": "d1c8feb4568d49661839afece95a6bbbdbf0f96f"
   }
 }
