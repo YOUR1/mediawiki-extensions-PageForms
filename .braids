@@ -261,5 +261,13 @@
     "squashed": true,
     "revision": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2",
     "lock": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2"
+  },
+  "extensions/Variables": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Variables.git",
+    "remote": "master/braid/extensions/Variables",
+    "branch": "master",
+    "squashed": true,
+    "revision": "d8bca97c9b111ee724faca7644b66da410a90031",
+    "lock": "d8bca97c9b111ee724faca7644b66da410a90031"
   }
 }
