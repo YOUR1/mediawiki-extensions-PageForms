@@ -133,5 +133,13 @@
     "squashed": true,
     "revision": "049afde999b819deb91c04f7c7908447e6c90ebb",
     "lock": "049afde999b819deb91c04f7c7908447e6c90ebb"
+  },
+  "extensions/LiquidThreads": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/LiquidThreads.git",
+    "remote": "master/braid/extensions/LiquidThreads",
+    "branch": "master",
+    "squashed": true,
+    "revision": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0",
+    "lock": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0"
   }
 }
