@@ -77,5 +77,13 @@
     "branch": "REL1_23",
     "squashed": true,
     "revision": "840a4a6048c42a31ac2020f588b54ffca571b833"
+  },
+  "extensions/ExternalData": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ExternalData.git",
+    "remote": "master/braid/extensions/ExternalData",
+    "branch": "master",
+    "squashed": true,
+    "revision": "65d3ba94161710b28c7d386298735c9af39fa9d8",
+    "lock": "65d3ba94161710b28c7d386298735c9af39fa9d8"
   }
 }
