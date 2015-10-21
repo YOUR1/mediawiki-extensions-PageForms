@@ -253,5 +253,13 @@
     "squashed": true,
     "revision": "c18937c6c62afad5f1fee09a91507d27be897433",
     "lock": "c18937c6c62afad5f1fee09a91507d27be897433"
+  },
+  "extensions/UserMerge": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/UserMerge.git",
+    "remote": "master/braid/extensions/UserMerge",
+    "branch": "master",
+    "squashed": true,
+    "revision": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2",
+    "lock": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2"
   }
 }
