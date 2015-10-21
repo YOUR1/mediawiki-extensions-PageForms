@@ -197,5 +197,13 @@
     "squashed": true,
     "revision": "ae8f8250b1a7df0e8f623816087aef741c680064",
     "lock": "ae8f8250b1a7df0e8f623816087aef741c680064"
+  },
+  "extensions/SemanticDrilldown": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticDrilldown",
+    "remote": "master/braid/extensions/SemanticDrilldown",
+    "branch": "master",
+    "squashed": true,
+    "revision": "17612a323170e268b72c5bbd5bed7ff1a3930526",
+    "lock": "17612a323170e268b72c5bbd5bed7ff1a3930526"
   }
 }
