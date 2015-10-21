@@ -125,5 +125,13 @@
     "squashed": true,
     "revision": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23",
     "lock": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23"
+  },
+  "extensions/LinkedWiki": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/LinkedWiki.git",
+    "remote": "master/braid/extensions/LinkedWiki",
+    "branch": "master",
+    "squashed": true,
+    "revision": "049afde999b819deb91c04f7c7908447e6c90ebb",
+    "lock": "049afde999b819deb91c04f7c7908447e6c90ebb"
   }
 }
