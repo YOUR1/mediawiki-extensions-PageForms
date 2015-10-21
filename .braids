@@ -141,5 +141,13 @@
     "squashed": true,
     "revision": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0",
     "lock": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0"
+  },
+  "extensions/LiquidThreadsOverview": {
+    "url": "https://github.com/GeneralVolkoV/LiquidThreadsOverview.git",
+    "remote": "master/braid/extensions/LiquidThreadsOverview",
+    "branch": "master",
+    "squashed": true,
+    "revision": "c7625623c9db02ff81900ba5e8abedb209dfd76b",
+    "lock": "c7625623c9db02ff81900ba5e8abedb209dfd76b"
   }
 }
