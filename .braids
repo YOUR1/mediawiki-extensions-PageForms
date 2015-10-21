@@ -22,5 +22,13 @@
     "squashed": true,
     "revision": "e81c80342fb60e537f33ee04ff0090b13f928875",
     "lock": "e81c80342fb60e537f33ee04ff0090b13f928875"
+  },
+  "extensions/Arrays": {
+    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Arrays.git",
+    "remote": "master/braid/extensions/Arrays",
+    "branch": "master",
+    "squashed": true,
+    "revision": "e484ab2dbbb29d56bf4329b97206f2cde0c6eafc",
+    "lock": "e484ab2dbbb29d56bf4329b97206f2cde0c6eafc"
   }
 }
