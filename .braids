@@ -55,6 +55,14 @@
     "revision": "885e76ed60d9df401bf01ed10598f29f212f70bc",
     "lock": "885e76ed60d9df401bf01ed10598f29f212f70bc"
   },
+  "core/REL1_23": {
+    "url": "https://git.wikimedia.org/git/mediawiki/core.git",
+    "remote": "REL1_23/braid/core/REL1_23",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "fb64dc5803a8b92f0dc70a4f81cbe7260653abf4",
+    "lock": "fb64dc5803a8b92f0dc70a4f81cbe7260653abf4"
+  },
   "extensions/AdminLinks": {
     "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
     "remote": "master/braid/extensions/AdminLinks",
