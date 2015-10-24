@@ -10,7 +10,18 @@
 define( 'MW_PHPUNIT_TEST', true );
 
 // Start up MediaWiki in command-line mode
-require_once dirname( dirname( __DIR__ ) ) . "/maintenance/Maintenance.php";
+
+# Bootstrap problem:
+# we need $IP to find Maintenance.php, but Maintenance.php is what sets it.
+
+$IP2=getenv( 'MW_INSTALL_PATH' );
+if ( $IP2 === false ) {
+	$IP2=dirname(dirname( __DIR__));
+}
+
+require_once $IP2 . "/maintenance/Maintenance.php";
+
+
 
 class PHPUnitMaintClass extends Maintenance {
 
