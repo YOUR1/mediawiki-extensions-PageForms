@@ -1112,7 +1112,7 @@ class GraphViz {
 			// execute the image creation command
 			if ( !self::executeCommand( $graphParms->getImageCommand( $isPreview ), $errorText ) )
 			{
-				//self::deleteFiles( $graphParms, $isPreview, false );
+				self::deleteFiles( $graphParms, $isPreview, false );
 
 				// remove path info from the errorText
 				$errorText = str_replace( $imageDir, "", $errorText );
