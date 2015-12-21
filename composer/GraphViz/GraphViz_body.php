@@ -944,7 +944,7 @@ class GraphViz {
 		} else {
 			$titleText = "";
 		}
-
+		
 		// begin the graphName with the article title text...
 		$graphName = $titleText;
 
@@ -1042,11 +1042,25 @@ class GraphViz {
 		$errorText = "";
 		// if the input is in the dot language, sanitize it
 		if ( $graphParms->getRenderer() != self::$graphLanguages[self::MSCGEN] ) {
+			
+			/** ArchiXL Mod
+			 * The sanitizeDotInput function causing invalid 
+			 * .dot markup. Disabled for further research.
+			 */
+			
+			/**
 			if ( !self::sanitizeDotInput( $input, $errorText ) ) {
+			 
 				return self::errorHTML( $errorText );
 			}
+			*/
+			
+			$input = self::replaceCustomShapeImage($input);
+			
 		}
 
+		
+		
 		// determine if the image to render exists
 		$imageExists = UploadLocalFile::getUploadedFile( $graphParms->getImageFileName( $isPreview ) ) ? true : false;
 
@@ -1098,7 +1112,7 @@ class GraphViz {
 			// execute the image creation command
 			if ( !self::executeCommand( $graphParms->getImageCommand( $isPreview ), $errorText ) )
 			{
-				self::deleteFiles( $graphParms, $isPreview, false );
+				//self::deleteFiles( $graphParms, $isPreview, false );
 
 				// remove path info from the errorText
 				$errorText = str_replace( $imageDir, "", $errorText );
@@ -1301,8 +1315,6 @@ class GraphViz {
 			}
 		}
 
-		// convert any image attributes in the input to specify the full file system path
-
 		$limit = -1; // no limit on the number of replacements
 		$count = 0; // count of replacements done (output)
 		$pattern = self::getDotImagePattern(); //pattern to match
@@ -1312,12 +1324,12 @@ class GraphViz {
 			$errorText = wfMessage( 'graphviz-dot-invalid-image', 'image' )->text();
 			return false;
 		}
-
+		
 		// convert any img src attributes (in HTML-like labels) in the input to specify the full file system path
-
+		
 		$count = 0;
 		$input = preg_replace_callback( self::DOT_IMG_PATTERN, "self::fixImgSrc", $input, $limit, $count );
-
+		
 		if ( $count > 0 && stripos( $input, 'src=""' ) !== false ) {
 			$errorText = wfMessage( 'graphviz-dot-invalid-image', 'IMG SRC' )->text();
 			return false;
@@ -1545,7 +1557,7 @@ class GraphViz {
 
 				// add enclosing square brackets to URLs that don't have them and add the title
 				$map = preg_replace( '~href="([^[][^"]+).+title="([^"]+)~',
-					'href="[$1 $2]"',
+					'href="[[$1|$2]]"',
 					$map );
 
 				// reorder map lines to the pattern shape name, coordinates, URL
@@ -1789,5 +1801,49 @@ class GraphViz {
 		}
 
 		return $uploadSubdir;
+	}
+
+	/**
+	 * Examine the GraphViz source. Replace any custom shape 'image' references with references to locally stored images
+	 * @author Remco de Boer 
+	 * @param type $input
+	 * @return type
+	 */
+	protected static function replaceCustomShapeImage($input) {
+		
+		$offset = 0;
+		$imageStart = 0;
+		$images[] = array();
+		$info = null;
+		
+		while($imageStart = strpos( $input, 'image="', $offset)) {
+			$imageStart += 7; // start at the opening quote
+		
+			// find the closing quote
+			$imageEnd = strpos( $input, '"', $imageStart);
+			$offset = $imageEnd;
+		
+			// Extract the name of the image
+			$imageName = substr($input, $imageStart, $imageEnd - $imageStart);
+			$info .= '<pre>imageName: ' . $imageName . '</pre>';
+		
+			// If the wiki contains a corresponding image, find the local path
+			$localImage = Title::newFromText($imageName, NS_IMAGE);//Title::makeTitleSafe( NS_IMAGE, $imageName);
+			if($localImage->exists()) {
+				// since graphviz runs on the local filesystem, we need the file path to the image
+				$imagePath = wfFindFile($localImage)->getLocalRefPath();
+				$info .= '<pre>localImage: ' . $imagePath . '</pre>';
+				$images[$imageName] = $imagePath;
+			}
+		}
+		
+		// replace image names with image locations
+		foreach ($images as $imageName => $imageLocation) {
+			$find = 'image="' . $imageName . '"';
+			$replace = 'image="' . $imageLocation . '"';
+			$input = str_replace($find, $replace, $input);
+		}
+		
+		return $input;
 	}
 }
