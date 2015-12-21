@@ -136,9 +136,6 @@ class SRFGraph extends SMWResultPrinter {
 		/** ArchiXL mod **/
 		if ( $this->m_nodeShape ) {
 			if($this->m_nodeShape === 'image') {
-				if (empty($this->m_fontSize)) {
-					$this->m_fontSize = 12;
-				}
 				// we need to process each node individually to ask for its custom shape
 				$graphInput .=  "node [shape=none, fontsize=$this->m_fontSize];";
 			} else {
