@@ -592,7 +592,7 @@ class SRFGraph extends SMWResultPrinter {
 		$params['fontsize'] = array(
 			'type' => 'integer',
 			'message' => 'srf-paramdesc-graph-fs',
-			'default' => false
+			'default' => 12
 		);
 		
 		$params['rootnode'] = array(
