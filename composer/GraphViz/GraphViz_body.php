@@ -781,7 +781,7 @@ class GraphViz {
 	 * @see http://www.graphviz.org/content/dot-language
 	 * @author Thomas Hummel
 	 */
-	public static function graphvizParserHook( $input, $args, $parser, $frame )
+	public static function graphvizParserHook( $input, $args, $parser, $frame = false )
 	{
 		if ( isset( $args['renderer'] ) ) {
 			switch( $args['renderer'] ) {
