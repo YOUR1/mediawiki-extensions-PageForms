@@ -71,6 +71,14 @@
     "revision": "8e06ec58c8f52079942c9cb2f30b2260f62dc1f4",
     "lock": "8e06ec58c8f52079942c9cb2f30b2260f62dc1f4"
   },
+  "composerlibs/event-dispatcher": {
+    "url": "https://github.com/onoi/event-dispatcher.git",
+    "remote": "master/braid/composerlibs/event-dispatcher",
+    "branch": "master",
+    "squashed": true,
+    "revision": "2ab3958a7c6341451afe4c31503d00d423b30b64",
+    "lock": "2ab3958a7c6341451afe4c31503d00d423b30b64"
+  },
   "composerlibs/installers": {
     "url": "https://github.com/composer/installers.git",
     "remote": "master/braid/composerlibs/installers",
