@@ -55,6 +55,14 @@
     "revision": "885e76ed60d9df401bf01ed10598f29f212f70bc",
     "lock": "885e76ed60d9df401bf01ed10598f29f212f70bc"
   },
+  "composer/Validator": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Validator",
+    "remote": "master/braid/composer/Validator",
+    "branch": "master",
+    "squashed": true,
+    "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
+    "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
+  },
   "composerlibs/installers": {
     "url": "https://github.com/composer/installers.git",
     "remote": "master/braid/composerlibs/installers",
