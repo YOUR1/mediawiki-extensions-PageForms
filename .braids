@@ -79,6 +79,14 @@
     "revision": "6213d900e92647831f7a406d5c530ea1f3d4360e",
     "lock": "6213d900e92647831f7a406d5c530ea1f3d4360e"
   },
+  "composerlibs/message-reporter": {
+    "url": "https://github.com/onoi/message-reporter.git",
+    "remote": "master/braid/composerlibs/message-reporter",
+    "branch": "master",
+    "squashed": true,
+    "revision": "483dc326ed19d6c79485d556a71a274a267d619e",
+    "lock": "483dc326ed19d6c79485d556a71a274a267d619e"
+  },
   "core/REL1_23": {
     "url": "https://git.wikimedia.org/git/mediawiki/core.git",
     "remote": "REL1_23/braid/core/REL1_23",
