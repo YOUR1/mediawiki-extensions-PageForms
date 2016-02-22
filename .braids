@@ -55,6 +55,14 @@
     "revision": "885e76ed60d9df401bf01ed10598f29f212f70bc",
     "lock": "885e76ed60d9df401bf01ed10598f29f212f70bc"
   },
+  "composerlibs/installers": {
+    "url": "https://github.com/composer/installers.git",
+    "remote": "master/braid/composerlibs/installers",
+    "branch": "master",
+    "squashed": true,
+    "revision": "6213d900e92647831f7a406d5c530ea1f3d4360e",
+    "lock": "6213d900e92647831f7a406d5c530ea1f3d4360e"
+  },
   "core/REL1_23": {
     "url": "https://git.wikimedia.org/git/mediawiki/core.git",
     "remote": "REL1_23/braid/core/REL1_23",
