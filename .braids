@@ -87,14 +87,6 @@
     "revision": "2ab3958a7c6341451afe4c31503d00d423b30b64",
     "lock": "2ab3958a7c6341451afe4c31503d00d423b30b64"
   },
-  "composerlibs/onoicache": {
-    "url": "https://github.com/onoi/cache.git",
-    "remote": "master/braid/composerlibs/onoicache",
-    "branch": "master",
-    "squashed": true,
-    "revision": "f1fb1e93dc930dead7ba4d7461b2c2d8eac6c5ee",
-    "lock": "f1fb1e93dc930dead7ba4d7461b2c2d8eac6c5ee"
-  },
   "core/REL1_23": {
     "url": "https://git.wikimedia.org/git/mediawiki/core.git",
     "remote": "REL1_23/braid/core/REL1_23",
