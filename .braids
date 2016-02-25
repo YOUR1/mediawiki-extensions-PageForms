@@ -87,14 +87,6 @@
     "revision": "2ab3958a7c6341451afe4c31503d00d423b30b64",
     "lock": "2ab3958a7c6341451afe4c31503d00d423b30b64"
   },
-  "composerlibs/message-reporter": {
-    "url": "https://github.com/onoi/message-reporter.git",
-    "remote": "master/braid/composerlibs/message-reporter",
-    "branch": "master",
-    "squashed": true,
-    "revision": "483dc326ed19d6c79485d556a71a274a267d619e",
-    "lock": "483dc326ed19d6c79485d556a71a274a267d619e"
-  },
   "composerlibs/onoicache": {
     "url": "https://github.com/onoi/cache.git",
     "remote": "master/braid/composerlibs/onoicache",
