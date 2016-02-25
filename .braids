@@ -63,14 +63,6 @@
     "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
-  "composerlibs/DataValues": {
-    "url": "https://github.com/DataValues/DataValues.git",
-    "remote": "master/braid/composerlibs/DataValues",
-    "branch": "master",
-    "squashed": true,
-    "revision": "603a19faeac34f5db23b786c6d9c20a151118c2a",
-    "lock": "603a19faeac34f5db23b786c6d9c20a151118c2a"
-  },
   "composerlibs/DataValuesInterfaces": {
     "url": "https://github.com/DataValues/Interfaces.git",
     "remote": "master/braid/composerlibs/DataValuesInterfaces",
