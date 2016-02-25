@@ -63,14 +63,6 @@
     "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
-  "composerlibs/DataValuesInterfaces": {
-    "url": "https://github.com/DataValues/Interfaces.git",
-    "remote": "master/braid/composerlibs/DataValuesInterfaces",
-    "branch": "master",
-    "squashed": true,
-    "revision": "38a04aede894929d822001e5e8851f4a08454a89",
-    "lock": "38a04aede894929d822001e5e8851f4a08454a89"
-  },
   "composerlibs/ParamProcessor": {
     "url": "https://github.com/JeroenDeDauw/ParamProcessor.git",
     "remote": "master/braid/composerlibs/ParamProcessor",
