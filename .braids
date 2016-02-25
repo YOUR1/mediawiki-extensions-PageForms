@@ -87,14 +87,6 @@
     "revision": "2ab3958a7c6341451afe4c31503d00d423b30b64",
     "lock": "2ab3958a7c6341451afe4c31503d00d423b30b64"
   },
-  "composerlibs/installers": {
-    "url": "https://github.com/composer/installers.git",
-    "remote": "master/braid/composerlibs/installers",
-    "branch": "master",
-    "squashed": true,
-    "revision": "6213d900e92647831f7a406d5c530ea1f3d4360e",
-    "lock": "6213d900e92647831f7a406d5c530ea1f3d4360e"
-  },
   "composerlibs/message-reporter": {
     "url": "https://github.com/onoi/message-reporter.git",
     "remote": "master/braid/composerlibs/message-reporter",
