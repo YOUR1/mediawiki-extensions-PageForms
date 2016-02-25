@@ -63,14 +63,6 @@
     "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
-  "composerlibs/Serialization": {
-    "url": "https://github.com/wmde/Serialization.git",
-    "remote": "master/braid/composerlibs/Serialization",
-    "branch": "master",
-    "squashed": true,
-    "revision": "8e06ec58c8f52079942c9cb2f30b2260f62dc1f4",
-    "lock": "8e06ec58c8f52079942c9cb2f30b2260f62dc1f4"
-  },
   "composerlibs/event-dispatcher": {
     "url": "https://github.com/onoi/event-dispatcher.git",
     "remote": "master/braid/composerlibs/event-dispatcher",
