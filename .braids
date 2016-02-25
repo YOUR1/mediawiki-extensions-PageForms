@@ -63,14 +63,6 @@
     "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
-  "composerlibs/ParamProcessor": {
-    "url": "https://github.com/JeroenDeDauw/ParamProcessor.git",
-    "remote": "master/braid/composerlibs/ParamProcessor",
-    "branch": "master",
-    "squashed": true,
-    "revision": "14f88e2a9b4e82fe48510c3fb156a01b0aea3266",
-    "lock": "14f88e2a9b4e82fe48510c3fb156a01b0aea3266"
-  },
   "composerlibs/Serialization": {
     "url": "https://github.com/wmde/Serialization.git",
     "remote": "master/braid/composerlibs/Serialization",
