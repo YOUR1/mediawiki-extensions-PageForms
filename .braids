@@ -39,14 +39,6 @@
     "revision": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc",
     "lock": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc"
   },
-  "composer/SemanticMediaWiki-2.2.x": {
-    "url": "https://github.com/SemanticMediaWiki/SemanticMediaWiki.git",
-    "remote": "2.2.x/braid/composer/SemanticMediaWiki-2.2.x",
-    "branch": "2.2.x",
-    "squashed": true,
-    "revision": "17831fbeeef8a7321887527ec6fc1ef218546a32",
-    "lock": "17831fbeeef8a7321887527ec6fc1ef218546a32"
-  },
   "composer/SemanticResultFormats": {
     "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
     "remote": "master/braid/composer/SemanticResultFormats",
