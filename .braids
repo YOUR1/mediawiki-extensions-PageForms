@@ -63,14 +63,6 @@
     "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1",
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
-  "composerlibs/event-dispatcher": {
-    "url": "https://github.com/onoi/event-dispatcher.git",
-    "remote": "master/braid/composerlibs/event-dispatcher",
-    "branch": "master",
-    "squashed": true,
-    "revision": "2ab3958a7c6341451afe4c31503d00d423b30b64",
-    "lock": "2ab3958a7c6341451afe4c31503d00d423b30b64"
-  },
   "core/REL1_23": {
     "url": "https://git.wikimedia.org/git/mediawiki/core.git",
     "remote": "REL1_23/braid/core/REL1_23",
