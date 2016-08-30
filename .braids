@@ -60,8 +60,8 @@
     "remote": "REL1_23/braid/core/REL1_23",
     "branch": "REL1_23",
     "squashed": true,
-    "revision": "f05a87cc536c5e74dc15d57c6da5244d70d37aaa",
-    "lock": "f05a87cc536c5e74dc15d57c6da5244d70d37aaa"
+    "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
+    "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
   "extensions/AdminLinks": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
