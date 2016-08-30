@@ -8,7 +8,7 @@
     "lock": "7898ab4be9bb0c52a547f8308a025f6876e8102f"
   },
   "composer/Lingo": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Lingo.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Lingo",
     "remote": "master/braid/composer/Lingo",
     "branch": "master",
     "squashed": true,
@@ -24,7 +24,7 @@
     "lock": "e3fd9793b89a30d8385969f76de37e1c637803e5"
   },
   "composer/SemanticGlossary": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticGlossary.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticGlossary",
     "remote": "master/braid/composer/SemanticGlossary",
     "branch": "master",
     "squashed": true,
@@ -56,7 +56,7 @@
     "lock": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
   },
   "core/REL1_23": {
-    "url": "https://git.wikimedia.org/git/mediawiki/core.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core",
     "remote": "REL1_23/braid/core/REL1_23",
     "branch": "REL1_23",
     "squashed": true,
@@ -64,7 +64,7 @@
     "lock": "fb64dc5803a8b92f0dc70a4f81cbe7260653abf4"
   },
   "extensions/AdminLinks": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/AdminLinks.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
     "remote": "master/braid/extensions/AdminLinks",
     "branch": "master",
     "squashed": true,
@@ -72,7 +72,7 @@
     "lock": "2619ed9beede0017f50ed08b20f6ea3a5200a838"
   },
   "extensions/ApprovedRevs": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ApprovedRevs.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ApprovedRevs",
     "remote": "master/braid/extensions/ApprovedRevs",
     "branch": "master",
     "squashed": true,
@@ -80,7 +80,7 @@
     "lock": "e81c80342fb60e537f33ee04ff0090b13f928875"
   },
   "extensions/Arrays": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Arrays.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Arrays",
     "remote": "master/braid/extensions/Arrays",
     "branch": "master",
     "squashed": true,
@@ -88,7 +88,7 @@
     "lock": "e484ab2dbbb29d56bf4329b97206f2cde0c6eafc"
   },
   "extensions/BreadCrumbs": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/BreadCrumbs.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs",
     "remote": "master/braid/extensions/BreadCrumbs",
     "branch": "master",
     "squashed": true,
@@ -96,7 +96,7 @@
     "lock": "22eebdcaaa165fd3896305b198d63416ccf78f75"
   },
   "extensions/BreadCrumbs2": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/BreadCrumbs2.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs2",
     "remote": "master/braid/extensions/BreadCrumbs2",
     "branch": "master",
     "squashed": true,
@@ -104,7 +104,7 @@
     "lock": "d1c8feb4568d49661839afece95a6bbbdbf0f96f"
   },
   "extensions/CategoryTree": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/CategoryTree.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree",
     "remote": "master/braid/extensions/CategoryTree",
     "branch": "master",
     "squashed": true,
@@ -112,7 +112,7 @@
     "lock": "8d7de84017d3f8efb6bfb5265665aa4907767cde"
   },
   "extensions/DataTransfer": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DataTransfer.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer",
     "remote": "master/braid/extensions/DataTransfer",
     "branch": "master",
     "squashed": true,
@@ -120,7 +120,7 @@
     "lock": "b6645aac78bcab8c8e8fe251e968adf643d609ba"
   },
   "extensions/DeleteBatch": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DeleteBatch.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DeleteBatch",
     "remote": "master/braid/extensions/DeleteBatch",
     "branch": "master",
     "squashed": true,
@@ -128,14 +128,14 @@
     "lock": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
   },
   "extensions/DynamicPageList": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/DynamicPageList.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DynamicPageList",
     "remote": "REL1_23/braid/extensions/DynamicPageList",
     "branch": "REL1_23",
     "squashed": true,
     "revision": "840a4a6048c42a31ac2020f588b54ffca571b833"
   },
   "extensions/ExternalData": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ExternalData.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ExternalData",
     "remote": "master/braid/extensions/ExternalData",
     "branch": "master",
     "squashed": true,
@@ -143,7 +143,7 @@
     "lock": "65d3ba94161710b28c7d386298735c9af39fa9d8"
   },
   "extensions/GoogleAnalytics": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/googleAnalytics.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/googleAnalytics",
     "remote": "master/braid/extensions/GoogleAnalytics",
     "branch": "master",
     "squashed": true,
@@ -151,7 +151,7 @@
     "lock": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323"
   },
   "extensions/HeaderTabs": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/HeaderTabs.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/HeaderTabs",
     "remote": "master/braid/extensions/HeaderTabs",
     "branch": "master",
     "squashed": true,
@@ -159,7 +159,7 @@
     "lock": "29d694f645ed21815c05299075eff73c8989a3eb"
   },
   "extensions/ImportUsers": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ImportUsers.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImportUsers",
     "remote": "master/braid/extensions/ImportUsers",
     "branch": "master",
     "squashed": true,
@@ -167,7 +167,7 @@
     "lock": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23"
   },
   "extensions/LinkedWiki": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/LinkedWiki.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LinkedWiki",
     "remote": "master/braid/extensions/LinkedWiki",
     "branch": "master",
     "squashed": true,
@@ -175,7 +175,7 @@
     "lock": "049afde999b819deb91c04f7c7908447e6c90ebb"
   },
   "extensions/LiquidThreads": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/LiquidThreads.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LiquidThreads",
     "remote": "master/braid/extensions/LiquidThreads",
     "branch": "master",
     "squashed": true,
@@ -191,7 +191,7 @@
     "lock": "c7625623c9db02ff81900ba5e8abedb209dfd76b"
   },
   "extensions/MagicNoCache": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/MagicNoCache.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MagicNoCache",
     "remote": "master/braid/extensions/MagicNoCache",
     "branch": "master",
     "squashed": true,
@@ -199,7 +199,7 @@
     "lock": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e"
   },
   "extensions/MediaFunctions": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/MediaFunctions.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MediaFunctions",
     "remote": "master/braid/extensions/MediaFunctions",
     "branch": "master",
     "squashed": true,
@@ -207,7 +207,7 @@
     "lock": "5e142961d53332162e339c8573a8da6eb5032491"
   },
   "extensions/MyVariables": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/MyVariables.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MyVariables",
     "remote": "master/braid/extensions/MyVariables",
     "branch": "master",
     "squashed": true,
@@ -215,7 +215,7 @@
     "lock": "499d2ee92acbf102d8b487738731f704d6c38f93"
   },
   "extensions/PdfBook": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/PdfBook.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfBook",
     "remote": "master/braid/extensions/PdfBook",
     "branch": "master",
     "squashed": true,
@@ -223,7 +223,7 @@
     "lock": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb"
   },
   "extensions/ReplaceText": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/ReplaceText.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ReplaceText",
     "remote": "master/braid/extensions/ReplaceText",
     "branch": "master",
     "squashed": true,
@@ -231,7 +231,7 @@
     "lock": "d1805b8abbac0ef0b1812a1e17a939b06e3e0868"
   },
   "extensions/SemanticCompoundQueries": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticCompoundQueries",
     "remote": "master/braid/extensions/SemanticCompoundQueries",
     "branch": "master",
     "squashed": true,
@@ -247,7 +247,7 @@
     "lock": "17612a323170e268b72c5bbd5bed7ff1a3930526"
   },
   "extensions/SemanticForms": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticForms",
     "remote": "master/braid/extensions/SemanticForms",
     "branch": "master",
     "squashed": true,
@@ -255,7 +255,7 @@
     "lock": "e0f15961c5479413d99b5bbc50609a3a9ef7da8f"
   },
   "extensions/SemanticFormsInputs": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticFormsInputs.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticFormsInputs",
     "remote": "master/braid/extensions/SemanticFormsInputs",
     "branch": "master",
     "squashed": true,
@@ -271,7 +271,7 @@
     "lock": "1e936bd3c544e19ea435e1bb99041b8a7cb99522"
   },
   "extensions/SemanticTitle": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/SemanticTitle.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticTitle",
     "remote": "master/braid/extensions/SemanticTitle",
     "branch": "master",
     "squashed": true,
@@ -279,7 +279,7 @@
     "lock": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108"
   },
   "extensions/UrlGetParameters": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/UrlGetParameters.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UrlGetParameters",
     "remote": "master/braid/extensions/UrlGetParameters",
     "branch": "master",
     "squashed": true,
@@ -287,7 +287,7 @@
     "lock": "c18937c6c62afad5f1fee09a91507d27be897433"
   },
   "extensions/UserMerge": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/UserMerge.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UserMerge",
     "remote": "master/braid/extensions/UserMerge",
     "branch": "master",
     "squashed": true,
@@ -295,7 +295,7 @@
     "lock": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2"
   },
   "extensions/Variables": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Variables.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Variables",
     "remote": "master/braid/extensions/Variables",
     "branch": "master",
     "squashed": true,
@@ -303,7 +303,7 @@
     "lock": "d8bca97c9b111ee724faca7644b66da410a90031"
   },
   "extensions/Widgets": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/Widgets.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets",
     "remote": "master/braid/extensions/Widgets",
     "branch": "master",
     "squashed": true,
