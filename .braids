@@ -44,8 +44,8 @@
     "remote": "master/braid/composer/SemanticResultFormats",
     "branch": "master",
     "squashed": true,
-    "revision": "885e76ed60d9df401bf01ed10598f29f212f70bc",
-    "lock": "885e76ed60d9df401bf01ed10598f29f212f70bc"
+    "revision": "986366a3cbcff524a5317aa0c7c8c052b7cc94a1",
+    "lock": "986366a3cbcff524a5317aa0c7c8c052b7cc94a1"
   },
   "composer/Validator": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Validator",
