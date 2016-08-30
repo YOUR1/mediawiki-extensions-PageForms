@@ -1,6 +1,6 @@
 {
   "composer/GraphViz": {
-    "url": "https://git.wikimedia.org/git/mediawiki/extensions/GraphViz.git",
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/GraphViz",
     "remote": "master/braid/composer/GraphViz",
     "branch": "master",
     "squashed": true,
