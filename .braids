@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/ImageMap": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/ImageMap",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "abe93ef762ee834323c33b7299eae6671194de9b"
+  },
   "core/REL1_27/extensions/InputBox": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/InputBox",
