@@ -70,6 +70,13 @@
     "squashed": true,
     "revision": "2bac17fe8090a831a5f35bc750456eca615d3b00"
   },
+  "core/REL1_27/extensions/Cite": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/Cite",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
+  },
   "extensions/AdminLinks": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
     "remote": "master/braid/extensions/AdminLinks",
