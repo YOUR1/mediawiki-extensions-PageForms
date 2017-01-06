@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/Poem": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/Poem",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "b88932ae11d24fced28d05946c5a1cd98e2f2696"
+  },
   "core/REL1_23/extensions/Renameuser": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/Renameuser",
