@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/Gadgets": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/Gadgets",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "90ba2f4c3502004576305f576831ad7ebfeb4c9a"
+  },
   "core/REL1_23/extensions/ImageMap": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/ImageMap",
