@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/ConfirmEdit": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/ConfirmEdit",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "92652aa032f48015e87d51aa28b760d3f014c3f9"
+  },
   "core/REL1_27/extensions/Gadgets": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/Gadgets",
