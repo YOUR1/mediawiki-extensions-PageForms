@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/WikiEditor": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/WikiEditor",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "3f6ac7ca6b30aff241b797718ba06bb951ab5e2c"
+  },
   "core/REL1_27": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core.git",
     "remote": "REL1_27/braid/core/REL1_27",
