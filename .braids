@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/Nuke": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/Nuke",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "074358412a16947da490395ec5486614591208eb"
+  },
   "core/REL1_27/extensions/ParserFunctions": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/ParserFunctions",
