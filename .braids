@@ -294,6 +294,13 @@
     "squashed": true,
     "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
   },
+  "core/REL1_27/skins/MonoBook": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
+    "remote": "REL1_27/braid/core/REL1_27/skins/MonoBook",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "f29c8481ed82764ddaa8f8c1b8ebb3d8aa88973e"
+  },
   "core/REL1_27/skins/Vector": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
     "remote": "REL1_27/braid/core/REL1_27/skins/Vector",
