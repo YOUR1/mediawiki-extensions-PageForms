@@ -294,6 +294,13 @@
     "squashed": true,
     "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
   },
+  "core/REL1_27/skins/Vector": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
+    "remote": "REL1_27/braid/core/REL1_27/skins/Vector",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "d11a80a1f68784a12804cd97436499fb729e3764"
+  },
   "extensions/AdminLinks": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
     "remote": "master/braid/extensions/AdminLinks",
