@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/SpamBlacklist": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/SpamBlacklist",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "c8992f0d0e163a0b16593a6eddef47e8dcc47b0d"
+  },
   "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/SyntaxHighlight_GeSHi",
