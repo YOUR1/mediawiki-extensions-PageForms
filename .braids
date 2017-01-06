@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/ParserFunctions": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/ParserFunctions",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "d0a5d10aaf44553956b5cb3da70a13d121904aad"
+  },
   "core/REL1_27/extensions/PdfHandler": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/PdfHandler",
