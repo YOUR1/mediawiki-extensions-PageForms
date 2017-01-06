@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/PdfHandler": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/PdfHandler",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
+  },
   "core/REL1_27/extensions/Poem": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/Poem",
