@@ -1,9 +1,0 @@
-{
-  "core/REL1_27/extensions/WikiEditor": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
-    "remote": "REL1_27/braid/core/REL1_27/extensions/WikiEditor",
-    "branch": "REL1_27",
-    "squashed": true,
-    "revision": "f2ef921a7e6c43307d320ea005c98658e225a2c1"
-  }
-}
