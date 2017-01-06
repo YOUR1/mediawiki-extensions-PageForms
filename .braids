@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/PdfHandler": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/PdfHandler",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "1f357d3c7ac572e3d9461644e6deee0148f9610e"
+  },
   "core/REL1_23/extensions/Poem": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/Poem",
