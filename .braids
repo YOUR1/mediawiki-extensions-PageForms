@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/InputBox": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/InputBox",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "b02a22828be5771b7042a3fc46af472ce057bcad"
+  },
   "core/REL1_27/extensions/Interwiki": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/Interwiki",
