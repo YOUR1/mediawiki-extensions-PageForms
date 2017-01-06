@@ -175,6 +175,13 @@
     "squashed": true,
     "revision": "3f6ac7ca6b30aff241b797718ba06bb951ab5e2c"
   },
+  "core/REL1_23/skins/Vector": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
+    "remote": "REL1_23/braid/core/REL1_23/skins/Vector",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "361d9d9cfcba716dbf90af62cc398e51d4c303b8"
+  },
   "core/REL1_27": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core.git",
     "remote": "REL1_27/braid/core/REL1_27",
