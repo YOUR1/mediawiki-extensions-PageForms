@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/Poem": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/Poem",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
+  },
   "core/REL1_27/extensions/Renameuser": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/Renameuser",
