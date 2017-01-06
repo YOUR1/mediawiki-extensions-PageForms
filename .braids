@@ -294,6 +294,13 @@
     "squashed": true,
     "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
   },
+  "core/REL1_27/skins/CologneBlue": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
+    "remote": "REL1_27/braid/core/REL1_27/skins/CologneBlue",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "8932b44bfc96f9e7f74e230c36f0f0cea879bf72"
+  },
   "core/REL1_27/skins/Modern": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git",
     "remote": "REL1_27/braid/core/REL1_27/skins/Modern",
