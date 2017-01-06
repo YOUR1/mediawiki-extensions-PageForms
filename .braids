@@ -77,6 +77,13 @@
     "squashed": true,
     "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
   },
+  "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
+    "remote": "REL1_27/braid/core/REL1_27/extensions/SyntaxHighlight_GeSHi",
+    "branch": "REL1_27",
+    "squashed": true,
+    "revision": "20c4ad51e37d2a1ea11ed00c0b9d8b5cc3d913a0"
+  },
   "core/REL1_27/extensions/TitleBlacklist": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
     "remote": "REL1_27/braid/core/REL1_27/extensions/TitleBlacklist",
