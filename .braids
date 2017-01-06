@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/Interwiki": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/Interwiki",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "f9ed98e6bb52f527e448d1aa1b7ae87b649a0c50"
+  },
   "core/REL1_23/extensions/LocalisationUpdate": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/LocalisationUpdate",
