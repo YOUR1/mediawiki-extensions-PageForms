@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/LocalisationUpdate": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/LocalisationUpdate",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "6fcdea6c6036580ae71ea3dc43469f0312685769"
+  },
   "core/REL1_23/extensions/Nuke": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/Nuke",
