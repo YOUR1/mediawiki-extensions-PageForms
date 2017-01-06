@@ -63,6 +63,13 @@
     "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6",
     "lock": "49aff6403bb75ab69baaa369ce87920333ba59d6"
   },
+  "core/REL1_23/extensions/Renameuser": {
+    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
+    "remote": "REL1_23/braid/core/REL1_23/extensions/Renameuser",
+    "branch": "REL1_23",
+    "squashed": true,
+    "revision": "a5cd087f6e43bf19cf1ae204cf32cfab2d9ffd64"
+  },
   "core/REL1_23/extensions/SpamBlacklist": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
     "remote": "REL1_23/braid/core/REL1_23/extensions/SpamBlacklist",
