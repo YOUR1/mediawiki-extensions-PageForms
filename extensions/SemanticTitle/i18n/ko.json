@@ -2,8 +2,10 @@
 	"@metadata": {
 		"authors": [
 			"Freebiekr",
-			"아라"
+			"아라",
+			"Revi"
 		]
 	},
-	"semantictitle-desc": "보이는 문서 제목을 시맨틱 속성 값으로 설정합니다"
+	"semantictitle-desc": "보이는 문서 제목을 시맨틱 속성 값으로 설정합니다",
+	"semantictitle-talkpagetitle": "$1 토론하기"
 }

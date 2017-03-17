@@ -1,8 +1,10 @@
 {
 	"@metadata": {
 		"authors": [
-			"Siebrand"
+			"Siebrand",
+			"Rcdeboer"
 		]
 	},
-	"semantictitle-desc": "Stel de zichtbare paginanaam in op de waarde van een semantische eigenschap"
+	"semantictitle-desc": "Stel de zichtbare paginanaam in op de waarde van een semantische eigenschap",
+	"semantictitle-talkpagetitle": "Bespreek $1"
 }
