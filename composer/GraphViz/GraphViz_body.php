@@ -1839,6 +1839,11 @@ class GraphViz {
 		
 		// replace image names with image locations
 		foreach ($images as $imageName => $imageLocation) {
+			
+			if(is_array($imageLocation)) {
+				$imageLocation = reset($imageLocation);
+			}
+			
 			$find = 'image="' . $imageName . '"';
 			$replace = 'image="' . $imageLocation . '"';
 			$input = str_replace($find, $replace, $input);
