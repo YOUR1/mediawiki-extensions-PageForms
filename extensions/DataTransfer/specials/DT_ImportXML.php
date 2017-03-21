@@ -5,14 +5,17 @@
  * @author Yaron Koren
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) die();
-
 class DTImportXML extends SpecialPage {
+
 	/**
 	 * Constructor
 	 */
-	public function DTImportXML() {
-		parent::__construct( 'ImportXML' );
+	public function __construct( $name = 'ImportXML' ) {
+		parent::__construct( $name );
+	}
+
+	public function doesWrites() {
+		return true;
 	}
 
 	function execute( $query ) {
