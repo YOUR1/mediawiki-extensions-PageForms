@@ -15,12 +15,12 @@ $magicWords['ar'] = array(
 	'widget' => array( 0, 'ودجة' ),
 );
 
-/** Egyptian Spoken Arabic (مصرى) */
+/** Egyptian Arabic (مصرى) */
 $magicWords['arz'] = array(
 	'widget' => array( 0, 'ودجة' ),
 );
 
-/** South Azerbaijani (تورکجه) */
+/** South Azerbaijani (تۆرکجه) */
 $magicWords['azb'] = array(
 	'widget' => array( 0, 'آراجلار' ),
 );
@@ -28,6 +28,11 @@ $magicWords['azb'] = array(
 /** Chechen (нохчийн) */
 $magicWords['ce'] = array(
 	'widget' => array( 0, 'тӀехьажар', 'виджет' ),
+);
+
+/** Chuvash (Чӑвашла) */
+$magicWords['cv'] = array(
+	'widget' => array( 0, 'widget' ),
 );
 
 /** German (Deutsch) */
@@ -60,7 +65,7 @@ $magicWords['fr'] = array(
 	'widget' => array( 0, 'widget' ),
 );
 
-/** Goan Konkani (Devanagari script) (कोंकणी) */
+/** Goan Konkani (Devanagari script) (गोवा कोंकणी) */
 $magicWords['gom-deva'] = array(
 	'widget' => array( 0, 'विसाधन' ),
 );
