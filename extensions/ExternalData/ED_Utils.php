@@ -193,10 +193,9 @@ END;
 				return wfMessage( "externaldata-db-incomplete-information" )->text();
 			}
 		} else {
-			// We don't check the password because it could
-			// legitimately be blank or null.
-			if ( $db_server == '' || $db_name == '' ||
-				$db_username == '' ) {
+			// We don't check the username or password because they
+			// could legitimately be blank or null.
+			if ( $db_server == '' || $db_name == '' ) {
 				return wfMessage( "externaldata-db-incomplete-information" )->text();
 			}
 		}
@@ -467,8 +466,13 @@ END;
 	static function searchDB( $db, $table, $vars, $conds, $sqlOptions ) {
 		// Add on a space at the beginning of $table so that
 		// $db->select() will treat it as a literal, instead of
-		// putting quotes around it or otherwise trying to parse it.
-		$table = ' ' . $table;
+		// putting quotes around it or otherwise trying to parse it,
+		// so that aliases like "users u" will be accepted.
+		// However, if a table prefix has been set, we need it added,
+		// so don't make it a literal in that case.
+		if ( $db->tablePrefix() == '' ) {
+			$table = ' ' . $table;
+		}
 		$result = $db->select( $table, $vars, $conds, 'EDUtils::searchDB', $sqlOptions );
 		if ( !$result ) {
 			return wfMessage( "externaldata-db-invalid-query" )->text();
@@ -557,13 +561,20 @@ END;
 			if ( !$nodes ) {
 				continue;
 			}
+
+			// Convert from SimpleXMLElement to string.
+			$nodesArray = array();
+			foreach ( $nodes as $xmlNode ) {
+				$nodesArray[] = (string)$xmlNode;
+			}
+
 			if ( array_key_exists( $xpath, $edgXMLValues ) ) {
 				// At the moment, this code will never get
 				// called, because duplicate values in
 				// $mappings will have been removed already.
-				$edgXMLValues[$xpath] = array_merge( $edgXMLValues[$xpath], (array)$nodes );
+				$edgXMLValues[$xpath] = array_merge( $edgXMLValues[$xpath], $nodesArray );
 			} else {
-				$edgXMLValues[$xpath] = (array)$nodes;
+				$edgXMLValues[$xpath] = $nodesArray;
 			}
 		}
 		return $edgXMLValues;
