@@ -5,7 +5,9 @@
  * @author Yaron Koren
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) die();
+if ( !defined( 'MEDIAWIKI' ) ) {
+	die();
+}
 
 // credits
 $GLOBALS['wgExtensionCredits']['specialpage'][] = array(
@@ -15,12 +17,13 @@ $GLOBALS['wgExtensionCredits']['specialpage'][] = array(
 	'author' => 'Yaron Koren',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:Admin_Links',
 	'descriptionmsg' => 'adminlinks-desc',
+	'license-name' => 'GPL-2.0+'
 );
 
 $GLOBALS['wgAdminLinksIP'] = __DIR__ . '/';
 $GLOBALS['wgMessagesDirs']['AdminLinks'] = __DIR__ . '/i18n';
-$GLOBALS['wgExtensionMessagesFiles']['AdminLinks'] = $GLOBALS['wgAdminLinksIP'] . 'AdminLinks.i18n.php';
-$GLOBALS['wgExtensionMessagesFiles']['AdminLinksAlias'] = $GLOBALS['wgAdminLinksIP'] . 'AdminLinks.alias.php';
+$GLOBALS['wgExtensionMessagesFiles']['AdminLinksAlias'] =
+	$GLOBALS['wgAdminLinksIP'] . 'AdminLinks.alias.php';
 $GLOBALS['wgSpecialPages']['AdminLinks'] = 'AdminLinks';
 $GLOBALS['wgHooks']['PersonalUrls'][] = 'AdminLinks::addURLToUserLinks';
 $GLOBALS['wgAvailableRights'][] = 'adminlinks';

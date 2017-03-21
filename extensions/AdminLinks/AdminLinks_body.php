@@ -74,7 +74,7 @@ class AdminLinks extends SpecialPage {
 	function execute( $query ) {
 		$this->setHeaders();
 		$admin_links_tree = $this->createInitialTree();
-		wfRunHooks( 'AdminLinks', array( &$admin_links_tree ) );
+		Hooks::run( 'AdminLinks', array( &$admin_links_tree ) );
 		global $wgOut;
 		if ( method_exists( $wgOut, 'addModuleStyles' ) &&
 			!is_null( $wgOut->getResourceLoader()->getModule( 'mediawiki.special' ) ) ) {
@@ -118,7 +118,8 @@ class AdminLinks extends SpecialPage {
 			array_splice( $tab_values, $prefs_location, 0, array( $admin_links_vals ) );
 
 			$personal_urls = array();
-			for ( $i = 0; $i < count( $tab_keys ); $i++ ) {
+			$tabKeysCount = count( $tab_keys );
+			for ( $i = 0; $i < $tabKeysCount; $i++ ) {
 				$personal_urls[$tab_keys[$i]] = $tab_values[$i];
 			}
 		}
@@ -248,8 +249,9 @@ class ALRow {
 	function toString() {
 		$text = "	<p>\n";
 		foreach ( $this->items as $i => $item ) {
-			if ( $i > 0 )
+			if ( $i > 0 ) {
 				$text .= " ·\n";
+			}
 			$text .= '		' . $item->text;
 		}
 		return $text . "\n	</p>\n";
@@ -279,11 +281,17 @@ class ALItem {
 	}
 
 	static function newFromSpecialPage( $page_name ) {
+		global $wgOut;
 		$item = new ALItem();
 		$item->label = $page_name;
 		$page = SpecialPageFactory::getPage( $page_name );
-		$item->text = Linker::linkKnown( $page->getTitle(),
-			htmlspecialchars( $page->getDescription() ) );
+		if ( $page ) {
+			$item->text = Linker::linkKnown( $page->getTitle(),
+				htmlspecialchars( $page->getDescription() ) );
+		} else {
+			$wgOut->addHTML( "<span class=\"error\">" .
+			    wfMessage( 'adminlinks_pagenotfound', $page_name )->escaped() . "<br></span>" );
+		}
 		return $item;
 	}
 
