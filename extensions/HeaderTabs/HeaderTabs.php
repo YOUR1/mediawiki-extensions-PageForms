@@ -10,42 +10,63 @@
  * @author Olivier Finlay Beaton
  */
 
-$htScriptPath = $wgScriptPath . '/extensions/HeaderTabs';
+// Protect against entries
+if ( !defined( 'MEDIAWIKI' ) ) {
+	die();
+}
 
-$dir = dirname( __FILE__ );
+// Allow exension registration mechanism
+if ( function_exists( 'wfLoadExtension' ) ) {
+        wfLoadExtension( 'HeaderTabs' );
+        // Keep i18n globals so mergeMessageFileList.php doesn't break
+	$wgMessagesDirs['HeaderTabs'] = __DIR__ . '/i18n';
+	$wgExtensionMessagesFiles['HeaderTabsMagic'] = __DIR__ . '/HeaderTabs.i18n.magic.php';
+        /* wfWarn(
+                'Deprecated PHP entry point used for Semanti Forms extension. Please use wfLoadExtension instead, ' .
+                'see https://www.mediawiki.org/wiki/Extension_registration for more details.'
+        ); */
+        return;
+}
 
+// Show extension credits
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
 	'name' => 'Header Tabs',
 	'descriptionmsg' => 'headertabs-desc',
-	'version' => '1.0.2',
-	'author' => array( '[http://www.sergeychernyshev.com Sergey Chernyshev]', 'Yaron Koren', '[http://olivierbeaton.com Olivier Finlay Beaton]' ),
-	'url' => 'https://www.mediawiki.org/wiki/Extension:Header_Tabs'
+	'version' => '1.1',
+	'author' => array(
+		'[http://www.sergeychernyshev.com Sergey Chernyshev]',
+		'Yaron Koren',
+		'[http://olivierbeaton.com Olivier Finlay Beaton]',
+		'...'
+	),
+	'url' => 'https://www.mediawiki.org/wiki/Extension:Header_Tabs',
+	'license-name' => 'GPL-2.0+'
 );
 
 // Translations
 $wgMessagesDirs['HeaderTabs'] = __DIR__ . '/i18n';
-$wgExtensionMessagesFiles['HeaderTabs'] = $dir . '/HeaderTabs.i18n.php';
+$wgExtensionMessagesFiles['HeaderTabs'] = __DIR__ . '/HeaderTabs.i18n.php';
 
 //! @todo implement in tab parsing code instead... but problems like nowiki (2011-12-12, ofb)
 // if you make them here, it will be article wide instead of tab-wide
 // __NOTABTOC__, __TABTOC__, __NOEDITTAB__
 // and one day with a special page: __NEWTABLINK__, __NONEWTABLINK__
 // and one day if we can force toc generation: __FORCETABTOC__
-$wgExtensionMessagesFiles['HeaderTabsMagic'] = $dir . '/HeaderTabs.i18n.magic.php';
+$wgExtensionMessagesFiles['HeaderTabsMagic'] = __DIR__ . '/HeaderTabs.i18n.magic.php';
 
 // Config
-$htUseHistory = true;
-$htRenderSingleTab = false;
-$htAutomaticNamespaces = array();
-$htDefaultFirstTab = false;
-$htDisableDefaultToc = true;
-$htGenerateTabTocs = false;
-$htStyle = 'large';
-$htEditTabLink = true;
+$wgHeaderTabsUseHistory = true;
+$wgHeaderTabsRenderSingleTab = false;
+$wgHeaderTabsAutomaticNamespaces = array();
+$wgHeaderTabsDefaultFirstTab = false;
+$wgHeaderTabsDisableDefaultToc = true;
+$wgHeaderTabsGenerateTabTocs = false;
+$wgHeaderTabsStyle = 'large';
+$wgHeaderTabsEditTabLink = true;
 
 // Other variables
-$htTabIndexes = array();
+$wgHeaderTabsTabIndexes = array();
 
 // Extension:Configure
 if ( isset( $wgConfigureAdditionalExtensions ) && is_array( $wgConfigureAdditionalExtensions ) ) {
@@ -55,53 +76,43 @@ if ( isset( $wgConfigureAdditionalExtensions ) && is_array( $wgConfigureAddition
 	 * @since 2011-09-22, 0.2
 	 */
 	$wgConfigureAdditionalExtensions[] = array(
-			'name' => 'HeaderTabs',
-			'settings' => array(
-					'htUseHistory' => 'bool',
-					'htRenderSingleTab' => 'bool',
-					'htAutomaticNamespaces' => 'array',
-					'htDefaultFirstTab' => 'string',
-					'htDisableDefaultToc' => 'bool',
-					'htGenerateTabTocs' => 'bool',
-					'htStyle' => 'string',
-					'htEditTabLink' => 'bool',
-				),
-			'array' => array(
-					'htAutomaticNamespaces' => 'simple',
-				),
-			'schema' => false,
-			'url' => 'https://www.mediawiki.org/wiki/Extension:Header_Tabs',
-		);
+		'name' => 'HeaderTabs',
+		'settings' => array(
+			'wgHeaderTabsUseHistory' => 'bool',
+			'wgHeaderTabsRenderSingleTab' => 'bool',
+			'wgHeaderTabsAutomaticNamespaces' => 'array',
+			'wgHeaderTabsDefaultFirstTab' => 'string',
+			'wgHeaderTabsDisableDefaultToc' => 'bool',
+			'wgHeaderTabsGenerateTabTocs' => 'bool',
+			'wgHeaderTabsStyle' => 'string',
+			'wgHeaderTabsEditTabLink' => 'bool',
+		),
+		'array' => array(
+			'wgHeaderTabsAutomaticNamespaces' => 'simple',
+		),
+		'schema' => false,
+		'url' => 'https://www.mediawiki.org/wiki/Extension:Header_Tabs',
+	);
 
 } // $wgConfigureAdditionalExtensions exists
 
-$wgHooks['ParserFirstCallInit'][] = 'headerTabsParserFunctions';
-$wgHooks['BeforePageDisplay'][] = 'HeaderTabs::addHTMLHeader';
-$wgHooks['ParserAfterTidy'][] = 'HeaderTabs::replaceFirstLevelHeaders';
-$wgHooks['ResourceLoaderGetConfigVars'][] = 'HeaderTabs::addConfigVarsToJS';
-$wgHooks['MakeGlobalVariablesScript'][] = 'HeaderTabs::setGlobalJSVariables';
+// Register hooks
+$wgHooks['ParserFirstCallInit'][] = 'HeaderTabsHooks::registerParserFunctions';
+$wgHooks['BeforePageDisplay'][] = 'HeaderTabsHooks::addHTMLHeader';
+$wgHooks['ParserAfterTidy'][] = 'HeaderTabsHooks::replaceFirstLevelHeaders';
+$wgHooks['ResourceLoaderGetConfigVars'][] = 'HeaderTabsHooks::addConfigVarsToJS';
+$wgHooks['MakeGlobalVariablesScript'][] = 'HeaderTabsHooks::setGlobalJSVariables';
 
-$wgAutoloadClasses['HeaderTabs'] = "$dir/HeaderTabs_body.php";
+// Load classes
+$wgAutoloadClasses['HeaderTabsHooks'] = __DIR__ . '/HeaderTabs.hooks.php';
+$wgAutoloadClasses['HeaderTabs'] = __DIR__ . '/HeaderTabs_body.php';
 
+// Use modules
 $wgResourceModules['ext.headertabs'] = array(
-	// JavaScript and CSS styles. To combine multiple files, just list them as an array.
 	'scripts' => 'skins/ext.headertabs.core.js',
-	// 'styles' => // the style is added in HeaderTabs::addHTMLHeader
+	// 'styles' => // the style is added in HeaderTabsHooks::addHTMLHeader()
 
-	// If your scripts need code from other modules, list their identifiers as dependencies
-	// and ResourceLoader will make sure they're loaded before you.
-	// You don't need to manually list 'mediawiki' or 'jquery', which are always loaded.
 	'dependencies' => array( 'jquery.ui.tabs' ),
-
-	// ResourceLoader needs to know where your files are; specify your
-	// subdir relative to "/extensions" (or $wgExtensionAssetsPath)
-	'localBasePath' => dirname( __FILE__ ),
+	'localBasePath' => __DIR__,
 	'remoteExtPath' => 'HeaderTabs',
 );
-
-# Parser function to insert a link changing a tab.
-function headerTabsParserFunctions( $parser ) {
-	$parser->setHook( 'headertabs', array( 'HeaderTabs', 'tag' ) );
-	$parser->setFunctionHook( 'switchtablink', array( 'HeaderTabs', 'renderSwitchTabLink' ) );
-	return true;
-}

@@ -17,27 +17,15 @@ class HeaderTabs {
 		return '<div id="nomoretabs"></div>';
 	}
 
-	public static function replaceFirstLevelHeaders( &$parser, &$text ) {
+	public static function replaceFirstLevelHeaders( &$parser, &$text, $aboveandbelow ) {
 		global $wgVersion;
-		global $htRenderSingleTab, $htAutomaticNamespaces, $htDefaultFirstTab, $htDisableDefaultToc, $htGenerateTabTocs, $htStyle, $htEditTabLink;
-		global $htTabIndexes;
+		global $wgHeaderTabsRenderSingleTab, $wgHeaderTabsDefaultFirstTab,
+			$wgHeaderTabsDisableDefaultToc, $wgHeaderTabsGenerateTabTocs,
+			$wgHeaderTabsStyle, $wgHeaderTabsEditTabLink,
+			$wgHeaderTabsTabIndexes;
 
 		//! @todo handle __NOTABTOC__, __TABTOC__, __FORCETABTOC__ here (2011-12-12, ofb)
 
-		// Remove spans added if "auto-number headings" is enabled.
-		$simplifiedText = preg_replace( '/\<span class="mw-headline-number"\>\d*\<\/span\>/', '', $text );
-
-		// Where do we stop rendering tabs, and what is below it?
-		// if we don't have a stop point, then bail out
-		$aboveandbelow = explode( '<div id="nomoretabs"></div>', $simplifiedText, 2 );
-		if ( count( $aboveandbelow ) <= 1 ) {
-			if ( in_array( $parser->getTitle()->getNamespace(), $htAutomaticNamespaces ) === FALSE ) {
-				return true; // <headertabs/> tag is not found
-			} else {
-				// assume end of article is nomoretabs
-				$aboveandbelow[] = '';
-			}
-		}
 		$below = $aboveandbelow[1];
 
 		wfDebugLog('headertabs', __METHOD__.': detected header handling, checking');
@@ -86,9 +74,9 @@ class HeaderTabs {
 		$above = '';
 
 		// auto tab and the first thing isn't a header (note we already removed the default toc, add it back later if needed)
-		if ( $htDefaultFirstTab !== FALSE && $parts[0] !== '' ) {
+		if ( $wgHeaderTabsDefaultFirstTab !== FALSE && $parts[0] !== '' ) {
 			// add the default header
-			$headline = '<h1><span class="mw-headline" id="'.str_replace(' ', '_', $htDefaultFirstTab).'">'.$htDefaultFirstTab.'</span></h1>';
+			$headline = '<h1><span class="mw-headline" id="'.str_replace(' ', '_', $wgHeaderTabsDefaultFirstTab).'">'.$wgHeaderTabsDefaultFirstTab.'</span></h1>';
 			array_unshift( $parts, $headline );
 			$above = ''; // explicit
 		} else {
@@ -97,7 +85,7 @@ class HeaderTabs {
 			array_shift( $parts ); // don't need above part anyway
 		}
 
-		$partslimit = $htRenderSingleTab ? 2 : 4;
+		$partslimit = $wgHeaderTabsRenderSingleTab ? 2 : 4;
 
 		wfDebugLog('headertabs', __METHOD__.': parts (limit '.$partslimit.'): '.count($parts));
 		if ( $above !== '' ) {
@@ -111,7 +99,7 @@ class HeaderTabs {
 		wfDebugLog('headertabs', __METHOD__.': split count OK, continuing');
 
 		// disable default TOC
-		if ( $htDisableDefaultToc ) {
+		if ( $wgHeaderTabsDisableDefaultToc ) {
 			// if it was somewhere else, we need to remove it
 			if ( count( $tocmatches ) > 0 && $tocmatches[0][1] !== 0 ) {
 				wfDebugLog('headertabs', __METHOD__.': removed non-standard-pos TOC');
@@ -144,7 +132,7 @@ class HeaderTabs {
 			preg_match( $tabpatternmatch, $parts[$i * 2], $matches );
 
 			// if this is a default tab, don't increment our section number
-			if ( $s !== 0 || $i !== 0 || $htDefaultFirstTab === FALSE || $matches[3] !== $htDefaultFirstTab ) {
+			if ( $s !== 0 || $i !== 0 || $wgHeaderTabsDefaultFirstTab === FALSE || $matches[3] !== $wgHeaderTabsDefaultFirstTab ) {
 				++$s;
 			}
 
@@ -178,7 +166,7 @@ class HeaderTabs {
 			}
 
 			//! @todo handle __TOC__, __FORCETOC__, __NOTOC__ here (2011-12-12, ofb)
-			if ( $htGenerateTabTocs ) {
+			if ( $wgHeaderTabsGenerateTabTocs ) {
 				// really? that was it?
 				// maybe a better way then clone... formatHeadings changes properties on the parser which we don't want to do
 				// would be better to have a 'clean' parser so the tab was treated as a new page
@@ -234,13 +222,13 @@ class HeaderTabs {
 		wfDebugLog( 'headertabs', __METHOD__ . ': generated ' . count( $tabs ) . ' tabs' );
 
 		$tabhtml = '<div id="headertabs"';
-		if (!empty($htStyle) && $htStyle !== 'jquery') {
-			$tabhtml .= ' class="'.$htStyle.'"';
+		if (!empty($wgHeaderTabsStyle) && $wgHeaderTabsStyle !== 'jquery') {
+			$tabhtml .= ' class="'.$wgHeaderTabsStyle.'"';
 		}
 		$tabhtml .= '>';
 
 		//! @todo handle __NOEDITTAB__ here (2011-12-12, ofb)
-		if ( $htEditTabLink ) {
+		if ( $wgHeaderTabsEditTabLink ) {
 			$tabhtml .= '<span class="ht-editsection" id="edittab">[<a href="" title="'.wfMessage('headertabs-edittab-hint')->text().'">'.wfMessage('headertabs-edittab')->text().'</a>]</span>';
 		}
 
@@ -269,40 +257,11 @@ class HeaderTabs {
 
 		$text = $above . $tabhtml . $below;
 
-		$parser->getOutput()->addHeadItem(HTML::inlineScript( 'document.styleSheets[0].insertRule?document.styleSheets[0].insertRule(".unselected {display:none;}", 0):document.styleSheets[0].addRule(".unselected", "display:none");' ), true );
+		$parser->getOutput()->addHeadItem(Html::inlineScript( 'document.styleSheets[0].insertRule?document.styleSheets[0].insertRule(".unselected {display:none;}", 0):document.styleSheets[0].addRule(".unselected", "display:none");' ), true );
 
 		foreach ( $tabs as $i => $tab ) {
 			$tabTitle = str_replace( ' ', '_', $tab['title'] );
-			$htTabIndexes[$tabTitle] = $i;
-		}
-
-		return true;
-	}
-
-	public static function addConfigVarsToJS( &$vars ) {
-		global $htUseHistory, $htEditTabLink;
-
-		$vars['htUseHistory'] = $htUseHistory;
-		$vars['htEditTabLink'] = $htEditTabLink;
-
-		return true;
-	}
-
-	/**
-	 * @param $out OutputPage
-	 * @return bool
-	 */
-	public static function addHTMLHeader( &$out ) {
-		global $htScriptPath, $htStyle;
-
-		//! @todo we might be able to only load our js and styles if we are rendering tabs, speeding up pages that don't use it? but what about cached pages? (2011-12-12, ofb)
-
-		$out->addModules( 'ext.headertabs' );
-
-		// Add the CSS file for the specified style.
-		if ( !empty( $htStyle ) && $htStyle !== 'jquery' ) {
-			$styleFile = $htScriptPath . '/skins/ext.headertabs.' . $htStyle . '.css';
-			$out->addExtensionStyle( $styleFile );
+			$wgHeaderTabsTabIndexes[$tabTitle] = $i;
 		}
 
 		return true;
@@ -329,9 +288,4 @@ class HeaderTabs {
 		return $parser->insertStripItem( $output, $parser->mStripState );
 	}
 
-	static function setGlobalJSVariables( &$vars ) {
-		global $htTabIndexes;
-		$vars['htTabIndexes'] = $htTabIndexes;
-		return true;
-	}
 }

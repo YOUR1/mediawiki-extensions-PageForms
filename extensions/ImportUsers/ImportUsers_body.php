@@ -15,6 +15,10 @@ class SpecialImportUsers extends SpecialPage {
 		parent::__construct( 'ImportUsers', 'import_users' );
 	}
 
+	public function doesWrites() {
+		return true;
+	}
+
 	/**
 	 * Show the special page
 	 *
@@ -24,8 +28,7 @@ class SpecialImportUsers extends SpecialPage {
 		global $wgOut, $wgUser;
 
 		if( !$wgUser->isAllowed( 'import_users' ) ) {
-			$wgOut->permissionRequired( 'import_users' );
-			return;
+			throw new PermissionsError( 'import_users' );
 		}
 
 		$this->setHeaders();
@@ -153,7 +156,7 @@ class SpecialImportUsers extends SpecialPage {
 
 		$output .= '<br /><b>' . wfMessage( 'importusers-log-summary' )->text() . '</b><br />';
 		$output .= wfMessage( 'importusers-log-summary-all', $summary['all'] )->text() . '<br />';
-		$output .= wfMessage( 'importusers-log-summary-added', $summary['added'] )->text() . '<br />';
+		$output .= wfMessage( 'importusers-log-summary-added', $summary['added'], $newuserarray[0] )->text() . '<br />';
 		$output .= wfMessage( 'importusers-log-summary-updated', $summary['updated'] )->text() . '<br />';
 
 		return $output;
