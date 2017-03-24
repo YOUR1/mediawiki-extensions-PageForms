@@ -23,6 +23,14 @@
     "revision": "e3fd9793b89a30d8385969f76de37e1c637803e5",
     "lock": "e3fd9793b89a30d8385969f76de37e1c637803e5"
   },
+  "composer/SemanticCompoundQueries": {
+    "url": "git@github.com:SemanticMediaWiki/SemanticCompoundQueries.git",
+    "remote": "master/braid/composer/SemanticCompoundQueries",
+    "branch": "master",
+    "squashed": true,
+    "revision": "2c7221496a565e08947e68a7617fbd3054fe637b",
+    "lock": "2c7221496a565e08947e68a7617fbd3054fe637b"
+  },
   "composer/SemanticGlossary": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticGlossary",
     "remote": "master/braid/composer/SemanticGlossary",
