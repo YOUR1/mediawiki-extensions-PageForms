@@ -409,6 +409,14 @@
     "revision": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0",
     "lock": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
   },
+  "extensions/DisplayTitle": {
+    "url": "git@github.com:wikimedia/mediawiki-extensions-DisplayTitle.git",
+    "remote": "master/braid/extensions/DisplayTitle",
+    "branch": "master",
+    "squashed": true,
+    "revision": "b4c092c4d4f8787b672b8057c32b4b82fbc036a9",
+    "lock": "b4c092c4d4f8787b672b8057c32b4b82fbc036a9"
+  },
   "extensions/DynamicPageList": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DynamicPageList",
     "remote": "REL1_23/braid/extensions/DynamicPageList",
