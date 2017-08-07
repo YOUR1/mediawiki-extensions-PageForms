@@ -284,6 +284,10 @@
     "branch": "master",
     "revision": "b4c092c4d4f8787b672b8057c32b4b82fbc036a9"
   },
+  "extensions/DynamicPageList": {
+    "url": "https://github.com/Alexia/DynamicPageList.git",
+    "revision": "559e5cec1fd620ba1aebecc5a538426f8b72a736"
+  },
   "extensions/ExternalData": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ExternalData",
     "branch": "master",
