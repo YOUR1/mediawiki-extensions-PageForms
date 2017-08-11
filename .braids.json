@@ -256,8 +256,7 @@
   },
   "extensions/BreadCrumbs": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs",
-    "branch": "master",
-    "revision": "dd00a1fdfed7b17c0e2fd9d65f3a2f60e1e2833c"
+    "revision": "0657677e3f585ab5c7e357214c2b55e7e0f4561b"
   },
   "extensions/BreadCrumbs2": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs2",

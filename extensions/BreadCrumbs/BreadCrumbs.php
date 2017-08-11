@@ -10,7 +10,7 @@
  * @package MediaWiki
  * @author Manuel Schneider <manuel.schneider@wikimedia.ch>, Tony Boyles <ABoyles@milcord.com>
  * @copyright © 2007 by Manuel Schneider, 2012 by Tony Boyles, Milcord llc
- * @license https://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
+ * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
 if ( !defined( 'MEDIAWIKI' ) ) {
@@ -23,11 +23,10 @@ $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'BreadCrumbs',
 	'descriptionmsg' => 'breadcrumbs-desc',
-	'version' => '0.5.0',
+	'version' => '0.4.1',
 	'author' => array(
 		'Manuel Schneider',
-		'Tony Boyles',
-		'...'
+		'[http://milcord.com Tony Boyles, Milcord llc]'
 	),
 	'url' => 'https://www.mediawiki.org/wiki/Extension:BreadCrumbs',
 	'license-name' => 'GPL-2.0+'
@@ -84,6 +83,7 @@ $wgHooks['GetPreferences'][] = 'fnBreadCrumbsAddPreferences';
 
 # Register the internationalization file
 $wgMessagesDirs['Breadcrumbs'] = __DIR__ . '/i18n';
+$wgExtensionMessagesFiles['Breadcrumbs'] = __DIR__ . '/BreadCrumbs.i18n.php';
 
 # Load the file containing the hook functions:
 require_once( 'BreadCrumbsFunctions.php' );
