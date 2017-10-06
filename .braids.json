@@ -297,6 +297,10 @@
     "branch": "master",
     "revision": "65d3ba94161710b28c7d386298735c9af39fa9d8"
   },
+  "extensions/Flow": {
+    "url": "git@github.com:wikimedia/mediawiki-extensions-Flow.git",
+    "revision": "6ecdef3a156fbf454e308b6377f5253059312075"
+  },
   "extensions/GoogleAnalytics": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/googleAnalytics",
     "branch": "master",
