@@ -1,8 +1,7 @@
 {
   "composer/GraphViz": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/GraphViz",
-    "branch": "master",
-    "revision": "7898ab4be9bb0c52a547f8308a025f6876e8102f"
+    "revision": "6281429ecbe5cbd9e45390e6d2c4c4ca06a9a209"
   },
   "composer/Lingo": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Lingo",
