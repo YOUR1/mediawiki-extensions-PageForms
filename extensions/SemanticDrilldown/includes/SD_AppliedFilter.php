@@ -21,7 +21,10 @@ class SDAppliedFilter {
 		if ( $search_terms != null ) {
 			$af->search_terms = array();
 			foreach( $search_terms as $search_term ) {
-				$af->search_terms[] = htmlspecialchars( str_replace( '_', ' ', $search_term ) );
+				$search_term = htmlspecialchars( str_replace( '_', ' ', $search_term ) );
+				// Ampersands need to be restored - hopefully
+				// this is safe.
+				$af->search_terms[] = str_replace( '&amp;', '&', $search_term );
 			}
 		}
 		if ( $lower_date != null ) {
@@ -48,6 +51,7 @@ class SDAppliedFilter {
 	 */
 	function checkSQL( $value_field ) {
 		global $wgDBtype;
+
 		$sql = "(";
 		$dbr = wfGetDB( DB_SLAVE );
 		if ( $this->search_terms != null ) {
@@ -103,16 +107,15 @@ class SDAppliedFilter {
 				elseif ( $fv->upper_limit )
 					$sql .= "$value_field < {$fv->upper_limit} ";
 			} elseif ( $this->filter->property_type == 'date' ) {
-				$date_field = $this->filter->getDateField();
+				list( $yearValue, $monthValue, $dayValue ) = SDUtils::getDateFunctions( $value_field );	
 				if ( $fv->time_period == 'day' ) {
-					$sql .= "YEAR($date_field) = {$fv->year} AND MONTH($date_field) = {$fv->month} AND DAYOFMONTH($date_field) = {$fv->day} ";
+					$sql .= "$yearValue = {$fv->year} AND $monthValue = {$fv->month} AND $dayValue = {$fv->day} ";
 				} elseif ( $fv->time_period == 'month' ) {
-					$sql .= "YEAR($date_field) = {$fv->year} AND MONTH($date_field) = {$fv->month} ";
+					$sql .= "$yearValue = {$fv->year} AND $monthValue = {$fv->month} ";
 				} elseif ( $fv->time_period == 'year' ) {
-					$sql .= "YEAR($date_field) = {$fv->year} ";
+					$sql .= "$yearValue = {$fv->year} ";
 				} else { // if ( $fv->time_period == 'year range' ) {
-					$sql .= "YEAR($date_field) >= {$fv->year} ";
-					$sql .= "AND YEAR($date_field) <= {$fv->end_year} ";
+					$sql .= "$yearValue >= {$fv->year} AND $yearValue <= {$fv->end_year} ";
 				}
 			} else {
 				$value = $fv->text;
@@ -141,14 +144,15 @@ class SDAppliedFilter {
 		} else {
 			// Is this necessary?
 			$date_field = $this->filter->getDateField();
-			if ( $this->filter->getTimePeriod() == 'month' ) {
-				$value_field = "YEAR($date_field), MONTH($date_field)";
-			} elseif ( $this->filter->getTimePeriod() == 'day' ) {
-				$value_field = "YEAR($date_field), MONTH($date_field), DAYOFMONTH($date_field)";
+			list( $yearValue, $monthValue, $dayValue ) = SDUtils::getDateFunctions( $date_field );
+			if ( $this->filter->getTimePeriod() == 'day' ) {
+				$value_field = "$yearValue, $monthValue, $dayValue";
+			} elseif ( $this->filter->getTimePeriod() == 'month' ) {
+				$value_field = "$yearValue, $monthValue";
 			} elseif ( $this->filter->getTimePeriod() == 'year' ) {
-				$value_field = "YEAR($date_field)";
+				$value_field = $yearValue;
 			} else { // if ( $this->filter->getTimePeriod() == 'year range' ) {
-				$value_field = "YEAR($date_field)";
+				$value_field = $yearValue;
 			}
 		}
 		$smwIDs = $dbr->tableName( SDUtils::getIDsTableName() );

@@ -5,12 +5,12 @@
 			"Brest"
 		]
 	},
-	"semanticdrilldown-desc": "Посредник за истенчена навигација по семантички податоци",
+	"semanticdrilldown-desc": "Посредник за уточнето снаоѓање по семантички податоци",
 	"specialpages-group-sd_group": "Семантичко истенчување",
 	"browsedata": "Прелистај податоци",
 	"sd_browsedata_choosecategory": "Одберете категорија",
 	"sd_browsedata_viewcategory": "види категорија",
-	"sd_browsedata_docu": "Стиснете на еден или повеќе елементи подолу за да ги истенчите резултатите.",
+	"sd_browsedata_docu": "Стиснете на еден или повеќе елементи подолу за да го уточните исходот.",
 	"sd_browsedata_subcategory": "Поткатегорија",
 	"sd_browsedata_other": "Други",
 	"sd_browsedata_none": "Нема",

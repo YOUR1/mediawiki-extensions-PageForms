@@ -18,26 +18,34 @@ class SDBrowseData extends IncludableSpecialPage {
 	}
 
 	function execute( $query ) {
-		global $wgRequest, $wgOut, $wgTitle;
 		global $sdgScriptPath, $sdgContLang, $sdgNumResultsPerPage;
 
-		if ( $wgTitle->getNamespace() != NS_SPECIAL ) {
+		// If this was called from the command line, exit.
+		if ( php_sapi_name() == "cli" ) {
+			return '';
+		}
+
+		$out = $this->getOutput();
+		$request = $this->getRequest();
+
+		if ( $this->getTitle()->getNamespace() != NS_SPECIAL ) {
 			global $wgParser;
 			$wgParser->disableCache();
 		}
 		$this->setHeaders();
-		$wgOut->addModules( 'ext.semanticdrilldown.main' );
-		$wgOut->addScript( '<!--[if IE]><link rel="stylesheet" href="' . $sdgScriptPath . '/skins/SD_IEfixes.css" media="screen" /><![endif]-->' );
+		$out->addModules( 'ext.semanticdrilldown.main' );
+		$out->addScript( '<!--[if IE]><link rel="stylesheet" href="' . $sdgScriptPath . '/skins/SD_IEfixes.css" media="screen" /><![endif]-->' );
 
 		// set default
 		if ( $sdgNumResultsPerPage == null )
 			$sdgNumResultsPerPage = 250;
-		list( $limit, $offset ) = wfCheckLimits( $sdgNumResultsPerPage, 'sdlimit' );
+
+		list( $limit, $offset ) = $request->getLimitOffset( $sdgNumResultsPerPage, 'sdlimit' );
 		$filters = array();
 
 		// get information on current category, subcategory and filters
 		// that have already been applied from the query string
-		$category = str_replace( '_', ' ', $wgRequest->getVal( '_cat' ) );
+		$category = str_replace( '_', ' ', $request->getVal( '_cat' ) );
 		// if query string did not contain this variables, try the URL
 		if ( ! $category ) {
 			$queryparts = explode( '/', $query, 1 );
@@ -63,7 +71,7 @@ class SDBrowseData extends IncludableSpecialPage {
 			$category = $categories[0];
 		}
 
-		$subcategory = $wgRequest->getVal( '_subcat' );
+		$subcategory = $request->getVal( '_subcat' );
 
 		$filters = SDUtils::loadFiltersForCategory( $category );
 
@@ -75,10 +83,10 @@ class SDBrowseData extends IncludableSpecialPage {
 		$remaining_filters = array();
 		foreach ( $filters as $i => $filter ) {
 			$filter_name = str_replace( array( ' ', "'" ) , array( '_', "\'" ), $filter->name );
-			$search_terms = $wgRequest->getArray( '_search_' . $filter_name );
-			$lower_date = $wgRequest->getArray( '_lower_' . $filter_name );
-			$upper_date = $wgRequest->getArray( '_upper_' . $filter_name );
-			if ( $vals_array = $wgRequest->getArray( $filter_name ) ) {
+			$search_terms = $request->getArray( '_search_' . $filter_name );
+			$lower_date = $request->getArray( '_lower_' . $filter_name );
+			$upper_date = $request->getArray( '_upper_' . $filter_name );
+			if ( $vals_array = $request->getArray( $filter_name ) ) {
 				foreach ( $vals_array as $j => $val ) {
 					$vals_array[$j] = str_replace( '_', ' ', $val );
 				}
@@ -114,16 +122,20 @@ class SDBrowseData extends IncludableSpecialPage {
 			}
 		}
 
-		$wgOut->addHTML( "\n			<div class=\"drilldown-results\">\n" );
+		$out->addHTML( "\n			<div class=\"drilldown-results\">\n" );
 		$rep = new SDBrowseDataPage( $category, $subcategory, $applied_filters, $remaining_filters, $offset, $limit );
 		$num = $rep->execute( $query );
-		$wgOut->addHTML( "\n			</div> <!-- drilldown-results -->\n" );
+		$out->addHTML( "\n			</div> <!-- drilldown-results -->\n" );
 
 		// This has to be set last, because otherwise the QueryPage
 		// code will overwrite it.
-		$wgOut->setPageTitle( $category_title );
+		$out->setPageTitle( $category_title );
 
 		return $num;
+	}
+
+	protected function getGroupName() {
+		return 'sd_group';
 	}
 }
 
@@ -209,13 +221,18 @@ class SDBrowseDataPage extends QueryPage {
 	 */
 	function createTempTable( $category, $subcategory, $subcategories, $applied_filters ) {
 		$dbr = wfGetDB( DB_SLAVE );
+
+		$temporaryTableManager = new TemporaryTableManager( $dbr );
+
 		$sql1 = "CREATE TEMPORARY TABLE semantic_drilldown_values ( id INT NOT NULL )";
-		$dbr->query( $sql1 );
+		$temporaryTableManager->queryWithAutoCommit( $sql1, __METHOD__ );
+
 		$sql2 = "CREATE INDEX id_index ON semantic_drilldown_values ( id )";
-		$dbr->query( $sql2 );
+		$temporaryTableManager->queryWithAutoCommit( $sql2, __METHOD__ );
+
 		$sql3 = "INSERT INTO semantic_drilldown_values SELECT ids.smw_id AS id\n";
 		$sql3 .= $this->getSQLFromClause( $category, $subcategory, $subcategories, $applied_filters );
-		$dbr->query( $sql3 );
+		$temporaryTableManager->queryWithAutoCommit( $sql3, __METHOD__ );
 	}
 
 	/**
@@ -356,9 +373,7 @@ class SDBrowseDataPage extends QueryPage {
 			} else {
 				$property_field = "a$i.p_id";
 				$sql .= "\n	AND $property_field = (SELECT MAX(smw_id) FROM $smwIDs WHERE smw_title = '$property_value' AND smw_namespace = $prop_ns) AND ";
-				if ( $af->filter->property_type === 'date' ) {
-					$value_field = "SUBSTRING(a$i.$value_field, 3)";
-				} elseif (strncmp($value_field, '(IF(o_blob IS NULL', 18) === 0) {
+				if (strncmp($value_field, '(IF(o_blob IS NULL', 18) === 0) {
 					$value_field = str_replace('o_', "a$i.o_", $value_field);
 				} else {
 					$value_field = "a$i.$value_field";
@@ -772,7 +787,7 @@ END;
 		for ($i = 0; $i < count( $numberArray ); $i++) {
 			if ( $curSeparator < count( $propertyValues ) - 1 ) {
 				$curNumber = $numberArray[$i];
-				while ( $curNumber >= $bucketSeparators[$curSeparator + 1] ) {
+				while ( ( $curSeparator < count( $bucketSeparators ) - 2 ) && ( $curNumber >= $bucketSeparators[$curSeparator + 1] ) ) {
 					$curSeparator++;
 				}
 			}
@@ -820,8 +835,6 @@ END;
 	}
 
 	function printComboBoxInput( $filter_name, $instance_num, $filter_values, $cur_value = null ) {
-		global $wgRequest;
-
 		$filter_name = str_replace( ' ', '_', $filter_name );
 		// URL-decode the filter name - necessary if it contains
 		// any non-Latin characters.
@@ -833,12 +846,14 @@ END;
 
 		$inputName = "_search_$filter_name";
 
+		$filter_url = $this->makeBrowseURL( $this->category, $this->applied_filters, $this->subcategory );
+
 		$text =<<< END
-<form method="get">
+<form method="get" action="$filter_url">
 
 END;
 
-		foreach ( $wgRequest->getValues() as $key => $val ) {
+		foreach ( $this->getRequest()->getValues() as $key => $val ) {
 			if ( $key != $inputName ) {
 				if ( is_array( $val ) ) {
 					foreach ( $val as $i => $realVal ) {
@@ -870,7 +885,12 @@ END;
 
 END;
 
-		$text .= Html::input( null, wfMessage( 'searchresultshead' )->text(), 'submit', array( 'style' => 'margin: 4px 0 8px 0;' ) ) . "\n";
+		$text .= Html::input(
+			null,
+			wfMessage( 'searchresultshead' )->text(),
+			'submit',
+			array( 'style' => 'margin: 4px 0 8px 0;' )
+		) . "\n";
 		$text .= "</form>\n";
 		return $text;
 	}
@@ -915,8 +935,6 @@ END;
 	// again in the future.
 	/*
 	function printDateRangeInput( $filter_name, $lower_date = null, $upper_date = null ) {
-		global $wgRequest;
-
 		$start_label = wfMessage( 'sd_browsedata_daterangestart' )->text();
 		$end_label = wfMessage( 'sd_browsedata_daterangeend' )->text();
 		$start_month_input = $this->printDateInput( "_lower_$filter_name", $lower_date );
@@ -927,7 +945,7 @@ END;
 $end_label $end_month_input</p>
 
 END;
-		foreach ( $wgRequest->getValues() as $key => $val ) {
+		foreach ( $this->getRequest()->getValues() as $key => $val ) {
 			if ( is_array( $val ) ) {
 				foreach ( $val as $realKey => $realVal ) {
 					$text .= Html::hidden( $key . '[' . $realKey . ']', $realVal ) . "\n";
@@ -1022,9 +1040,13 @@ END;
 	}
 
 	function getPageHeader() {
-		global $wgRequest;
 		global $sdgContLang, $sdgScriptPath;
 		global $sdgFiltersSmallestFontSize, $sdgFiltersLargestFontSize;
+
+		// If this was called from the command line, exit.
+		if ( php_sapi_name() == "cli" ) {
+			return '';
+		}
 
 		$categories = SDUtils::getCategoriesForBrowsing();
 		// if there are no categories, escape quickly
@@ -1034,7 +1056,7 @@ END;
 		$subcategory_text = wfMessage( 'sd_browsedata_subcategory' )->text();
 
 		$header = "";
-		$this->show_single_cat = $wgRequest->getCheck( '_single' );
+		$this->show_single_cat = $this->getRequest()->getCheck( '_single' );
 		if ( ! $this->show_single_cat ) {
 			$header .= $this->printCategoriesList( $categories );
 		}
@@ -1233,7 +1255,7 @@ END;
 
 	function formatResult( $skin, $result ) {
 		$title = Title::makeTitle( $result->namespace, $result->value );
-		return $skin->makeLinkObj( $title, htmlspecialchars( $title->getText() ) );
+		return Linker::link( $title, htmlspecialchars( $title->getText() ) );
 	}
 
 	/**
@@ -1249,6 +1271,11 @@ END;
 	 */
 	protected function outputResults( $out, $skin, $dbr, $res, $num, $offset ) {
 		global $wgContLang;
+
+		// If this was called from the command line, exit.
+		if ( php_sapi_name() == "cli" ) {
+			return '';
+		}
 
 		$all_display_params = SDUtils::getDisplayParamsForCategory( $this->category );
 		$querystring = null;

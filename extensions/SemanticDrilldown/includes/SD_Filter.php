@@ -183,7 +183,7 @@ class SDFilter {
 	 * being used.
 	 */
 	public function loadDBStructureInformation() {
-		global $smwgDefaultStore;
+		global $smwgDefaultStore, $wgDBtype;
 
 		if ( $smwgDefaultStore === 'SMWSQLStore3' || $smwgDefaultStore === 'SMWSparqlStore' ) {
 			if ( $this->property_type === 'page' ) {
@@ -201,7 +201,17 @@ class SDFilter {
 				$this->db_value_field = 'o_serialized';
 			} else { // string, text, code
 				$this->db_table_name = 'smw_di_blob';
-				$this->db_value_field = '(IF(o_blob IS NULL, o_hash, CONVERT(o_blob using utf8)))';
+				// CONVERT() is also supported in PostgreSQL,
+				// but it doesn't seem to work the same way.
+				// IF() is not supported in PostgreSQL - there
+				// is an alternative CASE() statement, but
+				// let's just keep it simple - in part in
+				// order to also support other DB types.
+				if ( $wgDBtype == 'mysql' ) {
+					$this->db_value_field = '(IF(o_blob IS NULL, o_hash, CONVERT(o_blob using utf8)))';
+				} else {
+					$this->db_value_field = 'o_hash';
+				}
 			}
 		} else {
 			// Things used to be so simple...
@@ -300,20 +310,21 @@ END;
 		$property_value = $this->escaped_property;
 		$date_field = $this->getDateField();
 		$dbr = wfGetDB( DB_SLAVE );
+		list( $yearValue, $monthValue, $dayValue ) = SDUtils::getDateFunctions( $date_field );
 		if ( $this->getTimePeriod() == 'day' ) {
-			$fields = "YEAR($date_field), MONTH($date_field), DAYOFMONTH($date_field)";
+			$fields = "$yearValue, $monthValue, $dayValue";
 		} elseif ( $this->getTimePeriod() == 'month' ) {
-			$fields = "YEAR($date_field), MONTH($date_field)";
+			$fields = "$yearValue, $monthValue";
 		} elseif ( $this->getTimePeriod() == 'year' ) {
-			$fields = "YEAR($date_field)";
+			$fields = $yearValue;
 		} else { // if ( $this->getTimePeriod() == 'decade' ) {
-			$fields = "YEAR($date_field)";
+			$fields = $yearValue;
 		}
 		$datesTable = $dbr->tableName( $this->getTableName() );
 		$idsTable = $dbr->tableName( SDUtils::getIDsTableName() );
 		$sql = <<<END
 	SELECT $fields, count(*)
-	FROM semantic_drilldown_values sdv 
+	FROM semantic_drilldown_values sdv
 	JOIN $datesTable a ON sdv.id = a.s_id
 	JOIN $idsTable p_ids ON a.p_id = p_ids.smw_id
 	WHERE p_ids.smw_title = '$property_value'
@@ -379,7 +390,6 @@ END;
 	JOIN $smw_ids p_ids ON p.p_id = p_ids.smw_id
 	WHERE p_ids.smw_title = '$property_value'
 	AND p_ids.smw_namespace = $prop_ns
-	AND $value_field != ''
 	GROUP BY $value_field
 	ORDER BY $value_field
 
@@ -387,6 +397,11 @@ END;
 		$res = $dbr->query( $sql );
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$value_string = str_replace( '_', ' ', $row[0] );
+			// We check this here, and not in the SQL, because
+			// for MySQL, 0 sometimes equals blank.
+			if ( $value_string === '' ) {
+				continue;
+			}
 			$possible_values[$value_string] = $row[1];
 		}
 		$dbr->freeResult( $res );
@@ -402,10 +417,12 @@ END;
 	 */
 	function createTempTable() {
 		$dbr = wfGetDB( DB_SLAVE );
+
 		$smw_ids = $dbr->tableName( SDUtils::getIDsTableName() );
+
 		$valuesTable = $dbr->tableName( $this->getTableName() );
 		$value_field = $this->getValueField();
-		$property_field = 'p_id';
+
 		$query_property = $this->escaped_property;
 
 		$sql = <<<END
@@ -419,7 +436,9 @@ END;
 			$sql .= "	JOIN $smw_ids o_ids ON $valuesTable.o_id = o_ids.smw_id\n";
 		}
 		$sql .= "	WHERE p_ids.smw_title = '$query_property'";
-		$dbr->query( $sql );
+
+		$temporaryTableManager = new TemporaryTableManager( $dbr );
+		$temporaryTableManager->queryWithAutoCommit( $sql, __METHOD__ );
 	}
 
 	/**
@@ -430,6 +449,8 @@ END;
 		// DROP TEMPORARY TABLE would be marginally safer, but it's
 		// not supported on all RDBMS's.
 		$sql = "DROP TABLE semantic_drilldown_filter_values";
-		$dbr->query( $sql );
+
+		$temporaryTableManager = new TemporaryTableManager( $dbr );
+		$temporaryTableManager->queryWithAutoCommit( $sql, __METHOD__ );
 	}
 }

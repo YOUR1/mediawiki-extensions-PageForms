@@ -325,6 +325,26 @@ class SDUtils {
 		return $pages;
 	}
 
+	static function getDateFunctions( $dateDBField ) {
+		global $wgDBtype;
+
+		// Unfortunately, date handling in general - and date extraction
+		// specifically - is done differently in almost every DB
+		// system. If support were ever added for SQLite or Oracle,
+		// those would require special handling as well.
+		if ( $wgDBtype == 'postgres' ) {
+			$yearValue = "EXTRACT(YEAR FROM TIMESTAMP $dateDBField)";
+			$monthValue = "EXTRACT(MONTH FROM TIMESTAMP $dateDBField)";
+			$dayValue = "EXTRACT(DAY FROM TIMESTAMP $dateDBField)";
+		} else { // MySQL, MS SQL Server
+			$yearValue = "YEAR($dateDBField)";
+			$monthValue = "MONTH($dateDBField)";
+			// SQL Server only supports DAY(), not DAYOFMONTH().
+			$dayValue = "DAY($dateDBField)";
+		}
+		return array( $yearValue, $monthValue, $dayValue );
+	}
+
 	static function monthToString( $month ) {
 		if ( $month == 1 ) {
 			return wfMessage( 'january' )->text();
@@ -425,7 +445,6 @@ class SDUtils {
 	 * 'HIDEFROMDRILLDOWN' and 'SHOWINDRILLDOWN' magic words in a page
 	 */
 	static function handleShowAndHide( &$parser, &$text ) {
-		global $wgOut, $wgAction;
 		$mw_hide = MagicWord::get( 'MAG_HIDEFROMDRILLDOWN' );
 		if ( $mw_hide->matchAndRemove( $text ) ) {
 			$parser->mOutput->setProperty( 'hidefromdrilldown', 'y' );
@@ -467,6 +486,17 @@ class SDUtils {
 
 		$browse_search_section->addRow( $sd_row );
 
+		return true;
+	}
+
+	/**
+	 * Register extension unit tests with old versions of MediaWiki
+	 *
+	 * @param string[] $paths
+	 * @return bool
+	 */
+	public static function onUnitTestsList( &$paths ) {
+		$paths[] = dirname( __FILE__ ) . '/../tests/phpunit';
 		return true;
 	}
 }
