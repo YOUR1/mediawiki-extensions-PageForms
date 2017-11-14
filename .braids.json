@@ -366,7 +366,7 @@
   },
   "extensions/SemanticDrilldown": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticDrilldown",
-    "revision": "c21c93d"
+    "revision": "c21c93db800a21945a56d56f4d791bccf707d74a"
   },
   "extensions/SemanticForms": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticForms",
