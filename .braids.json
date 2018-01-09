@@ -319,6 +319,10 @@
     "branch": "master",
     "revision": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23"
   },
+  "extensions/LinkTarget": {
+    "url": "git@github.com:wikimedia/mediawiki-extensions-LinkTarget.git",
+    "revision": "c2cd0de1aaf4bf2c4923d0010251e0b8f107c97c"
+  },
   "extensions/LinkedWiki": {
     "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LinkedWiki",
     "branch": "master",
