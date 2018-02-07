@@ -295,6 +295,11 @@
     "url": "git@github.com:wikimedia/mediawiki-extensions-Echo.git",
     "revision": "b87fa2f66f4816179c51d6c1398715f62b0227c2"
   },
+  "extensions/ExternalData": {
+    "url": "https://github.com/wikimedia/mediawiki-extensions-ExternalData.git",
+    "branch": "master",
+    "revision": "fe2bc5af54edb27e60e78329604581d0f844e724"
+  },
   "extensions/Flow": {
     "url": "git@github.com:wikimedia/mediawiki-extensions-Flow.git",
     "revision": "6ecdef3a156fbf454e308b6377f5253059312075"
