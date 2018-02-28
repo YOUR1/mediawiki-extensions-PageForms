@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/Gadgets": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
+      "branch": "REL1_27",
+      "revision": "4014d588097fd5a420c0ecba93229a81c1835ea6"
+    },
     "core/REL1_27/extensions/ImageMap": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
       "branch": "REL1_27",
