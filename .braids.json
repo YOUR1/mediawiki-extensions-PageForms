@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/WikiEditor": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
+      "branch": "REL1_27",
+      "revision": "952e04b327dbe9776a188fa70c352a66c8afd571"
+    },
     "extensions/AdminLinks": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
       "branch": "master",
