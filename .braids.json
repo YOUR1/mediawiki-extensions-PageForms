@@ -160,11 +160,6 @@
       "branch": "REL1_27",
       "revision": "4014d588097fd5a420c0ecba93229a81c1835ea6"
     },
-    "core/REL1_27/extensions/ImageMap": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
-      "branch": "REL1_27",
-      "revision": "abe93ef762ee834323c33b7299eae6671194de9b"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
