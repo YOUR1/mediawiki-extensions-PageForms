@@ -195,11 +195,6 @@
       "branch": "REL1_27",
       "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
     },
-    "core/REL1_27/extensions/Poem": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
-      "branch": "REL1_27",
-      "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
