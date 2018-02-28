@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/InputBox": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
+      "branch": "REL1_27",
+      "revision": "e66224b0bb2f879690153a8eb76000c40e8077a3"
+    },
     "core/REL1_27/extensions/Interwiki": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
       "branch": "REL1_27",
