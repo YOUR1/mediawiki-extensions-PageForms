@@ -215,11 +215,6 @@
       "branch": "REL1_27",
       "revision": "20c4ad51e37d2a1ea11ed00c0b9d8b5cc3d913a0"
     },
-    "core/REL1_27/extensions/TitleBlacklist": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
-      "branch": "REL1_27",
-      "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
