@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/Poem": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
+      "branch": "REL1_27",
+      "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
+    },
     "core/REL1_27/extensions/Renameuser": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
       "branch": "REL1_27",
