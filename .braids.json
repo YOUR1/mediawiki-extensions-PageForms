@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/Renameuser": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
+      "branch": "REL1_27",
+      "revision": "615d76190e8537968371e90c6449f2a1db3d90f6"
+    },
     "core/REL1_27/extensions/SpamBlacklist": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
       "branch": "REL1_27",
