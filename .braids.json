@@ -155,11 +155,6 @@
       "branch": "REL1_27",
       "revision": "f29c8481ed82764ddaa8f8c1b8ebb3d8aa88973e"
     },
-    "core/REL1_27/skins/Vector": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
-      "branch": "REL1_27",
-      "revision": "d11a80a1f68784a12804cd97436499fb729e3764"
-    },
     "extensions/AdminLinks": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
       "branch": "master",
