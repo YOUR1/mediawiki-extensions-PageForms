@@ -210,11 +210,6 @@
       "branch": "REL1_27",
       "revision": "c8992f0d0e163a0b16593a6eddef47e8dcc47b0d"
     },
-    "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
-      "branch": "REL1_27",
-      "revision": "20c4ad51e37d2a1ea11ed00c0b9d8b5cc3d913a0"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
