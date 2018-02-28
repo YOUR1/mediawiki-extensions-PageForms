@@ -225,6 +225,11 @@
       "branch": "REL1_27",
       "revision": "952e04b327dbe9776a188fa70c352a66c8afd571"
     },
+    "core/REL1_27/skins/CologneBlue": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
+      "branch": "REL1_27",
+      "revision": "8932b44bfc96f9e7f74e230c36f0f0cea879bf72"
+    },
     "core/REL1_27/skins/Modern": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git",
       "branch": "REL1_27",
