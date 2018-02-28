@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/TitleBlacklist": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
+      "branch": "REL1_27",
+      "revision": "e40d40e2f5ae6a7b4e8e17c2c3bb74aaeb9b2869"
+    },
     "core/REL1_27/extensions/WikiEditor": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
       "branch": "REL1_27",
