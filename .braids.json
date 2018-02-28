@@ -180,11 +180,6 @@
       "branch": "REL1_27",
       "revision": "e41495a0d5aebc82544a3d6fe24e2504a7873213"
     },
-    "core/REL1_27/extensions/Nuke": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
-      "branch": "REL1_27",
-      "revision": "074358412a16947da490395ec5486614591208eb"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
