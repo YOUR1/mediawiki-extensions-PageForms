@@ -150,11 +150,6 @@
       "branch": "REL1_27",
       "revision": "1d36774f5e3b2a4362e0f12cab040e4dc6fbd440"
     },
-    "core/REL1_27/extensions/ConfirmEdit": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
-      "branch": "REL1_27",
-      "revision": "92652aa032f48015e87d51aa28b760d3f014c3f9"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
