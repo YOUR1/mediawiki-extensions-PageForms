@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/PdfHandler": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
+      "branch": "REL1_27",
+      "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
+    },
     "core/REL1_27/extensions/Poem": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
       "branch": "REL1_27",
