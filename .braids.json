@@ -225,6 +225,11 @@
       "branch": "REL1_27",
       "revision": "952e04b327dbe9776a188fa70c352a66c8afd571"
     },
+    "core/REL1_27/skins/MonoBook": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
+      "branch": "REL1_27",
+      "revision": "85fee758a9f5ddcf1d157fafce13a7235bc5c86d"
+    },
     "core/REL1_27/skins/Vector": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
       "branch": "REL1_27",
