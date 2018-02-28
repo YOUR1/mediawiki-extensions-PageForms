@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/Nuke": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
+      "branch": "REL1_27",
+      "revision": "074358412a16947da490395ec5486614591208eb"
+    },
     "core/REL1_27/extensions/ParserFunctions": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
       "branch": "REL1_27",
