@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
+      "branch": "REL1_27",
+      "revision": "d321b8430f11ab28a34c7d086e51ef6432371c5a"
+    },
     "core/REL1_27/extensions/TitleBlacklist": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
       "branch": "REL1_27",
