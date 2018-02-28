@@ -145,11 +145,6 @@
       "branch": "REL1_27",
       "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
     },
-    "core/REL1_27/extensions/CiteThisPage": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CiteThisPage.git",
-      "branch": "REL1_27",
-      "revision": "1d36774f5e3b2a4362e0f12cab040e4dc6fbd440"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
