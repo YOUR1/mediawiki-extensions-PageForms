@@ -135,6 +135,11 @@
       "branch": "REL1_23",
       "revision": "361d9d9cfcba716dbf90af62cc398e51d4c303b8"
     },
+    "core/REL1_27": {
+      "url": "ssh://your1@gerrit.wikimedia.org:29418/mediawiki/core.git",
+      "branch": "REL1_27",
+      "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
+    },
     "extensions/AdminLinks": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
       "branch": "master",
