@@ -150,11 +150,6 @@
       "branch": "REL1_27",
       "revision": "db1cc18faa2f6aa3e65ab32ab218ade944acfd49"
     },
-    "core/REL1_27/skins/MonoBook": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
-      "branch": "REL1_27",
-      "revision": "f29c8481ed82764ddaa8f8c1b8ebb3d8aa88973e"
-    },
     "extensions/AdminLinks": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
       "branch": "master",
