@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/ImageMap": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
+      "branch": "REL1_27",
+      "revision": "43aaced550340d577a2f123b86a801fbfd4b0a9b"
+    },
     "core/REL1_27/extensions/InputBox": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
       "branch": "REL1_27",
