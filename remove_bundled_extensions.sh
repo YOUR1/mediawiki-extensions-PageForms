@@ -6,11 +6,13 @@ bundledskins="Vector MonoBook Modern CologneBlue"
 add_extension() {
 	echo "Adding extension $2 to branch $1"
 	braid remove core/$1/extensions/$2
+	rm -fr core/$1/extensions/$2
 }
 
 add_skin() {
 	echo "Added skin $2 to branch $1"
 	braid remove core/$1/skins/$2
+	rm -fr core/$1/skins/$2
 }
 
 ## Info message
