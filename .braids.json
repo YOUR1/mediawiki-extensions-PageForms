@@ -190,11 +190,6 @@
       "branch": "REL1_27",
       "revision": "d0a5d10aaf44553956b5cb3da70a13d121904aad"
     },
-    "core/REL1_27/extensions/PdfHandler": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
-      "branch": "REL1_27",
-      "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
