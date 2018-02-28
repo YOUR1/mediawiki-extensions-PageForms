@@ -185,11 +185,6 @@
       "branch": "REL1_27",
       "revision": "074358412a16947da490395ec5486614591208eb"
     },
-    "core/REL1_27/extensions/ParserFunctions": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
-      "branch": "REL1_27",
-      "revision": "d0a5d10aaf44553956b5cb3da70a13d121904aad"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
