@@ -175,11 +175,6 @@
       "branch": "REL1_27",
       "revision": "7ee2b27e5375b8c4e976b9cbdc4537f1119e2fbd"
     },
-    "core/REL1_27/extensions/LocalisationUpdate": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
-      "branch": "REL1_27",
-      "revision": "e41495a0d5aebc82544a3d6fe24e2504a7873213"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
