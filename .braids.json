@@ -170,11 +170,6 @@
       "branch": "REL1_27",
       "revision": "b02a22828be5771b7042a3fc46af472ce057bcad"
     },
-    "core/REL1_27/extensions/Interwiki": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
-      "branch": "REL1_27",
-      "revision": "7ee2b27e5375b8c4e976b9cbdc4537f1119e2fbd"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
