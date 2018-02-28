@@ -205,11 +205,6 @@
       "branch": "REL1_27",
       "revision": "615d76190e8537968371e90c6449f2a1db3d90f6"
     },
-    "core/REL1_27/extensions/SpamBlacklist": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
-      "branch": "REL1_27",
-      "revision": "c8992f0d0e163a0b16593a6eddef47e8dcc47b0d"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
