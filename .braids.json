@@ -140,6 +140,11 @@
       "branch": "REL1_27",
       "revision": "317104cd9b78e8a954df48d1428bb709e3c999c7"
     },
+    "core/REL1_27/extensions/Cite": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
+      "branch": "REL1_27",
+      "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
+    },
     "core/REL1_27/extensions/CiteThisPage": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CiteThisPage.git",
       "branch": "REL1_27",
