@@ -1,420 +1,423 @@
 {
-  "composer/GraphViz": {
-    "url": "https://phabricator.wikimedia.org/diffusion/EGVI/extension-graphviz.git",
-    "revision": "d53b65157b8ab212a6332b749c72af79dd4e2730"
-  },
-  "composer/Lingo": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Lingo",
-    "branch": "master",
-    "revision": "42e98a6339f7ae85fdb7668d335dc70bb94c39bc"
-  },
-  "composer/PageForms": {
-    "url": "https://github.com/wikimedia/mediawiki-extensions-PageForms.git",
-    "branch": "master",
-    "revision": "7f1cec5d7bcbc8ddce8e012deb71979acbb6aa02"
-  },
-  "composer/Piwik": {
-    "url": "https://github.com/DaSchTour/piwik-mediawiki-extension.git",
-    "branch": "master",
-    "revision": "e3fd9793b89a30d8385969f76de37e1c637803e5"
-  },
-  "composer/SemanticCompoundQueries": {
-    "url": "git@github.com:SemanticMediaWiki/SemanticCompoundQueries.git",
-    "branch": "master",
-    "revision": "2c7221496a565e08947e68a7617fbd3054fe637b"
-  },
-  "composer/SemanticGlossary": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticGlossary",
-    "branch": "master",
-    "revision": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a"
-  },
-  "composer/SemanticMaps": {
-    "url": "https://github.com/SemanticMediaWiki/SemanticMaps.git",
-    "branch": "master",
-    "revision": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc"
-  },
-  "composer/SemanticResultFormats": {
-    "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
-    "branch": "master",
-    "revision": "986366a3cbcff524a5317aa0c7c8c052b7cc94a1"
-  },
-  "composer/Validator": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Validator",
-    "branch": "master",
-    "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
-  },
-  "core/REL1_23": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core",
-    "branch": "REL1_23",
-    "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6"
-  },
-  "core/REL1_23/extensions/Cite": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
-    "branch": "REL1_23",
-    "revision": "23429159d55fa45f99b5488fb803c6f8804e312f"
-  },
-  "core/REL1_23/extensions/ConfirmEdit": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
-    "branch": "REL1_23",
-    "revision": "486d6eb409069db7674fd927d9ad37535a08ff86"
-  },
-  "core/REL1_23/extensions/Gadgets": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
-    "branch": "REL1_23",
-    "revision": "90ba2f4c3502004576305f576831ad7ebfeb4c9a"
-  },
-  "core/REL1_23/extensions/ImageMap": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
-    "branch": "REL1_23",
-    "revision": "1f17b019f88f91012b8e1805dd6ee7d48c1bdee3"
-  },
-  "core/REL1_23/extensions/InputBox": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
-    "branch": "REL1_23",
-    "revision": "c48ebed5b4b7c0c4ef3d28ef59aec8c3ff1e14cb"
-  },
-  "core/REL1_23/extensions/Interwiki": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
-    "branch": "REL1_23",
-    "revision": "f9ed98e6bb52f527e448d1aa1b7ae87b649a0c50"
-  },
-  "core/REL1_23/extensions/LocalisationUpdate": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
-    "branch": "REL1_23",
-    "revision": "6fcdea6c6036580ae71ea3dc43469f0312685769"
-  },
-  "core/REL1_23/extensions/Nuke": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
-    "branch": "REL1_23",
-    "revision": "ba618ffae828f4421a20f01e578fd9d5830c2d3f"
-  },
-  "core/REL1_23/extensions/ParserFunctions": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
-    "branch": "REL1_23",
-    "revision": "e4a11db50ca8effe1c354ef9a6af639f5431ec49"
-  },
-  "core/REL1_23/extensions/PdfHandler": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
-    "branch": "REL1_23",
-    "revision": "1f357d3c7ac572e3d9461644e6deee0148f9610e"
-  },
-  "core/REL1_23/extensions/Poem": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
-    "branch": "REL1_23",
-    "revision": "b88932ae11d24fced28d05946c5a1cd98e2f2696"
-  },
-  "core/REL1_23/extensions/Renameuser": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
-    "branch": "REL1_23",
-    "revision": "a5cd087f6e43bf19cf1ae204cf32cfab2d9ffd64"
-  },
-  "core/REL1_23/extensions/SpamBlacklist": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
-    "branch": "REL1_23",
-    "revision": "29395e3985f076216ad01718d5cc6327e74d89ee"
-  },
-  "core/REL1_23/extensions/SyntaxHighlight_GeSHi": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
-    "branch": "REL1_23",
-    "revision": "feaa2c78ae799adf8bbc1ea7a79203d94c314583"
-  },
-  "core/REL1_23/extensions/TitleBlacklist": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
-    "branch": "REL1_23",
-    "revision": "3feef4208b3bb04be82de16ea09a3cadf91d1f83"
-  },
-  "core/REL1_23/extensions/WikiEditor": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
-    "branch": "REL1_23",
-    "revision": "3f6ac7ca6b30aff241b797718ba06bb951ab5e2c"
-  },
-  "core/REL1_23/skins/Vector": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
-    "branch": "REL1_23",
-    "revision": "361d9d9cfcba716dbf90af62cc398e51d4c303b8"
-  },
-  "core/REL1_27": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core.git",
-    "branch": "REL1_27",
-    "revision": "2bac17fe8090a831a5f35bc750456eca615d3b00"
-  },
-  "core/REL1_27/extensions/Cite": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
-    "branch": "REL1_27",
-    "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
-  },
-  "core/REL1_27/extensions/CiteThisPage": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CiteThisPage.git",
-    "branch": "REL1_27",
-    "revision": "1d36774f5e3b2a4362e0f12cab040e4dc6fbd440"
-  },
-  "core/REL1_27/extensions/ConfirmEdit": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
-    "branch": "REL1_27",
-    "revision": "92652aa032f48015e87d51aa28b760d3f014c3f9"
-  },
-  "core/REL1_27/extensions/Gadgets": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
-    "branch": "REL1_27",
-    "revision": "4014d588097fd5a420c0ecba93229a81c1835ea6"
-  },
-  "core/REL1_27/extensions/ImageMap": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
-    "branch": "REL1_27",
-    "revision": "abe93ef762ee834323c33b7299eae6671194de9b"
-  },
-  "core/REL1_27/extensions/InputBox": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
-    "branch": "REL1_27",
-    "revision": "b02a22828be5771b7042a3fc46af472ce057bcad"
-  },
-  "core/REL1_27/extensions/Interwiki": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
-    "branch": "REL1_27",
-    "revision": "7ee2b27e5375b8c4e976b9cbdc4537f1119e2fbd"
-  },
-  "core/REL1_27/extensions/LocalisationUpdate": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
-    "branch": "REL1_27",
-    "revision": "e41495a0d5aebc82544a3d6fe24e2504a7873213"
-  },
-  "core/REL1_27/extensions/Nuke": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
-    "branch": "REL1_27",
-    "revision": "074358412a16947da490395ec5486614591208eb"
-  },
-  "core/REL1_27/extensions/ParserFunctions": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
-    "branch": "REL1_27",
-    "revision": "d0a5d10aaf44553956b5cb3da70a13d121904aad"
-  },
-  "core/REL1_27/extensions/PdfHandler": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
-    "branch": "REL1_27",
-    "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
-  },
-  "core/REL1_27/extensions/Poem": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
-    "branch": "REL1_27",
-    "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
-  },
-  "core/REL1_27/extensions/Renameuser": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
-    "branch": "REL1_27",
-    "revision": "615d76190e8537968371e90c6449f2a1db3d90f6"
-  },
-  "core/REL1_27/extensions/SpamBlacklist": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
-    "branch": "REL1_27",
-    "revision": "c8992f0d0e163a0b16593a6eddef47e8dcc47b0d"
-  },
-  "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
-    "branch": "REL1_27",
-    "revision": "20c4ad51e37d2a1ea11ed00c0b9d8b5cc3d913a0"
-  },
-  "core/REL1_27/extensions/TitleBlacklist": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
-    "branch": "REL1_27",
-    "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
-  },
-  "core/REL1_27/skins/CologneBlue": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
-    "branch": "REL1_27",
-    "revision": "8932b44bfc96f9e7f74e230c36f0f0cea879bf72"
-  },
-  "core/REL1_27/skins/Modern": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git",
-    "branch": "REL1_27",
-    "revision": "db1cc18faa2f6aa3e65ab32ab218ade944acfd49"
-  },
-  "core/REL1_27/skins/MonoBook": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
-    "branch": "REL1_27",
-    "revision": "f29c8481ed82764ddaa8f8c1b8ebb3d8aa88973e"
-  },
-  "core/REL1_27/skins/Vector": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
-    "branch": "REL1_27",
-    "revision": "d11a80a1f68784a12804cd97436499fb729e3764"
-  },
-  "extensions/AdminLinks": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
-    "branch": "master",
-    "revision": "2619ed9beede0017f50ed08b20f6ea3a5200a838"
-  },
-  "extensions/ApprovedRevs": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ApprovedRevs",
-    "branch": "master",
-    "revision": "e81c80342fb60e537f33ee04ff0090b13f928875"
-  },
-  "extensions/Arrays": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Arrays",
-    "branch": "master",
-    "revision": "e484ab2dbbb29d56bf4329b97206f2cde0c6eafc"
-  },
-  "extensions/BreadCrumbs": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs",
-    "revision": "0657677e3f585ab5c7e357214c2b55e7e0f4561b"
-  },
-  "extensions/BreadCrumbs2": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs2",
-    "branch": "master",
-    "revision": "d1c8feb4568d49661839afece95a6bbbdbf0f96f"
-  },
-  "extensions/CategoryTree": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree",
-    "branch": "master",
-    "revision": "8d7de84017d3f8efb6bfb5265665aa4907767cde"
-  },
-  "extensions/ConfirmEdit": {
-    "url": "git@github.com:wikimedia/mediawiki-extensions-ConfirmEdit.git",
-    "branch": "REL1_27",
-    "revision": "0ea032c98d0786dc34151bda1b2485844f74357e"
-  },
-  "extensions/DataTransfer": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer",
-    "branch": "master",
-    "revision": "b6645aac78bcab8c8e8fe251e968adf643d609ba"
-  },
-  "extensions/DeleteBatch": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DeleteBatch",
-    "branch": "master",
-    "revision": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
-  },
-  "extensions/DisplayTitle": {
-    "url": "git@github.com:wikimedia/mediawiki-extensions-DisplayTitle.git",
-    "branch": "master",
-    "revision": "b4c092c4d4f8787b672b8057c32b4b82fbc036a9"
-  },
-  "extensions/DynamicPageList": {
-    "url": "https://github.com/Alexia/DynamicPageList.git",
-    "revision": "559e5cec1fd620ba1aebecc5a538426f8b72a736"
-  },
-  "extensions/Echo": {
-    "url": "git@github.com:wikimedia/mediawiki-extensions-Echo.git",
-    "revision": "b87fa2f66f4816179c51d6c1398715f62b0227c2"
-  },
-  "extensions/ExternalData": {
-    "url": "https://github.com/wikimedia/mediawiki-extensions-ExternalData.git",
-    "branch": "master",
-    "revision": "fe2bc5af54edb27e60e78329604581d0f844e724"
-  },
-  "extensions/Flow": {
-    "url": "git@github.com:wikimedia/mediawiki-extensions-Flow.git",
-    "revision": "6ecdef3a156fbf454e308b6377f5253059312075"
-  },
-  "extensions/GoogleAnalytics": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/googleAnalytics",
-    "branch": "master",
-    "revision": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323"
-  },
-  "extensions/HeaderTabs": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/HeaderTabs",
-    "branch": "master",
-    "revision": "29d694f645ed21815c05299075eff73c8989a3eb"
-  },
-  "extensions/ImportUsers": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImportUsers",
-    "branch": "master",
-    "revision": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23"
-  },
-  "extensions/LinkTarget": {
-    "url": "git@github.com:wikimedia/mediawiki-extensions-LinkTarget.git",
-    "revision": "c2cd0de1aaf4bf2c4923d0010251e0b8f107c97c"
-  },
-  "extensions/LinkedWiki": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LinkedWiki",
-    "branch": "master",
-    "revision": "049afde999b819deb91c04f7c7908447e6c90ebb"
-  },
-  "extensions/LiquidThreads": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LiquidThreads",
-    "branch": "master",
-    "revision": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0"
-  },
-  "extensions/LiquidThreadsOverview": {
-    "url": "https://github.com/GeneralVolkoV/LiquidThreadsOverview.git",
-    "branch": "master",
-    "revision": "c7625623c9db02ff81900ba5e8abedb209dfd76b"
-  },
-  "extensions/MagicNoCache": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MagicNoCache",
-    "branch": "master",
-    "revision": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e"
-  },
-  "extensions/MediaFunctions": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MediaFunctions",
-    "branch": "master",
-    "revision": "5e142961d53332162e339c8573a8da6eb5032491"
-  },
-  "extensions/MyVariables": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MyVariables",
-    "branch": "master",
-    "revision": "499d2ee92acbf102d8b487738731f704d6c38f93"
-  },
-  "extensions/PdfBook": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfBook",
-    "branch": "master",
-    "revision": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb"
-  },
-  "extensions/ReplaceText": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ReplaceText",
-    "branch": "master",
-    "revision": "d1805b8abbac0ef0b1812a1e17a939b06e3e0868"
-  },
-  "extensions/SemanticCompoundQueries": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticCompoundQueries",
-    "branch": "master",
-    "revision": "ae8f8250b1a7df0e8f623816087aef741c680064"
-  },
-  "extensions/SemanticDrilldown": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticDrilldown",
-    "revision": "c21c93db800a21945a56d56f4d791bccf707d74a"
-  },
-  "extensions/SemanticForms": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticForms",
-    "branch": "master",
-    "revision": "e0f15961c5479413d99b5bbc50609a3a9ef7da8f"
-  },
-  "extensions/SemanticFormsInputs": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticFormsInputs",
-    "branch": "master",
-    "revision": "fc7d604b51be88383cf03c45d4e0b441c24e02fa"
-  },
-  "extensions/SemanticInternalObjects": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticInternalObjects",
-    "branch": "master",
-    "revision": "1e936bd3c544e19ea435e1bb99041b8a7cb99522"
-  },
-  "extensions/SemanticTitle": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticTitle",
-    "branch": "master",
-    "revision": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108"
-  },
-  "extensions/UrlGetParameters": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UrlGetParameters",
-    "branch": "master",
-    "revision": "c18937c6c62afad5f1fee09a91507d27be897433"
-  },
-  "extensions/UserMerge": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UserMerge",
-    "branch": "master",
-    "revision": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2"
-  },
-  "extensions/Variables": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Variables",
-    "branch": "master",
-    "revision": "d8bca97c9b111ee724faca7644b66da410a90031"
-  },
-  "extensions/Widgets": {
-    "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets",
-    "branch": "master",
-    "revision": "0338885c6fd759eb6545296333373bc69b6bd1da"
-  },
-  "libraries/smarty": {
-    "url": "https://github.com/smarty-php/smarty.git",
-    "branch": "master",
-    "revision": "4537d8aae6c4a26f5439bc3a05d3437d25c2c4d2"
+  "config_version": 1,
+  "mirrors": {
+    "composer/GraphViz": {
+      "url": "https://phabricator.wikimedia.org/diffusion/EGVI/extension-graphviz.git",
+      "revision": "d53b65157b8ab212a6332b749c72af79dd4e2730"
+    },
+    "composer/Lingo": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Lingo",
+      "branch": "master",
+      "revision": "42e98a6339f7ae85fdb7668d335dc70bb94c39bc"
+    },
+    "composer/PageForms": {
+      "url": "https://github.com/wikimedia/mediawiki-extensions-PageForms.git",
+      "branch": "master",
+      "revision": "7f1cec5d7bcbc8ddce8e012deb71979acbb6aa02"
+    },
+    "composer/Piwik": {
+      "url": "https://github.com/DaSchTour/piwik-mediawiki-extension.git",
+      "branch": "master",
+      "revision": "e3fd9793b89a30d8385969f76de37e1c637803e5"
+    },
+    "composer/SemanticCompoundQueries": {
+      "url": "git@github.com:SemanticMediaWiki/SemanticCompoundQueries.git",
+      "branch": "master",
+      "revision": "2c7221496a565e08947e68a7617fbd3054fe637b"
+    },
+    "composer/SemanticGlossary": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticGlossary",
+      "branch": "master",
+      "revision": "fe0a6a67c9366a67d9ba7a1ad8e3b927e92f6c6a"
+    },
+    "composer/SemanticMaps": {
+      "url": "https://github.com/SemanticMediaWiki/SemanticMaps.git",
+      "branch": "master",
+      "revision": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc"
+    },
+    "composer/SemanticResultFormats": {
+      "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
+      "branch": "master",
+      "revision": "986366a3cbcff524a5317aa0c7c8c052b7cc94a1"
+    },
+    "composer/Validator": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Validator",
+      "branch": "master",
+      "revision": "ad952979a8a76f88c06f52cca3fb9abadad820e1"
+    },
+    "core/REL1_23": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core",
+      "branch": "REL1_23",
+      "revision": "49aff6403bb75ab69baaa369ce87920333ba59d6"
+    },
+    "core/REL1_23/extensions/Cite": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
+      "branch": "REL1_23",
+      "revision": "23429159d55fa45f99b5488fb803c6f8804e312f"
+    },
+    "core/REL1_23/extensions/ConfirmEdit": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
+      "branch": "REL1_23",
+      "revision": "486d6eb409069db7674fd927d9ad37535a08ff86"
+    },
+    "core/REL1_23/extensions/Gadgets": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
+      "branch": "REL1_23",
+      "revision": "90ba2f4c3502004576305f576831ad7ebfeb4c9a"
+    },
+    "core/REL1_23/extensions/ImageMap": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
+      "branch": "REL1_23",
+      "revision": "1f17b019f88f91012b8e1805dd6ee7d48c1bdee3"
+    },
+    "core/REL1_23/extensions/InputBox": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
+      "branch": "REL1_23",
+      "revision": "c48ebed5b4b7c0c4ef3d28ef59aec8c3ff1e14cb"
+    },
+    "core/REL1_23/extensions/Interwiki": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
+      "branch": "REL1_23",
+      "revision": "f9ed98e6bb52f527e448d1aa1b7ae87b649a0c50"
+    },
+    "core/REL1_23/extensions/LocalisationUpdate": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
+      "branch": "REL1_23",
+      "revision": "6fcdea6c6036580ae71ea3dc43469f0312685769"
+    },
+    "core/REL1_23/extensions/Nuke": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
+      "branch": "REL1_23",
+      "revision": "ba618ffae828f4421a20f01e578fd9d5830c2d3f"
+    },
+    "core/REL1_23/extensions/ParserFunctions": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
+      "branch": "REL1_23",
+      "revision": "e4a11db50ca8effe1c354ef9a6af639f5431ec49"
+    },
+    "core/REL1_23/extensions/PdfHandler": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
+      "branch": "REL1_23",
+      "revision": "1f357d3c7ac572e3d9461644e6deee0148f9610e"
+    },
+    "core/REL1_23/extensions/Poem": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
+      "branch": "REL1_23",
+      "revision": "b88932ae11d24fced28d05946c5a1cd98e2f2696"
+    },
+    "core/REL1_23/extensions/Renameuser": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
+      "branch": "REL1_23",
+      "revision": "a5cd087f6e43bf19cf1ae204cf32cfab2d9ffd64"
+    },
+    "core/REL1_23/extensions/SpamBlacklist": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
+      "branch": "REL1_23",
+      "revision": "29395e3985f076216ad01718d5cc6327e74d89ee"
+    },
+    "core/REL1_23/extensions/SyntaxHighlight_GeSHi": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
+      "branch": "REL1_23",
+      "revision": "feaa2c78ae799adf8bbc1ea7a79203d94c314583"
+    },
+    "core/REL1_23/extensions/TitleBlacklist": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
+      "branch": "REL1_23",
+      "revision": "3feef4208b3bb04be82de16ea09a3cadf91d1f83"
+    },
+    "core/REL1_23/extensions/WikiEditor": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/WikiEditor.git",
+      "branch": "REL1_23",
+      "revision": "3f6ac7ca6b30aff241b797718ba06bb951ab5e2c"
+    },
+    "core/REL1_23/skins/Vector": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
+      "branch": "REL1_23",
+      "revision": "361d9d9cfcba716dbf90af62cc398e51d4c303b8"
+    },
+    "core/REL1_27": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/core.git",
+      "branch": "REL1_27",
+      "revision": "2bac17fe8090a831a5f35bc750456eca615d3b00"
+    },
+    "core/REL1_27/extensions/Cite": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.git",
+      "branch": "REL1_27",
+      "revision": "90128c2d784067e0512f2a9e48cf32b283e228b3"
+    },
+    "core/REL1_27/extensions/CiteThisPage": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CiteThisPage.git",
+      "branch": "REL1_27",
+      "revision": "1d36774f5e3b2a4362e0f12cab040e4dc6fbd440"
+    },
+    "core/REL1_27/extensions/ConfirmEdit": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ConfirmEdit.git",
+      "branch": "REL1_27",
+      "revision": "92652aa032f48015e87d51aa28b760d3f014c3f9"
+    },
+    "core/REL1_27/extensions/Gadgets": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
+      "branch": "REL1_27",
+      "revision": "4014d588097fd5a420c0ecba93229a81c1835ea6"
+    },
+    "core/REL1_27/extensions/ImageMap": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImageMap.git",
+      "branch": "REL1_27",
+      "revision": "abe93ef762ee834323c33b7299eae6671194de9b"
+    },
+    "core/REL1_27/extensions/InputBox": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/InputBox.git",
+      "branch": "REL1_27",
+      "revision": "b02a22828be5771b7042a3fc46af472ce057bcad"
+    },
+    "core/REL1_27/extensions/Interwiki": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Interwiki.git",
+      "branch": "REL1_27",
+      "revision": "7ee2b27e5375b8c4e976b9cbdc4537f1119e2fbd"
+    },
+    "core/REL1_27/extensions/LocalisationUpdate": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LocalisationUpdate.git",
+      "branch": "REL1_27",
+      "revision": "e41495a0d5aebc82544a3d6fe24e2504a7873213"
+    },
+    "core/REL1_27/extensions/Nuke": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Nuke.git",
+      "branch": "REL1_27",
+      "revision": "074358412a16947da490395ec5486614591208eb"
+    },
+    "core/REL1_27/extensions/ParserFunctions": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ParserFunctions.git",
+      "branch": "REL1_27",
+      "revision": "d0a5d10aaf44553956b5cb3da70a13d121904aad"
+    },
+    "core/REL1_27/extensions/PdfHandler": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfHandler.git",
+      "branch": "REL1_27",
+      "revision": "847b64e35eb3213b6f9803c29e53ca1ae5fb675f"
+    },
+    "core/REL1_27/extensions/Poem": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Poem.git",
+      "branch": "REL1_27",
+      "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
+    },
+    "core/REL1_27/extensions/Renameuser": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
+      "branch": "REL1_27",
+      "revision": "615d76190e8537968371e90c6449f2a1db3d90f6"
+    },
+    "core/REL1_27/extensions/SpamBlacklist": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SpamBlacklist.git",
+      "branch": "REL1_27",
+      "revision": "c8992f0d0e163a0b16593a6eddef47e8dcc47b0d"
+    },
+    "core/REL1_27/extensions/SyntaxHighlight_GeSHi": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
+      "branch": "REL1_27",
+      "revision": "20c4ad51e37d2a1ea11ed00c0b9d8b5cc3d913a0"
+    },
+    "core/REL1_27/extensions/TitleBlacklist": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TitleBlacklist.git",
+      "branch": "REL1_27",
+      "revision": "7bb99ac1166bde18b4944cea07a23e0f849698ec"
+    },
+    "core/REL1_27/skins/CologneBlue": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
+      "branch": "REL1_27",
+      "revision": "8932b44bfc96f9e7f74e230c36f0f0cea879bf72"
+    },
+    "core/REL1_27/skins/Modern": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git",
+      "branch": "REL1_27",
+      "revision": "db1cc18faa2f6aa3e65ab32ab218ade944acfd49"
+    },
+    "core/REL1_27/skins/MonoBook": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
+      "branch": "REL1_27",
+      "revision": "f29c8481ed82764ddaa8f8c1b8ebb3d8aa88973e"
+    },
+    "core/REL1_27/skins/Vector": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git",
+      "branch": "REL1_27",
+      "revision": "d11a80a1f68784a12804cd97436499fb729e3764"
+    },
+    "extensions/AdminLinks": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/AdminLinks",
+      "branch": "master",
+      "revision": "2619ed9beede0017f50ed08b20f6ea3a5200a838"
+    },
+    "extensions/ApprovedRevs": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ApprovedRevs",
+      "branch": "master",
+      "revision": "e81c80342fb60e537f33ee04ff0090b13f928875"
+    },
+    "extensions/Arrays": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Arrays",
+      "branch": "master",
+      "revision": "e484ab2dbbb29d56bf4329b97206f2cde0c6eafc"
+    },
+    "extensions/BreadCrumbs": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs",
+      "revision": "0657677e3f585ab5c7e357214c2b55e7e0f4561b"
+    },
+    "extensions/BreadCrumbs2": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/BreadCrumbs2",
+      "branch": "master",
+      "revision": "d1c8feb4568d49661839afece95a6bbbdbf0f96f"
+    },
+    "extensions/CategoryTree": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree",
+      "branch": "master",
+      "revision": "8d7de84017d3f8efb6bfb5265665aa4907767cde"
+    },
+    "extensions/ConfirmEdit": {
+      "url": "git@github.com:wikimedia/mediawiki-extensions-ConfirmEdit.git",
+      "branch": "REL1_27",
+      "revision": "0ea032c98d0786dc34151bda1b2485844f74357e"
+    },
+    "extensions/DataTransfer": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer",
+      "branch": "master",
+      "revision": "b6645aac78bcab8c8e8fe251e968adf643d609ba"
+    },
+    "extensions/DeleteBatch": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DeleteBatch",
+      "branch": "master",
+      "revision": "5fee64e2bfce6f1bddac2a6c81eb90fc1b9923a0"
+    },
+    "extensions/DisplayTitle": {
+      "url": "git@github.com:wikimedia/mediawiki-extensions-DisplayTitle.git",
+      "branch": "master",
+      "revision": "b4c092c4d4f8787b672b8057c32b4b82fbc036a9"
+    },
+    "extensions/DynamicPageList": {
+      "url": "https://github.com/Alexia/DynamicPageList.git",
+      "revision": "559e5cec1fd620ba1aebecc5a538426f8b72a736"
+    },
+    "extensions/Echo": {
+      "url": "git@github.com:wikimedia/mediawiki-extensions-Echo.git",
+      "revision": "b87fa2f66f4816179c51d6c1398715f62b0227c2"
+    },
+    "extensions/ExternalData": {
+      "url": "https://github.com/wikimedia/mediawiki-extensions-ExternalData.git",
+      "branch": "master",
+      "revision": "fe2bc5af54edb27e60e78329604581d0f844e724"
+    },
+    "extensions/Flow": {
+      "url": "git@github.com:wikimedia/mediawiki-extensions-Flow.git",
+      "revision": "6ecdef3a156fbf454e308b6377f5253059312075"
+    },
+    "extensions/GoogleAnalytics": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/googleAnalytics",
+      "branch": "master",
+      "revision": "ce5ef02de5f0b6d0f5d8ad98bec73aa25bff1323"
+    },
+    "extensions/HeaderTabs": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/HeaderTabs",
+      "branch": "master",
+      "revision": "29d694f645ed21815c05299075eff73c8989a3eb"
+    },
+    "extensions/ImportUsers": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ImportUsers",
+      "branch": "master",
+      "revision": "b61e53586cef2735ac07d4a2ecfedf9bc2fbfb23"
+    },
+    "extensions/LinkTarget": {
+      "url": "git@github.com:wikimedia/mediawiki-extensions-LinkTarget.git",
+      "revision": "c2cd0de1aaf4bf2c4923d0010251e0b8f107c97c"
+    },
+    "extensions/LinkedWiki": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LinkedWiki",
+      "branch": "master",
+      "revision": "049afde999b819deb91c04f7c7908447e6c90ebb"
+    },
+    "extensions/LiquidThreads": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/LiquidThreads",
+      "branch": "master",
+      "revision": "884c4d8a9feef25c2becb5d8bf8531d610bc35d0"
+    },
+    "extensions/LiquidThreadsOverview": {
+      "url": "https://github.com/GeneralVolkoV/LiquidThreadsOverview.git",
+      "branch": "master",
+      "revision": "c7625623c9db02ff81900ba5e8abedb209dfd76b"
+    },
+    "extensions/MagicNoCache": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MagicNoCache",
+      "branch": "master",
+      "revision": "a6aac2ceb3a1ff0485f1cc0b7f12697181f0931e"
+    },
+    "extensions/MediaFunctions": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MediaFunctions",
+      "branch": "master",
+      "revision": "5e142961d53332162e339c8573a8da6eb5032491"
+    },
+    "extensions/MyVariables": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/MyVariables",
+      "branch": "master",
+      "revision": "499d2ee92acbf102d8b487738731f704d6c38f93"
+    },
+    "extensions/PdfBook": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfBook",
+      "branch": "master",
+      "revision": "17d1dfd8475ac21b81a60c3f82afe58fde9d47bb"
+    },
+    "extensions/ReplaceText": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ReplaceText",
+      "branch": "master",
+      "revision": "d1805b8abbac0ef0b1812a1e17a939b06e3e0868"
+    },
+    "extensions/SemanticCompoundQueries": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticCompoundQueries",
+      "branch": "master",
+      "revision": "ae8f8250b1a7df0e8f623816087aef741c680064"
+    },
+    "extensions/SemanticDrilldown": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticDrilldown",
+      "revision": "c21c93db800a21945a56d56f4d791bccf707d74a"
+    },
+    "extensions/SemanticForms": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticForms",
+      "branch": "master",
+      "revision": "e0f15961c5479413d99b5bbc50609a3a9ef7da8f"
+    },
+    "extensions/SemanticFormsInputs": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticFormsInputs",
+      "branch": "master",
+      "revision": "fc7d604b51be88383cf03c45d4e0b441c24e02fa"
+    },
+    "extensions/SemanticInternalObjects": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticInternalObjects",
+      "branch": "master",
+      "revision": "1e936bd3c544e19ea435e1bb99041b8a7cb99522"
+    },
+    "extensions/SemanticTitle": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SemanticTitle",
+      "branch": "master",
+      "revision": "0b97e612b05a2b2d9e862661f536b6d2f2b3f108"
+    },
+    "extensions/UrlGetParameters": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UrlGetParameters",
+      "branch": "master",
+      "revision": "c18937c6c62afad5f1fee09a91507d27be897433"
+    },
+    "extensions/UserMerge": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UserMerge",
+      "branch": "master",
+      "revision": "c2662f57a675bf5bd2bfe0adaac14a434434d3c2"
+    },
+    "extensions/Variables": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Variables",
+      "branch": "master",
+      "revision": "d8bca97c9b111ee724faca7644b66da410a90031"
+    },
+    "extensions/Widgets": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets",
+      "branch": "master",
+      "revision": "0338885c6fd759eb6545296333373bc69b6bd1da"
+    },
+    "libraries/smarty": {
+      "url": "https://github.com/smarty-php/smarty.git",
+      "branch": "master",
+      "revision": "4537d8aae6c4a26f5439bc3a05d3437d25c2c4d2"
+    }
   }
 }
