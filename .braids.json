@@ -155,11 +155,6 @@
       "branch": "REL1_27",
       "revision": "92652aa032f48015e87d51aa28b760d3f014c3f9"
     },
-    "core/REL1_27/extensions/Gadgets": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Gadgets.git",
-      "branch": "REL1_27",
-      "revision": "4014d588097fd5a420c0ecba93229a81c1835ea6"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
