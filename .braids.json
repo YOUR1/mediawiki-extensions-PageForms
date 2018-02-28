@@ -200,11 +200,6 @@
       "branch": "REL1_27",
       "revision": "8cdc76d08f3c82dbb67ef5d324d2767623fb2de6"
     },
-    "core/REL1_27/extensions/Renameuser": {
-      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Renameuser.git",
-      "branch": "REL1_27",
-      "revision": "615d76190e8537968371e90c6449f2a1db3d90f6"
-    },
     "core/REL1_27/skins/CologneBlue": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git",
       "branch": "REL1_27",
