@@ -225,6 +225,11 @@
       "branch": "REL1_27",
       "revision": "952e04b327dbe9776a188fa70c352a66c8afd571"
     },
+    "core/REL1_27/skins/Modern": {
+      "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git",
+      "branch": "REL1_27",
+      "revision": "db1cc18faa2f6aa3e65ab32ab218ade944acfd49"
+    },
     "core/REL1_27/skins/MonoBook": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git",
       "branch": "REL1_27",
