@@ -13,8 +13,25 @@ class ApprovedRevs {
 	// Static arrays to prevent querying the database more than necessary.
 	static $mApprovedContentForPage = array();
 	static $mApprovedRevIDForPage = array();
+	static $mApproverForPage = array();
 	static $mUserCanApprove = null;
-	
+
+	/**
+	 * Gets the approved revision User for this page, or null if there isn't
+	 * one.
+	 */
+	public static function getRevApprover( $title ) {
+		$pageID = $title->getArticleID();
+		if ( !isset( self::$mApproverForPage[$pageID] ) && self::pageIsApprovable( $title ) ) {
+			$dbr = wfGetDB( DB_SLAVE );
+			$approverID = $dbr->selectField( 'approved_revs', 'approver_id',
+				array( 'page_id' => $pageID ) );
+			$approver = $approverID ? User::newFromID( $approverID ) : null;
+			self::$mApproverForPage[$pageID] = $approver;
+		}
+		return $approver;
+	}
+
 	/**
 	 * Gets the approved revision ID for this page, or null if there isn't
 	 * one.
@@ -49,14 +66,8 @@ class ApprovedRevs {
 	 * (otherwise).
 	 */
 	public static function getPageText( $title, $revisionID = null ) {
-		if ( method_exists( 'Revision', 'getContent' ) ) {
-			// MW >= 1.21
-			$revision = Revision::newFromTitle( $title, $revisionID );
-			return $revision->getContent()->getNativeData();
-		} else {
-			$article = new Article( $title, $revisionID );
-			return $article->getContent();
-		}
+		$revision = Revision::newFromTitle( $title, $revisionID );
+		return $revision->getContent()->getNativeData();
 	}
 
 	/**
@@ -83,17 +94,15 @@ class ApprovedRevs {
 	 * a page via the simple URL for it - not specfying a version number,
 	 * not editing the page, etc.
 	 */
-	public static function isDefaultPageRequest() {
-		global $wgRequest;
-		if ( $wgRequest->getCheck( 'oldid' ) ) {
+	public static function isDefaultPageRequest( $request ) {
+		if ( $request->getCheck( 'oldid' ) ) {
 			return false;
 		}
-		// check if it's an action other than viewing
-		global $wgRequest;
-		if ( $wgRequest->getCheck( 'action' ) &&
-			$wgRequest->getVal( 'action' ) != 'view' &&
-			$wgRequest->getVal( 'action' ) != 'purge' &&
-			$wgRequest->getVal( 'action' ) != 'render' ) {
+		// Check if it's an action other than viewing.
+		if ( $request->getCheck( 'action' ) &&
+			$request->getVal( 'action' ) != 'view' &&
+			$request->getVal( 'action' ) != 'purge' &&
+			$request->getVal( 'action' ) != 'render' ) {
 				return false;
 		}
 		return true;
@@ -118,7 +127,7 @@ class ApprovedRevs {
 		}
 
 		// Allow custom setting of whether the page is approvable.
-		if ( !wfRunHooks( 'ApprovedRevsPageIsApprovable', array( $title, &$isApprovable ) ) ) {
+		if ( !Hooks::run( 'ApprovedRevsPageIsApprovable', array( $title, &$isApprovable ) ) ) {
 			$title->isApprovable = $isApprovable;
 			return $title->isApprovable;
 		}
@@ -148,8 +157,13 @@ class ApprovedRevs {
 		return $isApprovable;
 	}
 
-	public static function userCanApprove( $title ) {
+	public static function checkPermission( User $user, Title $title, $permission ) {
+		return ( $title->userCan( $permission, $user ) || $user->isAllowed( $permission ) );
+	}
+
+	public static function userCanApprove( User $user, Title $title ) {
 		global $egApprovedRevsSelfOwnedNamespaces;
+		$permission = 'approverevisions';
 
 		// $mUserCanApprove is a static variable used for
 		// "caching" the result of this function, so that
@@ -158,7 +172,7 @@ class ApprovedRevs {
 			return true;
 		} elseif ( self::$mUserCanApprove === false ) {
 			return false;
-		} elseif ( $title->userCan( 'approverevisions' ) ) {
+		} elseif ( ApprovedRevs::checkPermission( $user, $title, $permission ) ) {
 			self::$mUserCanApprove = true;
 			return true;
 		} else {
@@ -167,14 +181,13 @@ class ApprovedRevs {
 			// revisions - it depends on whether the current
 			// namespace is within the admin-defined
 			// $egApprovedRevsSelfOwnedNamespaces array.
-			global $wgUser;
 			$namespace = $title->getNamespace();
 			if ( in_array( $namespace, $egApprovedRevsSelfOwnedNamespaces ) ) {
 				if ( $namespace == NS_USER ) {
 					// If the page is in the 'User:'
 					// namespace, this user can approve
 					// revisions if it's their user page.
-					if ( $title->getText() == $wgUser->getName() ) {
+					if ( $title->getText() == $user->getName() ) {
 						self::$mUserCanApprove = true;
 						return true;
 					}
@@ -185,14 +198,14 @@ class ApprovedRevs {
 					// query - is there an easier way?
 					$dbr = wfGetDB( DB_SLAVE );
 					$row = $dbr->selectRow(
-						array( 'revision', 'page' ),
-						'revision.rev_user_text',
-						array( 'page.page_title' => $title->getDBkey() ),
+						array( 'r' => 'revision', 'p' => 'page' ),
+						'r.rev_user_text',
+						array( 'p.page_title' => $title->getDBkey() ),
 						null,
-						array( 'ORDER BY' => 'revision.rev_id ASC' ),
-						array( 'revision' => array( 'JOIN', 'revision.rev_page = page.page_id' ) )
+						array( 'ORDER BY' => 'r.rev_id ASC' ),
+						array( 'revision' => array( 'JOIN', 'r.rev_page = p.page_id' ) )
 					);
-					if ( $row->rev_user_text == $wgUser->getName() ) {
+					if ( $row->rev_user_text == $user->getName() ) {
 						self::$mUserCanApprove = true;
 						return true;
 					}
@@ -203,17 +216,28 @@ class ApprovedRevs {
 		return false;
 	}
 
-	public static function saveApprovedRevIDInDB( $title, $rev_id ) {
+	public static function saveApprovedRevIDInDB( $title, $rev_id, $isAutoApprove = true ) {
+		global $wgUser;
+		$userBit = array();
+
+		if ( !$isAutoApprove ) {
+			$userBit = array( 'approver_id' => $wgUser->getID() );
+		}
+
 		$dbr = wfGetDB( DB_MASTER );
 		$page_id = $title->getArticleID();
 		$old_rev_id = $dbr->selectField( 'approved_revs', 'rev_id', array( 'page_id' => $page_id ) );
 		if ( $old_rev_id ) {
-			$dbr->update( 'approved_revs', array( 'rev_id' => $rev_id ), array( 'page_id' => $page_id ) );
+			$dbr->update( 'approved_revs',
+				array_merge( array( 'rev_id' => $rev_id ), $userBit ),
+				array( 'page_id' => $page_id ) );
 		} else {
-			$dbr->insert( 'approved_revs', array( 'page_id' => $page_id, 'rev_id' => $rev_id ) );
+			$dbr->insert( 'approved_revs',
+				array_merge( array( 'page_id' => $page_id, 'rev_id' => $rev_id ), $userBit ) );
 		}
 		// Update "cache" in memory
 		self::$mApprovedRevIDForPage[$page_id] = $rev_id;
+		self::$mApproverForPage[$page_id] = $wgUser;
 	}
 
 	static function setPageSearchText( $title, $text ) {
@@ -227,7 +251,7 @@ class ApprovedRevs {
 	 * info for extensions such as Semantic MediaWiki; and logs the action.
 	 */
 	public static function setApprovedRevID( $title, $rev_id, $is_latest = false ) {
-		self::saveApprovedRevIDInDB( $title, $rev_id );
+		self::saveApprovedRevIDInDB( $title, $rev_id, false );
 		$parser = new Parser();
 
 		// If the revision being approved is definitely the latest
@@ -257,7 +281,7 @@ class ApprovedRevs {
 			$logParams
 		);
 
-		wfRunHooks( 'ApprovedRevsRevisionApproved', array( $parser, $title, $rev_id ) );
+		Hooks::run( 'ApprovedRevsRevisionApproved', array( $parser, $title, $rev_id ) );
 	}
 
 	public static function deleteRevisionApproval( $title ) {
@@ -297,11 +321,24 @@ class ApprovedRevs {
 			''
 		);
 
-		wfRunHooks( 'ApprovedRevsRevisionUnapproved', array( $parser, $title ) );
+		Hooks::run( 'ApprovedRevsRevisionUnapproved', array( $parser, $title ) );
 	}
 
 	public static function addCSS() {
 		global $wgOut;
 		$wgOut->addModuleStyles( 'ext.ApprovedRevs' );
 	}
+
+	/**
+	 * Helper function for backward compatibility.
+	 */
+	public static function makeLink( $linkRenderer, $title, $msg = null, $attrs = array(), $params = array() ) {
+		if ( !is_null( $linkRenderer ) ) {
+			// MW 1.28+
+			return $linkRenderer->makeLink( $title, $msg, $attrs, $params );
+		} else {
+			return Linker::linkKnown( $title, $msg, $attrs, $params );
+		}
+	}
+
 }

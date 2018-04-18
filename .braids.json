@@ -253,7 +253,7 @@
     "extensions/ApprovedRevs": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/ApprovedRevs",
       "branch": "master",
-      "revision": "e81c80342fb60e537f33ee04ff0090b13f928875"
+      "revision": "b7dba90aabdb754004c902688c35ff5137fed2cc"
     },
     "extensions/Arrays": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Arrays",

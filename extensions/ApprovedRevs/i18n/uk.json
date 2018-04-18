@@ -8,7 +8,8 @@
 			"Ата",
 			"Тест",
 			"Andriykopanytsia",
-			"Ahonc"
+			"Ahonc",
+			"Piramidion"
 		]
 	},
 	"approvedrevs-desc": "Встановити єдиний перегляд сторінки як затверджуючий",
@@ -30,6 +31,7 @@
 	"approvedrevs-approvedpages": "Усі сторінки, що мають затверджені версії.",
 	"approvedrevs-notlatestpages": "Сторінки, чиї затверджені версії не є останніми",
 	"approvedrevs-unapprovedpages": "Несхвалені сторінки",
+	"approvedrevs-invalidpages": "Сторінки з недійсними затвердженнями",
 	"approvedrevs-view": "Перегляд:",
 	"approvedrevs-revisionnumber": "версія $1",
 	"approvedrevs-approvedby": "затверджена $1 $2",
@@ -39,5 +41,11 @@
 	"approvedrevs-viewlatestrev": "Перегляд останньої версії.",
 	"approvedrevs-approvedrevision": "Затверджена версія",
 	"right-approverevisions": "встановлення певних версій сторінок затвердженими",
-	"right-viewlinktolatest": "Переглянути пояснювальний текст у верхній частині сторінки яка має схвалену версію."
+	"right-viewlinktolatest": "Переглянути пояснювальний текст у верхній частині сторінки яка має схвалену версію.",
+	"apihelp-approve-description": "Перевірити версію, затвердивши її або знявши затвердження.",
+	"apihelp-approve-summary": "Перевірити версію, затвердивши її або знявши затвердження.",
+	"apihelp-approve-param-revid": "Ідентифікатор версії, яку треба затвердити.",
+	"apihelp-approve-param-unapprove": "Якщо встановлено, з версії буде знято затвердження, замість того, щоб затвердити її.",
+	"apihelp-approve-example-1": "Затвердити версію 12345",
+	"apihelp-approve-example-2": "Зняти затвердження версії 12345"
 }

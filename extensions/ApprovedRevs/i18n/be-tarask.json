@@ -11,6 +11,7 @@
 	"approvedrevs-logname": "Журнал зацьверджаньня вэрсіяў",
 	"approvedrevs-logdesc": "Гэта журнал зацьверджаных вэрсіяў.",
 	"approvedrevs-approve": "зацьвердзіць",
+	"approvedrevs-approver": "Гэтая вэрсія была зацьверджаная $1.",
 	"approvedrevs-unapprove": "адхіліць",
 	"approvedrevs-approvesuccess": "Гэтая вэрсія старонкі была зацьверджаная.",
 	"approvedrevs-unapprovesuccess": "Болей не існуе зацьверджанай вэрсіі гэтай старонкі.\nЗамест яе будзе паказаная апошняя вэрсія.",
@@ -26,6 +27,7 @@
 	"approvedrevs-approvedpages": "Усе старонкі з зацьверджанымі вэрсіямі",
 	"approvedrevs-notlatestpages": "Старонкі, зацьверджаныя вэрсіі якіх не зьяўляюцца апошнімі",
 	"approvedrevs-unapprovedpages": "Незацьверджаныя старонкі",
+	"approvedrevs-invalidpages": "Старонкі зь няслушнымі ўхваленьнямі",
 	"approvedrevs-view": "Прагляд:",
 	"approvedrevs-revisionnumber": "вэрсія $1",
 	"approvedrevs-approvedby": "зацьверджаная $1 $2",
@@ -35,5 +37,11 @@
 	"approvedrevs-viewlatestrev": "Паказаць апошнюю вэрсію.",
 	"approvedrevs-approvedrevision": "Зацьверджаная вэрсія",
 	"right-approverevisions": "зацьверджаньне вызначаных вэрсіяў вікі-старонак",
-	"right-viewlinktolatest": "прагляд тлумачальнага тэксту ў версе старонак, якія маюць зацьверджаныя вэрсіі"
+	"right-viewlinktolatest": "прагляд тлумачальнага тэксту ў версе старонак, якія маюць зацьверджаныя вэрсіі",
+	"apihelp-approve-description": "Вычытка вэрсіі ўхваленьнем ці не ўхваленьнем яе.",
+	"apihelp-approve-summary": "Вычытка вэрсіі ўхваленьнем ці не ўхваленьнем яе.",
+	"apihelp-approve-param-revid": "ID вэрсіі, для якой пацьвярджаць.",
+	"apihelp-approve-param-unapprove": "Калі пазначанае, вэрсія ня будзе зацьверджаная.",
+	"apihelp-approve-example-1": "Зацьвердзіць вэрсію 12345",
+	"apihelp-approve-example-2": "Адхіліць вэрсію 12345"
 }

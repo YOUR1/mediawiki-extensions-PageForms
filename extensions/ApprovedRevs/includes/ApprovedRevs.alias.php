@@ -17,7 +17,7 @@ $specialPageAliases['ar'] = array(
 	'ApprovedRevs' => array( 'مراجعات_موفقة', 'صفحات_موفقة', 'صفحات_غير_موفقة' ),
 );
 
-/** Egyptian Spoken Arabic (مصرى) */
+/** Egyptian Arabic (مصرى) */
 $specialPageAliases['arz'] = array(
 	'ApprovedRevs' => array( 'مراجعات_متوفقه', 'صفحات_متوافق_عليها', 'صفحات_مش_متوافق_عليها' ),
 );
@@ -92,9 +92,9 @@ $specialPageAliases['lb'] = array(
 	'ApprovedRevs' => array( 'Net_nogekuckt_Säiten' ),
 );
 
-/** لوری (لوری) */
+/** Northern Luri (لۊری شومالی) */
 $specialPageAliases['lrc'] = array(
-	'ApprovedRevs' => array( 'وانئریا_تصیق_بیه', 'بلگه_یا_تصیق_بییه', 'بلگه_یا_تصیق_نبیه' ),
+	'ApprovedRevs' => array( 'ڤانئیأریا_تأصیق_بیە', 'بألگە_یا_تصیق_بییھ', 'بلگە_یا_تصیق_نبیە' ),
 );
 
 /** Malagasy (Malagasy) */

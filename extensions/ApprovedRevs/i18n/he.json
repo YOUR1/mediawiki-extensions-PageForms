@@ -2,13 +2,15 @@
 	"@metadata": {
 		"authors": [
 			"Amire80",
-			"Inkbug"
+			"Inkbug",
+			"Guycn2"
 		]
 	},
 	"approvedrevs-desc": "הגדרת גרסה אחת של דף כגרסה מאושרת",
 	"approvedrevs-logname": "יומן אישור גרסאות",
 	"approvedrevs-logdesc": "זהו יומן של גרסאות שאושרו.",
 	"approvedrevs-approve": "לאשר",
+	"approvedrevs-approver": "גרסה זו אושרה על־ידי $1.",
 	"approvedrevs-unapprove": "לבטל אישור",
 	"approvedrevs-approvesuccess": "הגרסה הזאת של הדף הוגדרה כגרסה מאושרת.",
 	"approvedrevs-unapprovesuccess": "אין עוד גרסה מאושרת לדף זה.\nבמקום זאת תוצג הגרסה העדכנית ביותר.",
@@ -32,6 +34,6 @@
 	"approvedrevs-approvethisrev": "לאשר את הגרסה הזאת.",
 	"approvedrevs-viewlatestrev": "להציג את הגרסה האחרונה.",
 	"approvedrevs-approvedrevision": "גרסה מאושרת",
-	"right-approverevisions": "הגדר גרסה מסוימת של דף הוויקי כמאושרת",
-	"right-viewlinktolatest": "הצגת הסבר בחלק העליון של העמודים שיש להם גרסה מאושרת"
+	"right-approverevisions": "סימון גרסאות מסוימות של דפים כגרסאות שאושרו",
+	"right-viewlinktolatest": "צפייה בהסברים בחלק העליון של דפים שיש להם גרסה מאושרת"
 }

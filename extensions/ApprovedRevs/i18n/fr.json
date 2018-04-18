@@ -4,13 +4,15 @@
 			"Gomoko",
 			"IAlex",
 			"Peter17",
-			"Sherbrooke"
+			"Sherbrooke",
+			"Wladek92"
 		]
 	},
 	"approvedrevs-desc": "Marquer une seule révision d’une page comme approuvée",
 	"approvedrevs-logname": "Journal des approbations de révisions",
 	"approvedrevs-logdesc": "Ceci est le journal des révisions qui ont été marquées comme approuvées.",
 	"approvedrevs-approve": "approuver",
+	"approvedrevs-approver": "Cette révision a été approuvée par $1.",
 	"approvedrevs-unapprove": "désapprouver",
 	"approvedrevs-approvesuccess": "Cette révision de la page a été marquée comme étant la version approuvée.",
 	"approvedrevs-unapprovesuccess": "Il n’y a plus de version approuvée de cette page.\nÀ la place, la révision la plus récente sera affichée.",
@@ -26,6 +28,7 @@
 	"approvedrevs-approvedpages": "Toutes les pages avec une révision approuvée",
 	"approvedrevs-notlatestpages": "Pages dont la révision approuvée n’est pas la plus récente",
 	"approvedrevs-unapprovedpages": "Pages non approuvées",
+	"approvedrevs-invalidpages": "Pages avec des approbations non valides",
 	"approvedrevs-view": "Voir :",
 	"approvedrevs-revisionnumber": "modification $1",
 	"approvedrevs-approvedby": "approuvé par $1 le $2",
@@ -35,5 +38,11 @@
 	"approvedrevs-viewlatestrev": "Voir la dernière révision.",
 	"approvedrevs-approvedrevision": "Accepter la révision",
 	"right-approverevisions": "Marquer une révision précise d’une page comme approuvée",
-	"right-viewlinktolatest": "Voir le texte explicatif en haut des pages qui ont une révision approuvée"
+	"right-viewlinktolatest": "Voir le texte explicatif en haut des pages qui ont une révision approuvée",
+	"apihelp-approve-description": "Relire une révision en l’approuvant ou en la désapprouvant.",
+	"apihelp-approve-summary": "Relire une révision en l’approuvant ou non.",
+	"apihelp-approve-param-revid": "L’ID de révision à approuver.",
+	"apihelp-approve-param-unapprove": "Si positionné, la révision sera désapprouvée plutôt qu’approuvée.",
+	"apihelp-approve-example-1": "Approuver la révision 12345",
+	"apihelp-approve-example-2": "Désapprouver la révision 12345"
 }

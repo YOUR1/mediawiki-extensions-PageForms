@@ -1,5 +1,7 @@
 <?php
 
+use MediaWiki\MediaWikiServices;
+
 /**
  * Functions for the Approved Revs extension called by hooks in the MediaWiki
  * code.
@@ -14,9 +16,9 @@ class ApprovedRevsHooks {
 
 	static $mNoSaveOccurring = false;
 
-	static public function userRevsApprovedAutomatically( $title ) {
+	static public function userRevsApprovedAutomatically( User $user, Title $title ) {
 		global $egApprovedRevsAutomaticApprovals;
-		return ( ApprovedRevs::userCanApprove( $title ) && $egApprovedRevsAutomaticApprovals );
+		return ( ApprovedRevs::userCanApprove( $user, $title ) && $egApprovedRevsAutomaticApprovals );
 	}
 
 	/**
@@ -27,7 +29,9 @@ class ApprovedRevsHooks {
 	 * function - it currently uses 'PersonalUrls', which works.
 	 */
 	static public function removeRobotsTag( &$personal_urls, &$title ) {
-		if ( ! ApprovedRevs::isDefaultPageRequest() ) {
+		global $wgRequest;
+
+		if ( ! ApprovedRevs::isDefaultPageRequest( $wgRequest ) ) {
 			return true;
 		}
 
@@ -40,18 +44,21 @@ class ApprovedRevsHooks {
 	}
 
 	/**
+	 * Hook: ArticleEditUpdates
+	 *
 	 * Call LinksUpdate on the text of this page's approved revision,
 	 * if there is one.
 	 */
-	static public function updateLinksAfterEdit( &$page, &$editInfo, $changed ) {
-		$title = $page->getTitle();
+	static public function updateLinksAfterEdit( WikiPage &$wikiPage, &$editInfo, $changed ) {
+		$title = $wikiPage->getTitle();
 		if ( ! ApprovedRevs::pageIsApprovable( $title ) ) {
 			return true;
 		}
-		// If this user's revisions get approved automatically,
-		// exit now, because this will be the approved
-		// revision anyway.
-		if ( self::userRevsApprovedAutomatically( $title ) ) {
+		// If this user's revisions get approved automatically, exit
+		// now, because this will be the approved revision anyway.
+		$userID = $wikiPage->getUser();
+		$user = User::newFromId( $userID );
+		if ( self::userRevsApprovedAutomatically( $user, $title ) ) {
 			return true;
 		}
 		$text = '';
@@ -72,14 +79,16 @@ class ApprovedRevsHooks {
 			}
 		}
 
-		$editInfo = $page->prepareTextForEdit( $text );
-		$u = new LinksUpdate( $page->mTitle, $editInfo->output );
+		$editInfo = $wikiPage->prepareContentForEdit( new WikitextContent( $text ) );
+		$u = new LinksUpdate( $wikiPage->mTitle, $editInfo->output );
 		$u->doUpdate();
 
 		return true;
 	}
 
 	/**
+	 * Hook: PageContentSaveComplete
+	 *
 	 * If the user saving this page has approval power, and automatic
 	 * approvals are enabled, and the page is approvable, and either
 	 * (a) this page already has an approved revision, or (b) unapproved
@@ -87,16 +96,16 @@ class ApprovedRevsHooks {
 	 * latest revision to be the approved one - don't bother logging
 	 * the approval, though; the log is reserved for manual approvals.
 	 */
-	static public function setLatestAsApproved( &$article , &$user, $text,
-		$summary, $flags, $unused1, $unused2, &$flags, $revision,
-		&$status, $baseRevId ) {
+	static public function setLatestAsApproved( WikiPage $wikipage, $user, $content,
+		$summary, $isMinor, $isWatch, $section, $flags, $revision,
+		$status, $baseRevId ) {
 
 		if ( is_null( $revision ) ) {
 			return true;
 		}
 
-		$title = $article->getTitle();
-		if ( ! self::userRevsApprovedAutomatically( $title ) ) {
+		$title = $wikipage->getTitle();
+		if ( ! self::userRevsApprovedAutomatically( $user, $title ) ) {
 			return true;
 		}
 
@@ -113,22 +122,24 @@ class ApprovedRevsHooks {
 		}
 
 		// Save approval without logging.
-		ApprovedRevs::saveApprovedRevIDInDB( $title, $revision->getID() );
+		ApprovedRevs::saveApprovedRevIDInDB( $title, $revision->getID(), true );
 		return true;
 	}
 
 	/**
+	 * PageContentSaveComplete hook handler
+	 *
 	 * Set the text that's stored for the page for standard searches.
 	 */
-	static public function setSearchText( &$article , &$user, $text,
-		$summary, $flags, $unused1, $unused2, &$flags, $revision,
-		&$status, $baseRevId ) {
+	static public function setSearchText( WikiPage $wikiPage, $user, $content,
+		$summary, $isMinor, $isWatch, $section, $flags, $revision,
+		$status, $baseRevId ) {
 
 		if ( is_null( $revision ) ) {
 			return true;
 		}
 
-		$title = $article->getTitle();
+		$title = $wikiPage->getTitle();
 		if ( !ApprovedRevs::pageIsApprovable( $title ) ) {
 			return true;
 		}
@@ -140,9 +151,9 @@ class ApprovedRevsHooks {
 
 		// We only need to modify the search text if the approved
 		// revision is not the latest one.
-		if ( $revisionID != $article->getLatest() ) {
-			$approvedArticle = new Article( $title, $revisionID );
-			$approvedText = $approvedArticle->getContent();
+		if ( $revisionID != $wikiPage->getLatest() ) {
+			$approvedPage = WikiPage::factory( $title );
+			$approvedText = $approvedPage->getContent()->getNativeData();
 			ApprovedRevs::setPageSearchText( $title, $approvedText );
 		}
 
@@ -166,14 +177,14 @@ class ApprovedRevsHooks {
 	 * the page is simply being viewed, and if no specific revision has
 	 * been requested.
 	 */
-	static function showApprovedRevision( &$title, &$article ) {
-		if ( ! ApprovedRevs::isDefaultPageRequest() ) {
+	static function showApprovedRevision( &$title, &$article, $context ) {
+		$request = $context->getRequest();
+
+		if ( ! ApprovedRevs::isDefaultPageRequest( $request ) ) {
 			return true;
 		}
 
-		$namespace = $title->getNamespace();
-		global $egApprovedRevsNamespaces;
-	 	if ( ! in_array ( $namespace, $egApprovedRevsNamespaces ) ) {
+		if ( ! ApprovedRevs::pageIsApprovable( $title ) ) {
 			return true;
 		}
 
@@ -188,22 +199,23 @@ class ApprovedRevsHooks {
 		// impact, so we'll go with it for now, at least.
 		if ( ! empty( $revisionID ) || $egApprovedRevsBlankIfUnapproved ) {
 			$article = new Article( $title, $revisionID );
-			// This call (whichever it is) is necessary because it
+			// This call is necessary because it
 			// causes $article->mRevision to get initialized,
 			// which in turn allows "edit section" links to show
 			// up if the approved revision is also the latest.
-			if ( method_exists( $article, 'getRevisionFetched' ) ) {
-				// MW 1.19+
-				$article->getRevisionFetched();
-			} else {
-				// MW 1.18
-				$article->fetchContent();
-			}
+			$article->getRevisionFetched();
 		}
 		return true;
 	}
 
-	public static function showBlankIfUnapproved( &$article, &$content ) {
+	/**
+	 * Hook: ArticleAfterFetchContentObject
+	 *
+	 * @param Article $article
+	 * @param Content $content
+	 * @return true
+	 */
+	public static function showBlankIfUnapproved( &$article, Content &$content ) {
 		global $egApprovedRevsBlankIfUnapproved;
 		if ( ! $egApprovedRevsBlankIfUnapproved ) {
 			return true;
@@ -225,29 +237,30 @@ class ApprovedRevsHooks {
 		// there doesn't seem to be any other way to distinguish
 		// between a user looking at the main view of page, and a
 		// user specifically looking at the latest revision of the
-		// page (which we don't want to show as blank.)
+		// page (which we don't want to show as blank).
 		global $wgEnableParserCache;
 		$wgEnableParserCache = false;
 
-		if ( ! ApprovedRevs::isDefaultPageRequest() ) {
+		$context = $article->getContext();
+		$request = $context->getRequest();
+		if ( ! ApprovedRevs::isDefaultPageRequest( $request ) ) {
 			return true;
 		}
 
 		ApprovedRevs::addCSS();
 
-		$content = '';
+		// Set the content to blank.
+		if( $content instanceof TextContent ) {
+			$contentClass = get_class( $content );
+			$content = new $contentClass( '' );
+		} else {
+			$content = '';
+		}
 
 		return true;
 	}
 
 	/**
-	 * Called for MW 1.21+.
-	 */
-	public static function showBlankIfUnapproved2( &$article, &$contentObject ) {
-		return self::showBlankIfUnapproved( $article, $contentObject->mText );
-	}
-
- 	/**
 	 * Sets the subtitle when viewing old revisions of a page.
 	 * This function's code is mostly copied from Article::setOldSubtitle(),
 	 * and it is meant to serve as a replacement for that function, using
@@ -264,8 +277,9 @@ class ApprovedRevsHooks {
 	 */
 	static function setOldSubtitle( $article, $revisionID ) {
 		$title = $article->getTitle(); # Added for ApprovedRevs - and removed hook
-		
-		$unhide = $article->getContext()->getRequest()->getInt( 'unhide' ) == 1;
+		$context = $article->getContext();
+
+		$unhide = $context->getRequest()->getInt( 'unhide' ) == 1;
 
 		// Cascade unhide param in links for easy deletion browsing.
 		$extraParams = array();
@@ -284,8 +298,8 @@ class ApprovedRevsHooks {
 		$latestID = $article->getLatest(); // Modified for Approved Revs
 		$current = ( $revisionID == $latestID );
 		$approvedID = ApprovedRevs::getApprovedRevID( $title );
-		$language = $article->getContext()->getLanguage();
-		$user = $article->getContext()->getUser();
+		$language = $context->getLanguage();
+		$user = $context->getUser();
 
 		$td = $language->userTimeAndDate( $timestamp, $user );
 		$tddate = $language->userDate( $timestamp, $user );
@@ -299,29 +313,41 @@ class ApprovedRevsHooks {
 			? 'revision-info-current'
 			: 'revision-info';
 
-		$outputPage = $article->getContext()->getOutput();
-		$outputPage->addSubtitle( "<div id=\"mw-{$infomsg}\">" . wfMessage( $infomsg,
-			$td )->rawParams( $userlinks )->params( $revision->getID(), $tddate,
-			$tdtime, $revision->getUser() )->parse() . "</div>" );
+		$outputPage = $context->getOutput();
+		$revisionInfo = "<div id=\"mw-{$infomsg}\">" .
+			$context->msg( $infomsg, $td )
+				->rawParams( $userlinks )
+				->params( $revision->getId(), $tddate, $tdtime, $revision->getUserText() )
+				->rawParams( Linker::revComment( $revision, true, true ) )
+				->parse() .
+			"</div>";
+		$outputPage->addSubtitle( $revisionInfo );
 
 		// Created for Approved Revs
 		$latestLinkParams = array();
 		if ( $latestID != $approvedID ) {
 			$latestLinkParams['oldid'] = $latestID;
 		}
+		if ( function_exists( 'MediaWiki\MediaWikiServices::getLinkRenderer' ) ) {
+			$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
+		} else {
+			$linkRenderer = null;
+		}
 		$lnk = $current
 			? wfMessage( 'currentrevisionlink' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'currentrevisionlink' )->escaped(),
+				wfMessage( 'currentrevisionlink' )->text(),
 				array(),
 				$latestLinkParams + $extraParams
 			);
 		$curdiff = $current
 			? wfMessage( 'diff' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'diff' )->escaped(),
+				wfMessage( 'diff' )->text(),
 				array(),
 				array(
 					'diff' => 'cur',
@@ -330,9 +356,10 @@ class ApprovedRevsHooks {
 			);
 		$prev = $title->getPreviousRevisionID( $revisionID );
 		$prevlink = $prev
-			? Linker::linkKnown(
+			? ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'previousrevision' )->escaped(),
+				wfMessage( 'previousrevision' )->text(),
 				array(),
 				array(
 					'direction' => 'prev',
@@ -341,9 +368,10 @@ class ApprovedRevsHooks {
 			)
 			: wfMessage( 'previousrevision' )->escaped();
 		$prevdiff = $prev
-			? Linker::linkKnown(
+			? ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'diff' )->escaped(),
+				wfMessage( 'diff' )->text(),
 				array(),
 				array(
 					'diff' => 'prev',
@@ -353,9 +381,10 @@ class ApprovedRevsHooks {
 			: wfMessage( 'diff' )->escaped();
 		$nextlink = $current
 			? wfMessage( 'nextrevision' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'nextrevision' )->escaped(),
+				wfMessage( 'nextrevision' )->text(),
 				array(),
 				array(
 					'direction' => 'next',
@@ -364,31 +393,34 @@ class ApprovedRevsHooks {
 			);
 		$nextdiff = $current
 			? wfMessage( 'diff' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'diff' )->escaped(),
+				wfMessage( 'diff' )->text(),
 				array(),
 				array(
 					'diff' => 'next',
 					'oldid' => $revisionID
 				) + $extraParams
 			);
-			
+
 		// Added for Approved Revs
 		$approved = ( $approvedID != null && $revisionID == $approvedID );
 		$approvedlink = $approved
 			? wfMessage( 'approvedrevs-approvedrevision' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'approvedrevs-approvedrevision' )->escaped(),
+				wfMessage( 'approvedrevs-approvedrevision' )->text(),
 				array(),
 				$extraParams
 			);
 		$approveddiff = $approved
 			? wfMessage( 'diff' )->escaped()
-			: Linker::linkKnown(
+			: ApprovedRevs::makeLink(
+				$linkRenderer,
 				$title,
-				wfMessage( 'diff' )->escaped(),
+				wfMessage( 'diff' )->text(),
 				array(),
 				array(
 					'diff' => $approvedID,
@@ -401,7 +433,7 @@ class ApprovedRevsHooks {
 			$cdel .= ' ';
 		}
 
-		// Modified for ApprovedRevs
+		// Modified for Approved Revs
 		$outputPage->addSubtitle( "<div id=\"mw-revision-nav\">" . $cdel .
 			wfMessage( 'approvedrevs-revision-nav' )->rawParams(
 				$prevdiff, $prevlink, $approvedlink, $approveddiff, $lnk, $curdiff, $nextlink, $nextdiff
@@ -421,8 +453,9 @@ class ApprovedRevsHooks {
 			return true;
 		}
 
-		global $wgRequest;
-		if ( $wgRequest->getCheck( 'oldid' ) ) {
+		$context = $article->getContext();
+		$request = $context->getRequest();
+		if ( $request->getCheck( 'oldid' ) ) {
 			// If the user is looking at the latest revision,
 			// disable caching, to avoid the wiki getting the
 			// contents from the cache, and thus getting the
@@ -436,40 +469,60 @@ class ApprovedRevsHooks {
 			return false;
 		}
 
-		if ( ! $title->userCan( 'viewlinktolatest' ) ) {
-			return false;
-		}
-
+		$text = "";
 		ApprovedRevs::addCSS();
-		if ( $revisionID == $article->getLatest() ) {
-			$text = Xml::element(
-				'span',
-				array( 'class' => 'approvedAndLatestMsg' ),
-				wfMessage( 'approvedrevs-approvedandlatest' )->text()
-			);
-		} else {
-			$text = wfMessage( 'approvedrevs-notlatest' )->parse();
 
-			$text .= ' ' . Linker::link(
-				$title,
-				wfMessage( 'approvedrevs-viewlatestrev' )->parse(),
-				array(),
-				array( 'oldid' => $article->getLatest() ),
-				array( 'known', 'noclasses' )
-			);
+		$user = $context->getUser();
+		if ( ApprovedRevs::checkPermission( $user, $title, "viewlinktolatest" ) ) {
+			if ( $revisionID == $article->getLatest() ) {
+				$text .= Xml::element(
+					'span',
+					array( 'class' => 'approvedAndLatestMsg' ),
+					wfMessage( 'approvedrevs-approvedandlatest' )->text()
+				);
+			} else {
+				$text .= wfMessage( 'approvedrevs-notlatest' )->parse();
 
-			$text = Xml::tags(
-				'span',
-				array( 'class' => 'notLatestMsg' ),
-				$text
-			);
+				if ( function_exists( 'MediaWiki\MediaWikiServices::getLinkRenderer' ) ) {
+					$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
+				} else {
+					$linkRenderer = null;
+				}
+				$text .= ' ' . ApprovedRevs::makeLink(
+					$linkRenderer,
+					$title,
+					wfMessage( 'approvedrevs-viewlatestrev' )->parse(),
+					array(),
+					array( 'oldid' => $article->getLatest() )
+				);
+
+				$text = Xml::tags(
+					'span',
+					array( 'class' => 'notLatestMsg' ),
+					$text
+				);
+			}
 		}
 
-		global $wgOut;
-		if ( $wgOut->getSubtitle() != '' ) {
-			$wgOut->addSubtitle( '<br />' . $text );
-		} else {
-			$wgOut->setSubtitle( $text );
+		if ( ApprovedRevs::checkPermission( $user, $title, "viewapprover" ) ) {
+			$revisionUser = ApprovedRevs::getRevApprover( $title );
+			if ( $revisionUser ) {
+				$text .= Xml::openElement( 'span', array( 'class' => 'approvingUser' ) ) .
+					wfMessage(
+						  'approvedrevs-approver',
+						  Linker::userLink( $revisionUser->getId(), $revisionUser->getName() )
+					)->text() .
+					Xml::closeElement( 'span' );
+			}
+		}
+
+		if ( $text !== "" ) {
+			$out = $context->getOutput();
+			if ( $out->getSubtitle() != '' ) {
+				$out->addSubtitle( '<br />' . $text );
+			} else {
+				$out->setSubtitle( $text );
+			}
 		}
 
 		return false;
@@ -481,34 +534,33 @@ class ApprovedRevsHooks {
 	 * get confused, since they'll be seeing the latest one.
 	 */
 	public static function addWarningToEditPage( &$editPage ) {
-		// only show the warning if it's not an old revision
-		global $wgRequest;
-		if ( $wgRequest->getCheck( 'oldid' ) ) {
+		$article = $editPage->getArticle();
+		$context = $article->getContext();
+		$request = $context->getRequest();
+
+		// Only show the warning if it's not an old revision.
+		if ( $request->getCheck( 'oldid' ) ) {
 			return true;
 		}
-		$title = $editPage->getArticle()->getTitle();
+
+		$title = $article->getTitle();
 		$approvedRevID = ApprovedRevs::getApprovedRevID( $title );
 		$latestRevID = $title->getLatestRevID();
 		if ( ! empty( $approvedRevID ) && $approvedRevID != $latestRevID ) {
 			ApprovedRevs::addCSS();
-			// A lengthy way to avoid not calling $wgOut...
-			// hopefully this is better!
-			$editPage->getArticle()->getContext()->getOutput()->wrapWikiMsg( "<p class=\"approvedRevsEditWarning\">$1</p>\n", 'approvedrevs-editwarning' );
+			$out = $context->getOutput();
+			$out->wrapWikiMsg( "<p class=\"approvedRevsEditWarning\">$1</p>\n", 'approvedrevs-editwarning' );
 		}
 		return true;
 	}
 
 	/**
-	 * Same as addWarningToEditPage(), but for the Semantic Foms
+	 * Same as addWarningToEditPage(), but for the Page Forms
 	 * 'edit with form' tab.
 	 */
-	public static function addWarningToSFForm( &$pageName, &$preFormHTML ) {
-		// The title could be obtained via $pageName in theory - the
-		// problem is that, pre-SF 2.0.2, that variable wasn't set
-		// correctly.
-		global $wgTitle;
-		$approvedRevID = ApprovedRevs::getApprovedRevID( $wgTitle );
-		$latestRevID = $wgTitle->getLatestRevID();
+	public static function addWarningToPFForm( &$title, &$preFormHTML ) {
+		$approvedRevID = ApprovedRevs::getApprovedRevID( $title );
+		$latestRevID = $title->getLatestRevID();
 		if ( ! empty( $approvedRevID ) && $approvedRevID != $latestRevID ) {
 			ApprovedRevs::addCSS();
 			$preFormHTML .= Xml::element ( 'p',
@@ -524,17 +576,20 @@ class ApprovedRevsHooks {
 	 * 'action=edit' URL (i.e., the latest revision), no matter which
 	 * revision they're actually on.
 	 */
-	static function changeEditLink( $skin, &$contentActions ) {
-		global $wgRequest;
-		if ( $wgRequest->getCheck( 'oldid' ) ) {
+	static function changeEditLink( SkinTemplate &$skinTemplate, &$links ) {
+		$context = $skinTemplate->getContext();
+		$request = $context->getRequest();
+
+		if ( $request->getCheck( 'oldid' ) ) {
 			return true;
 		}
 
-		$title = $skin->getTitle();
+		$title = $skinTemplate->getTitle();
 		if ( ApprovedRevs::hasApprovedRevision( $title ) ) {
-			// the URL is the same regardless of whether the tab
+			$contentActions = &$links['views'];
+			// The URL is the same regardless of whether the tab
 			// is 'edit' or 'view source', but the "action" is
-			// different
+			// different.
 			if ( array_key_exists( 'edit', $contentActions ) ) {
 				$contentActions['edit']['href'] = $title->getLocalUrl( array( 'action' => 'edit' ) );
 			}
@@ -546,27 +601,12 @@ class ApprovedRevsHooks {
 	}
 
 	/**
-	 * Same as changedEditLink(), but only for the Vector skin (and
-	 * related skins).
-	 */
-	static function changeEditLinkVector( &$skin, &$links ) {
-		// the old '$content_actions' array is thankfully just a
-		// sub-array of this one
-		self::changeEditLink( $skin, $links['views'] );
-		return true;
-	}
-
-	/**
 	 * Store the approved revision ID, if any, directly in the object
 	 * for this article - this is called so that a query to the database
 	 * can be made just once for every view of a history page, instead
 	 * of for every row.
 	 */
 	static function storeApprovedRevisionForHistoryPage( &$article ) {
-		// A bug in some versions of MW 1.19 causes $article to be null.
-		if ( is_null( $article ) ) {
-			return true;
-		}
 		// This will be null if there's no ID.
 		$approvedRevID = ApprovedRevs::getApprovedRevID( $article->getTitle() );
 		$article->getTitle()->approvedRevID = $approvedRevID;
@@ -587,14 +627,14 @@ class ApprovedRevsHooks {
 			return true;
 		}
 
-		$article = $historyPage->getArticle();
-		// use the rev ID field in the $article object, which was
-		// stored earlier
+		$context = $historyPage->getContext();
+		$user = $context->getUser();
+
 		$approvedRevID = $title->approvedRevID;
 		if ( $row->rev_id == $approvedRevID ) {
 			$s .= ' &#9733;';
 		}
-		if ( ApprovedRevs::userCanApprove( $title ) ) {
+		if ( ApprovedRevs::userCanApprove( $user, $title ) ) {
 			if ( $row->rev_id == $approvedRevID ) {
 				$url = $title->getLocalUrl(
 					array( 'action' => 'unapprove' )
@@ -613,100 +653,6 @@ class ApprovedRevsHooks {
 			) . ')';
 		}
 		return true;
-	}
-
-	/**
-	 * Handle the 'approve' action, defined for ApprovedRevs -
-	 * mark the revision as approved, log it, and show a message to
-	 * the user.
-	 */
-	static function setAsApproved( $action, $article ) {
-		// Return "true" if the call failed (meaning, pass on handling
-		// of the hook to others), and "false" otherwise.
-		if ( $action != 'approve' ) {
-			return true;
-		}
-		$title = $article->getTitle();
-		if ( ! ApprovedRevs::pageIsApprovable( $title ) ) {
-			return true;
-		}
-		if ( ! ApprovedRevs::userCanApprove( $title ) ) {
-			return true;
-		}
-		global $wgRequest;
-		if ( ! $wgRequest->getCheck( 'oldid' ) ) {
-			return true;
-		}
-		$revisionID = $wgRequest->getVal( 'oldid' );
-		ApprovedRevs::setApprovedRevID( $title, $revisionID );
-
-		global $wgOut;
-		$wgOut->addHTML( "\t\t" . Xml::element(
-			'div',
-			array( 'class' => 'successbox' ),
-			wfMessage( 'approvedrevs-approvesuccess' )->text()
-		) . "\n" );
-		$wgOut->addHTML( "\t\t" . Xml::element(
-			'p',
-			array( 'style' => 'clear: both' )
-		) . "\n" );
-
-		// Show the revision, instead of the history page.
-		if ( defined( 'SMW_VERSION' ) && version_compare( SMW_VERSION, '1.9', '<' ) ) {
-			// Call this only for SMW < 1.9 - it causes semantic
-			// data to not be set when using SMW 1.9 (a bug fixed
-			// in SMW 1.9.1), but thankfully it doesn't seem to be
-			// needed, in any case.
-			$article->doPurge();
-		}
-		$article->view();
-
-		return false;
-	}
-
-	/**
-	 * Handle the 'unapprove' action, defined for ApprovedRevs -
-	 * unset the previously-approved revision, log the change, and show
-	 * a message to the user.
-	 */
-	static function unsetAsApproved( $action, $article ) {
-		// return "true" if the call failed (meaning, pass on handling
-		// of the hook to others), and "false" otherwise
-		if ( $action != 'unapprove' ) {
-			return true;
-		}
-		$title = $article->getTitle();
-		if ( ! ApprovedRevs::userCanApprove( $title ) ) {
-			return true;
-		}
-
-		ApprovedRevs::unsetApproval( $title );
-
-		// the message depends on whether the page should display
-		// a blank right now or not
-		global $egApprovedRevsBlankIfUnapproved;
-		if ( $egApprovedRevsBlankIfUnapproved ) {
-			$successMsg = wfMessage( 'approvedrevs-unapprovesuccess2' )->text();
-		} else {
-			$successMsg = wfMessage( 'approvedrevs-unapprovesuccess' )->text();
-		}
-
-		global $wgOut;
-		$wgOut->addHTML( "\t\t" . Xml::element(
-			'div',
-			array( 'class' => 'successbox' ),
-			$successMsg
-		) . "\n" );
-		$wgOut->addHTML( "\t\t" . Xml::element(
-			'p',
-			array( 'style' => 'clear: both' )
-		) . "\n" );
-
-		// show the revision, instead of the history page
-		$article->doPurge();
-		$article->view();
-
-		return false;
 	}
 
 	/**
@@ -773,11 +719,12 @@ class ApprovedRevsHooks {
 		if ( $updater === null ) {
 			global $wgExtNewTables, $wgDBtype;
 			//if ( $wgDBtype == 'mysql' ) {
-				$wgExtNewTables[] = array( 'approved_revs', "$dir/ApprovedRevs.sql" );
+				$wgExtNewTables[] = array( 'approved_revs', "$dir/../sql/ApprovedRevs.sql" );
 			//}
 		} else {
 			//if ( $updater->getDB()->getType() == 'mysql' ) {
-				$updater->addExtensionUpdate( array( 'addTable', 'approved_revs', "$dir/ApprovedRevs.sql", true ) );
+				$updater->addExtensionUpdate( array( 'addTable', 'approved_revs', "$dir/../sql/ApprovedRevs.sql", true ) );
+				$updater->addExtensionUpdate( array( 'addField', 'approved_revs', 'approver_id', "$dir/../sql/patch-approver_id.sql", true ) );
 			//}
 		}
 		return true;
@@ -793,14 +740,14 @@ class ApprovedRevsHooks {
 	 *
 	 * @since 0.5.6
 	 *
-	 * @param Article &$article
+	 * @param Article $article
 	 * @param boolean $outputDone
 	 * @param boolean $useParserCache
 	 *
 	 * @return true
 	 */
-	public static function setArticleHeader( Article &$article, &$outputDone, &$useParserCache ) {
-		global $wgOut, $wgRequest, $egApprovedRevsBlankIfUnapproved;
+	public static function setArticleHeader( Article $article, &$outputDone, &$useParserCache ) {
+		global $egApprovedRevsBlankIfUnapproved;
 
 		// For now, we only set the header if "blank if unapproved"
 		// is set.
@@ -809,13 +756,18 @@ class ApprovedRevsHooks {
 		}
 
 		$title = $article->getTitle();
+		$context = $article->getContext();
+		$user = $context->getUser();
+		$out = $context->getOutput();
+		$request = $context->getRequest();
+
 		if ( ! ApprovedRevs::pageIsApprovable( $title ) ) {
 			return true;
 		}
 
 		// If the user isn't supposed to see these kinds of
 		// messages, exit.
-		if ( ! $title->userCan( 'viewlinktolatest' ) ) {
+		if ( ! ApprovedRevs::checkPermission( $user, $title, "viewlinktolatest" ) ) {
 			return false;
 		}
 
@@ -825,40 +777,40 @@ class ApprovedRevsHooks {
 		// don't display anything.
 		$approvedRevID = ApprovedRevs::getApprovedRevID( $title );
 		if ( ! empty( $approvedRevID ) &&
-			( ! $wgRequest->getCheck( 'oldid' ) ||
-			$wgRequest->getInt( 'oldid' ) == $approvedRevID ) ) {
+			( ! $request->getCheck( 'oldid' ) ||
+			$request->getInt( 'oldid' ) == $approvedRevID ) ) {
 			return true;
 		}
 
 		// Disable caching, so that if it's a specific ID being shown
 		// that happens to be the latest, it doesn't show a blank page.
 		$useParserCache = false;
-		$wgOut->addHTML( '<span style="margin-left: 10.75px">' );
+		$out->addHTML( '<span style="margin-left: 10.75px">' );
 
 		// If the user is looking at a specific revision, show an
 		// "approve this revision" message - otherwise, it means
 		// there's no approved revision (we would have exited out if
 		// there were), so show a message explaining why the page is
 		// blank, with a link to the latest revision.
-		if ( $wgRequest->getCheck( 'oldid' ) ) {
-			if ( ApprovedRevs::userCanApprove( $title ) ) {
+		if ( $request->getCheck( 'oldid' ) ) {
+			if ( ApprovedRevs::userCanApprove( $user, $title ) ) {
 				// @TODO - why is this message being shown
 				// at all? Aren't the "approve this revision"
 				// links in the history page always good
 				// enough?
-				$wgOut->addHTML( Xml::tags( 'span', array( 'id' => 'contentSub2' ),
+				$out->addHTML( Xml::tags( 'span', array( 'id' => 'contentSub2' ),
 					Xml::element( 'a',
 					array( 'href' => $title->getLocalUrl(
 						array(
 							'action' => 'approve',
-							'oldid' => $wgRequest->getInt( 'oldid' )
+							'oldid' => $request->getInt( 'oldid' )
 						)
 					) ),
 					wfMessage( 'approvedrevs-approvethisrev' )->text()
 				) ) );
 			}
 		} else {
-			$wgOut->addSubtitle(
+			$out->addSubtitle(
 				htmlspecialchars( wfMessage( 'approvedrevs-blankpageshown' )->text() ) . '&#160;' .
 				Xml::element( 'a',
 					array( 'href' => $title->getLocalUrl(
@@ -871,7 +823,7 @@ class ApprovedRevsHooks {
 			);
 		}
 
-		$wgOut->addHTML( '</span>' );
+		$out->addHTML( '</span>' );
 
 		return true;
 	}
@@ -881,28 +833,66 @@ class ApprovedRevsHooks {
 	 * a header message stating that, if the setting to display this
 	 * message is activated.
 	 */
-	public static function displayNotApprovedHeader( Article &$article, &$outputDone, &$useParserCache ) {
+	public static function displayNotApprovedHeader( Article $article, &$outputDone, &$useParserCache ) {
 		global $egApprovedRevsShowNotApprovedMessage;
-		if ( !$egApprovedRevsShowNotApprovedMessage) {
+		if ( !$egApprovedRevsShowNotApprovedMessage ) {
 			return true;
 		}
- 
+
 		$title = $article->getTitle();
 		if ( ! ApprovedRevs::pageIsApprovable( $title ) ) {
 			return true;
 		}
-
-		if ( ! ApprovedRevs::hasApprovedRevision( $title ) ) {
-			$text = wfMessage( 'approvedrevs-noapprovedrevision' )->text();
-			global $wgOut;
-			if ( $wgOut->getSubtitle() != '' ) {
-				$wgOut->addSubtitle( '<br />' . $text );
-			} else {
-				$wgOut->setSubtitle( $text );
-			}
+		if ( ApprovedRevs::hasApprovedRevision( $title ) ) {
+			return true;
 		}
- 
+
+		$text = wfMessage( 'approvedrevs-noapprovedrevision' )->text();
+
+		$context = $article->getContext();
+		$out = $context->getOutput();
+		if ( $out->getSubtitle() != '' ) {
+			$out->addSubtitle( '<br />' . $text );
+		} else {
+			$out->setSubtitle( $text );
+		}
+
 		return true;
 	}
 
+	/**
+	 * Add a class to the <body> tag indicating the approval status
+	 * of this page, so it can be styled accordingly.
+	 */
+	public static function addBodyClass( $out, $skin, &$bodyAttrs ) {
+		$title = $skin->getTitle();
+		$context = $skin->getContext();
+		$request = $context->getRequest();
+
+		if ( ! ApprovedRevs::hasApprovedRevision( $title ) ) {
+			// This page has no approved rev.
+			$bodyAttrs['class'] .= " approvedRevs-noapprovedrev";
+		} else {
+			// The page has an approved rev - see if this is it.
+			$approvedRevID = ApprovedRevs::getApprovedRevID( $title );
+			if ( ! empty( $approvedRevID ) &&
+				( ! $request->getCheck( 'oldid' ) ||
+				$request->getInt( 'oldid' ) == $approvedRevID ) ) {
+				// This is the approved rev.
+				$bodyAttrs['class'] .= " approvedRevs-approved";
+			} else {
+				// This is not the approved rev.
+				$bodyAttrs['class'] .= " approvedRevs-notapproved";
+			}
+		}
+	}
+
+	/**
+	 * @param $qp array
+	 * @return bool true
+	 */
+	public static function onwgQueryPages( &$qp ) {
+		$qp['SpecialApprovedRevsPage'] = 'ApprovedRevs';
+		return true;
+	}
 }
