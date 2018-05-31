@@ -35,11 +35,6 @@
       "branch": "master",
       "revision": "3b5d8721b41fdac8c4db06989bff9bd83f68bacc"
     },
-    "composer/SemanticResultFormats": {
-      "url": "https://github.com/SemanticMediaWiki/SemanticResultFormats.git",
-      "branch": "master",
-      "revision": "986366a3cbcff524a5317aa0c7c8c052b7cc94a1"
-    },
     "composer/Validator": {
       "url": "https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Validator",
       "branch": "master",
