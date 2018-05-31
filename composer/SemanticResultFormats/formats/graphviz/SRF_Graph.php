@@ -67,21 +67,7 @@ class SRFGraph extends SMWResultPrinter {
 	protected $m_nodeShape;
 	protected $m_parentRelation;
 	protected $m_wordWrapLimit;
-	
-	/** ArchiXL mod **/
-	protected $m_nodeStyle;
-	protected $m_nodeColor;
-	protected $m_imageProperty;
-	protected $m_customArrows;	
-	protected $m_arrowHeadProperty;
-	protected $m_arrowTailProperty;
-	protected $m_edgeStyleProperty;
-	protected $m_fontSize;
-	protected $m_rootNode;
-	protected $m_renderer;
-	protected $m_edgesDrawn = array(); // array that stores the edges that have already been drawn. Used to eliminate duplicate relations with custom arrows.
-	
-	
+		
 	/**
 	 * (non-PHPdoc)
 	 * @see SMWResultPrinter::handleParameters()
@@ -107,18 +93,6 @@ class SRFGraph extends SMWResultPrinter {
 		$this->m_nodeShape = $params['nodeshape'];
 		$this->m_wordWrapLimit = $params['wordwraplimit'];
 		
-		/** ArchiXL mod **/
-		$this->m_imageProperty = trim( $params['imageproperty'] );
-		$this->m_customArrows = $params['customarrows'];
-		$this->m_arrowHeadProperty = trim( $params['arrowheadproperty'] );
-		$this->m_arrowTailProperty = trim( $params['arrowtailproperty'] );
-		$this->m_edgeStyleProperty = trim( $params['edgestyleproperty'] );
-		$this->m_nodeStyle = $params['nodestyle'];
-		$this->m_nodeColor = trim ($params['colorproperty']);
-		$this->m_fontSize = $params['fontsize'];
-		$this->m_rootNode = $params['rootnode'];
-		$this->m_renderer = $params['renderer'];
-		
 	}
 	
 	protected function getResultText( SMWQueryResult $res, $outputmode ) {
@@ -133,15 +107,6 @@ class SRFGraph extends SMWResultPrinter {
 		
 		if ( $this->m_graphSize != '' ) $graphInput .= "size=\"$this->m_graphSize\";";
 		
-		/** ArchiXL mod **/
-		if ( $this->m_nodeShape ) {
-			if($this->m_nodeShape === 'image') {
-				// we need to process each node individually to ask for its custom shape
-				$graphInput .=  "node [shape=none, fontsize=$this->m_fontSize];";
-			} else {
-				$graphInput .=  "node [shape=$this->m_nodeShape, style=$this->m_nodeStyle, fontsize=$this->m_fontSize];";
-			}
-		}
 		$graphInput .= "rankdir=$this->m_rankdir;";
 		
 		while ( $row = $res->getNext() ) {
@@ -284,62 +249,6 @@ class SRFGraph extends SMWResultPrinter {
 			if ( $this->m_graphLabel || $this->m_graphColor || $this->m_customArrows ) {
 				$graphInput .= ' [';
 				
-				/** ArchiXL Mod **/
-				if( $this->m_customArrows ) {
-
-					$invert = false;
-					if(strncmp($labelName, "-", 1) == 0) { // when relation starts with "-"
-						$labelName = substr( $labelName, 1); // remove it
-						$invert = true;
-					} 			
-
-					$graphInput .= "dir=both,"; // need to set edge type to 'both' to be able to draw arrowtails
-
-					// prevent duplicate edges, which may occur when e.g. both the direct and inverse relation are querie
-					$invisibleEdge = false;
-					$from = $invert ? $text : $name;
-					$to = $invert ? $name : $text;
-					$edge = "$from-$labelName-$to";
-
-					if( in_array( $edge, $this->m_edgesDrawn ) ) {
-						$invisibleEdge = true;
-					} else {
-						$this->m_edgesDrawn[] = $edge;
-					}
-
-					if( $invisibleEdge ) {
-						$graphInput .= "style=invis,";
-					} else {
-						
-						if (!empty($this->m_arrowHeadProperty)) {
-							$arrowHead = $this->getArrowType( $labelName, $this->m_arrowHeadProperty );	
-						} else {
-							$arrowHead="normal";
-						}
-
-						if (!empty($this->m_arrowTailProperty)) {
-							$arrowTail = $this->getArrowType( $labelName, $this->m_arrowTailProperty );
-						} else {
-							$arrowTail = "none";
-						}
-
-						if (!empty($this->m_edgeStyleProperty)) {
-							$edgeStyle = $this->getArrowStyle($labelName, $this->m_edgeStyleProperty );
-						} else {
-							$edgeStyle = "normal";
-						} 			
-
-						// Set arrow head
-						$graphInput .= "arrowhead=" . ($invert ? $arrowTail : $arrowHead ) . ",";
-
-						// Set arrow tail 
-						$graphInput .= "arrowtail=" . ($invert ? $arrowHead : $arrowTail ) . ",";
-
-						// Set arrow style
-						$graphInput .= "style=$edgeStyle, ";
-					}
-				}
-
 				if ( array_search( $labelName, $this->m_labelArray, true ) === false ) {
 					$this->m_labelArray[] = $labelName;
 				}
@@ -545,68 +454,6 @@ class SRFGraph extends SMWResultPrinter {
 			'message' => 'srf-paramdesc-graph-wwl',
 			'manipulatedefault' => false,
 		);
-		
-		/** ArchiXL Mod **/
-		$params['nodestyle'] = array(
-			'default' => false,
-			'message' => 'srf-paramdesc-graph-nodestyle',
-			'values' => array('rounded')
-		);
-		
-		$params['imageproperty'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-imageprop',
-			'default' => false
-		);
-		
-		$params['colorproperty'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-colorprop',
-			'default' => false
-		);
-		
-		$params['customarrows'] = array(
-			'type' => 'boolean',
-			'message' => 'srf-paramdesc-graph-customarrows',
-			'default' => false
-		);
-		
-		$params['arrowheadproperty'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-arrowheadprop',
-			'default' => false
-		);
-		
-		$params['arrowtailproperty'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-arrowtailprop',
-			'default' => false
-		);
-		
-		$params['edgestyleproperty'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-edgestyleprop',
-			'default' => false
-		);
-		
-		$params['fontsize'] = array(
-			'type' => 'integer',
-			'message' => 'srf-paramdesc-graph-fs',
-			'default' => 12
-		);
-		
-		$params['rootnode'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-rn',
-			'default' => false
-		);
-		
-		$params['renderer'] = array(
-			'type' => 'string',
-			'message' => 'srf-paramdesc-graph-rndr',
-			'default' => false
-		);
-		
 		
 		return $params;
 	}
