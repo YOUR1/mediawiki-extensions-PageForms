@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Metalhead64",
-			"Purodha"
-		]
-	},
-	"linktarget-desc": "Fügt angegebenen Links ein Ziel-(<code lang=\"en\" xml:lang=\"en\" dir=\"ltr\">target</code>)-Attribut hinzu."
-}

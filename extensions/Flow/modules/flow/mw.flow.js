@@ -1,1 +1,0 @@
-mw.flow = mw.flow || {};
