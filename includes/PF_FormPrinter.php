@@ -89,7 +89,7 @@ class PFFormPrinter {
 	/**
 	 * Register all information about the passed-in form input class.
 	 *
-	 * @param Class $inputTypeClass The class representing the new input.
+	 * @param string $inputTypeClass The full qualified class name representing the new input.
 	 * Must be derived from PFFormInput.
 	 */
 	public function registerInputType( $inputTypeClass ) {
@@ -288,23 +288,25 @@ class PFFormPrinter {
 	}
 
 	static function makePlaceholderInFormHTML( $str ) {
-		return '@insertHTML_' . $str . '@';
+		return '@insert"HTML_' . $str . '@';
 	}
 
 	function multipleTemplateStartHTML( $tif ) {
-		$text = '';
 		// If placeholder is set, it means we want to insert a
 		// multiple template form's HTML into the main form's HTML.
 		// So, the HTML will be stored in $text.
-		$text .= "\t" . '<div class="multipleTemplateWrapper">' . "\n";
-		$text .= "\t" . '<div class="multipleTemplateList"';
+		$text = "\t" . '<div class="multipleTemplateWrapper">' . "\n";
+		$attrs = array( 'class' => 'multipleTemplateList' );
 		if ( !is_null( $tif->getMinInstancesAllowed() ) ) {
-			$text .= " minimumInstances=\"{$tif->getMinInstancesAllowed()}\"";
+			$attrs['minimumInstances'] = $tif->getMinInstancesAllowed();
 		}
 		if ( !is_null( $tif->getMaxInstancesAllowed() ) ) {
-			$text .= " maximumInstances=\"{$tif->getMaxInstancesAllowed()}\"";
+			$attrs['maximumInstances'] = $tif->getMaxInstancesAllowed();
 		}
-		$text .= ">\n";
+		if ( $tif->getDisplayedFieldsWhenMinimized() != null ) {
+			$attrs['data-displayed-fields-when-minimized'] = $tif->getDisplayedFieldsWhenMinimized();
+		}
+		$text .= "\t" . Html::openElement( 'div', $attrs ) . "\n";
 		return $text;
 	}
 
@@ -528,6 +530,8 @@ END;
 		$wgPageFormsGridParams[$templateName] = $gridParams;
 		$wgPageFormsGridValues[$templateName] = $tif->getGridValues();
 
+		PFFormUtils::setGlobalVarsForSpreadsheet();
+
 		return $text;
 	}
 
@@ -688,6 +692,17 @@ END;
 		return '';
 	}
 
+	static function displayLoadingImage() {
+		global $wgPageFormsScriptPath;
+
+		$loadingBGImage = Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loadingbg.png" ) );
+		$text = '<div style="position: fixed; left: 50%; top: 50%;">' . $loadingBGImage . '</div>';
+		$loadingImage = Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ) );
+		$text .= '<div style="position: fixed; left: 50%; top: 50%; padding: 48px;">' . $loadingImage . '</div>';
+
+		return Html::rawElement( 'span', array( 'class' => 'loadingImage' ), $text );
+	}
+
 	/**
 	 * This function is the real heart of the entire Page Forms
 	 * extension. It handles two main actions: (1) displaying a form on the
@@ -806,7 +821,10 @@ END;
 			$userCanEditPage = count( $permissionErrors ) == 0;
 			Hooks::run( 'PageForms::UserCanEditPage', array( $this->mPageTitle, &$userCanEditPage ) );
 		}
-		$form_text = "";
+
+		// Start off with a loading spinner - this will be removed by
+		// the JavaScript once everything has finished loading.
+		$form_text = self::displayLoadingImage();
 		if ( $is_query || $userCanEditPage ) {
 			$form_is_disabled = false;
 			// Show "Your IP address will be recorded" warning if
@@ -899,7 +917,7 @@ END;
 					} else {
 						$previous_template_name = '';
 					}
-					$template_name = str_replace( '_', ' ', $tag_components[1] );
+					$template_name = str_replace( '_', ' ', $wgParser->recursiveTagParse( $tag_components[1] ) );
 					$is_new_template = ( $template_name != $previous_template_name );
 					if ( $is_new_template ) {
 						$template = PFTemplate::newFromName( $template_name );
@@ -942,10 +960,10 @@ END;
 					}
 
 					// We get values from the request,
-					// regardless of whether the the source
-					// is the page or a form submit, because
-					// even if the source is a page, values
-					// can still come from a query string.
+					// regardless of whether the source is the
+					// page or a form submit, because even if
+					// the source is a page, values can still
+					// come from a query string.
 					$tif->setFieldValuesFromSubmit();
 
 					$tif->checkIfAllInstancesPrinted( $form_submitted, $source_is_page );
@@ -1191,6 +1209,7 @@ END;
 						if ( $new_text ) {
 							$wiki_page->addTemplateParam( $template_name, $tif->getInstanceNum(), $field_name, $cur_value_in_template );
 							$section = substr_replace( $section, $new_text, $brackets_loc, $brackets_end_loc + 3 - $brackets_loc );
+							$start_position = $brackets_loc + strlen( $new_text );
 						} else {
 							$start_position = $brackets_end_loc;
 						}

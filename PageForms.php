@@ -69,7 +69,7 @@ if ( defined( 'PF_VERSION' ) ) {
 	return 1;
 }
 
-define( 'PF_VERSION', '4.3.1' );
+define( 'PF_VERSION', '4.5.1' );
 
 $GLOBALS['wgExtensionCredits']['specialpage'][] = array(
 	'path' => __FILE__,
@@ -122,13 +122,14 @@ if ( class_exists( 'MediaWiki\Linker\LinkRenderer' ) ) {
 $GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'PFFormEditAction::displayTab';
 $GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'PFHelperFormAction::displayTab';
 $GLOBALS['wgHooks']['ArticlePurge'][] = 'PFFormUtils::purgeCache';
+$GLOBALS['wgHooks']['PageContentSaveComplete'][] = 'PFHooks::setPostEditCookie';
 $GLOBALS['wgHooks']['ParserFirstCallInit'][] = 'PFHooks::registerFunctions';
 $GLOBALS['wgHooks']['MakeGlobalVariablesScript'][] = 'PFHooks::setGlobalJSVariables';
 $GLOBALS['wgHooks']['PageSchemasRegisterHandlers'][] = 'PFPageSchemas::registerClass';
 $GLOBALS['wgHooks']['EditPage::importFormData'][] = 'PFHooks::showFormPreview';
+$GLOBALS['wgHooks']['CargoTablesActionLinks'][] = 'PFHooks::addToCargoTablesLinks';
 $GLOBALS['wgHooks']['TinyMCEDisable'][] = 'PFHooks::disableTinyMCE';
 $GLOBALS['wgHooks']['CanonicalNamespaces'][] = 'PFHooks::registerNamespaces';
-$GLOBALS['wgHooks']['UnitTestsList'][] = 'PFHooks::onUnitTestsList';
 $GLOBALS['wgHooks']['ResourceLoaderRegisterModules'][] = 'PFHooks::registerModules';
 
 if ( defined( 'SMW_VERSION' ) ) {
@@ -157,8 +158,8 @@ $GLOBALS['wgSpecialPages']['CreateForm'] = 'PFCreateForm';
 $GLOBALS['wgAutoloadClasses']['PFCreateForm'] = __DIR__ . '/specials/PF_CreateForm.php';
 $GLOBALS['wgSpecialPages']['Templates'] = 'PFTemplates';
 $GLOBALS['wgAutoloadClasses']['PFTemplates'] = __DIR__ . '/specials/PF_Templates.php';
-$GLOBALS['wgSpecialPages']['EditUsingSpreadsheet'] = 'PFEditUsingSpreadsheet';
-$GLOBALS['wgAutoloadClasses']['PFEditUsingSpreadsheet'] = __DIR__ . '/specials/PF_EditUsingSpreadsheet.php';
+$GLOBALS['wgSpecialPages']['MultiPageEdit'] = 'PFMultiPageEdit';
+$GLOBALS['wgAutoloadClasses']['PFMultiPageEdit'] = __DIR__ . '/specials/PF_MultiPageEdit.php';
 $GLOBALS['wgSpecialPages']['CreateTemplate'] = 'PFCreateTemplate';
 $GLOBALS['wgAutoloadClasses']['PFCreateTemplate'] = __DIR__ . '/specials/PF_CreateTemplate.php';
 if ( defined( 'SMW_VERSION' ) ) {
@@ -181,7 +182,7 @@ $GLOBALS['wgAutoloadClasses']['PFUploadSourceField'] = __DIR__ . '/specials/PF_U
 $GLOBALS['wgAutoloadClasses']['PFUploadWindow'] = __DIR__ . '/specials/PF_UploadWindow.php';
 $GLOBALS['wgAutoloadClasses']['PFTemplateField'] = __DIR__ . '/includes/PF_TemplateField.php';
 $GLOBALS['wgAutoloadClasses']['TemplatesPage'] = __DIR__ . '/specials/PF_Templates.php';
-$GLOBALS['wgAutoloadClasses']['SpreadsheetTemplatesPage'] = __DIR__ . '/specials/PF_EditUsingSpreadsheet.php';
+$GLOBALS['wgAutoloadClasses']['SpreadsheetTemplatesPage'] = __DIR__ . '/specials/PF_MultiPageEdit.php';
 $GLOBALS['wgAutoloadClasses']['FormsPage'] = __DIR__ . '/specials/PF_Forms.php';
 $GLOBALS['wgAutoloadClasses']['PFForm'] = __DIR__ . '/includes/PF_Form.php';
 $GLOBALS['wgAutoloadClasses']['PFTemplate'] = __DIR__ . '/includes/PF_Template.php';
@@ -265,9 +266,10 @@ $GLOBALS['wgResourceModules'] += array(
 		'dependencies' => array(
 			'jquery.ui.core',
 			'jquery.ui.autocomplete',
-			'jquery.ui.sortable',
+			'ext.pageforms.sortable',
 			'ext.pageforms.autogrow',
 			'mediawiki.util',
+			"mediawiki.api",
 			'ext.pageforms.select2',
 			'ext.pageforms.wikieditor'
 		),
@@ -298,13 +300,24 @@ $GLOBALS['wgResourceModules'] += array(
 		'styles' => 'skins/FancyBox/jquery.fancybox.3.2.10.css',
 		'dependencies' => array( 'ext.pageforms.browser' ),
 	),
-	'ext.pageforms.dynatree' => $wgPageFormsResourceTemplate + array(
-		'dependencies' => array( 'jquery.ui.widget' ),
+	'ext.pageforms.fancytree.dep' => $wgPageFormsResourceTemplate + array(
+		'scripts' => 'libs/jquery.fancytree.ui-deps.js',
+		'styles' => 'skins/skin-win8/ui.fancytree.css',
+	),
+	'ext.pageforms.fancytree' => $wgPageFormsResourceTemplate + array(
 		'scripts' => array(
-			'libs/jquery.dynatree.js',
-			'libs/PF_dynatree.js',
+			'libs/jquery.fancytree.js',
+			'libs/PF_tree.js',
 		),
-		'styles' => 'skins/ui.dynatree.css',
+		'styles' => 'skins/skin-win8/ui.fancytree.css',
+		'dependencies' => array(
+			'ext.pageforms.fancytree.dep',
+			'jquery.ui.widget',
+			'jquery.ui.position'
+		 ),
+	),
+	"ext.pageforms.sortable" => $wgPageFormsResourceTemplate + array(
+		'scripts' => 'libs/Sortable.js'
 	),
 	'ext.pageforms.autogrow' => $wgPageFormsResourceTemplate + array(
 		'scripts' => 'libs/PF_autogrow.js',
@@ -403,6 +416,7 @@ $GLOBALS['wgResourceModules'] += array(
 		),
 		'dependencies' => array(
 			'ext.pageforms',
+			'jquery.ui.sortable',
 			'mediawiki.jqueryMsg',
 		),
 		'messages' => array(
@@ -422,7 +436,9 @@ $GLOBALS['wgResourceModules'] += array(
 			'skins/jsgrid/theme.css',
 		),
 		'dependencies' => array(
+			'ext.pageforms.select2',
 			'jquery.ui.sortable',
+			'mediawiki.language.months',
 		),
 		'messages' => array(
 			'htmlform-yes',
@@ -539,6 +555,12 @@ $GLOBALS['wgGroupPermissions']['user']['createclass'] = true;
 $GLOBALS['wgAvailableRights'][] = 'createclass';
 
 # ##
+# Permission to access Special:MultiPageEdit
+# ##
+$GLOBALS['wgGroupPermissions']['user']['multipageedit'] = true;
+$GLOBALS['wgAvailableRights'][] = 'multipageedit';
+
+# ##
 # List separator character
 # ##
 $GLOBALS['wgPageFormsListSeparator'] = ",";
@@ -606,6 +628,10 @@ $GLOBALS['wgPageFormsShowOnSelect'] = array();
 $GLOBALS['wgPageFormsAutocompleteValues'] = array();
 $GLOBALS['wgPageFormsGridValues'] = array();
 $GLOBALS['wgPageFormsGridParams'] = array();
+$GLOBALS['wgPageFormsContLangYes'] = null;
+$GLOBALS['wgPageFormsContLangNo'] = null;
+$GLOBALS['wgPageFormsContLangMonths'] = array();
+$GLOBALS['wgPageFormsHeightForMinimizingInstances'] = 800;
 // SMW
 $GLOBALS['wgPageFormsFieldProperties'] = array();
 // Cargo
@@ -616,6 +642,9 @@ $GLOBALS['wgPageFormsDependentFields'] = array();
  * Minimum number of values in a checkboxes field to show the 'Select all'/'Select none' switches
  */
 $GLOBALS['wgPageFormsCheckboxesSelectAllMinimum'] = 10;
+
+// Allowed namespaces for #autoedit parser function (only pages in these namespaces can be edited via #autoedit)
+$GLOBALS['wgPageFormsAutoeditNamespaces'] = array( 0 );
 
 // Necessary setting for SMW 1.9+
 $GLOBALS['smwgEnabledSpecialPage'][] = 'RunQuery';

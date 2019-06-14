@@ -97,10 +97,10 @@ class PFFormLinker {
 			return true;
 		}
 
-		global $wgPageFormsLinkAllRedLinksToForms;
-		// Don't do this if it's a category page - it probably
-		// won't have an associated form.
-		if ( $wgPageFormsLinkAllRedLinksToForms && $target->getNamespace() != NS_CATEGORY ) {
+		global $wgPageFormsLinkAllRedLinksToForms, $wgContentNamespaces;
+		// We'll do this only for "content namespaces" (by default, just
+		// the main namespace, though others can be added).
+		if ( $wgPageFormsLinkAllRedLinksToForms && in_array( $target->getNamespace(), $wgContentNamespaces ) ) {
 			$attribs['href'] = $target->getLinkURL( array( 'action' => 'formedit', 'redlink' => '1' ) );
 			return true;
 		}
@@ -143,12 +143,16 @@ class PFFormLinker {
 		// Don't do this if it's a category page - it probably
 		// won't have an associated form.
 		if ( $wgPageFormsLinkAllRedLinksToForms && $target->getNamespace() != NS_CATEGORY ) {
-			$attribs['href'] = $target->getLinkURL( array( 'action' => 'formedit', 'redlink' => '1' ) );
+			// The class of $target can be either Title or
+			// TitleValue.
+			$title = Title::newFromLinkTarget( $target );
+			$attribs['href'] = $title->getLinkURL( array( 'action' => 'formedit', 'redlink' => '1' ) );
 			return true;
 		}
 
 		if ( self::getDefaultFormForNamespace( $namespace ) !== null ) {
-			$attribs['href'] = $target->getLinkURL( array( 'action' => 'formedit', 'redlink' => '1' ) );
+			$title = Title::newFromLinkTarget( $target );
+			$attribs['href'] = $title->getLinkURL( array( 'action' => 'formedit', 'redlink' => '1' ) );
 			return true;
 		}
 
@@ -236,6 +240,12 @@ class PFFormLinker {
 		} else {
 			global $wgContLang;
 			$namespace_labels = $wgContLang->getNamespaces();
+			if ( !array_key_exists( $namespace, $namespace_labels ) ) {
+				// This can happen if it's a custom namespace that
+				// was not entirely correctly declared.
+				self::$formPerNamespace[$namespace] = null;
+				return null;
+			}
 			$namespace_label = $namespace_labels[$namespace];
 		}
 

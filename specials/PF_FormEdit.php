@@ -17,9 +17,6 @@ class PFFormEdit extends UnlistedSpecialPage {
 	public $mForm;
 	public $mError;
 
-	/**
-	 * Constructor
-	 */
 	function __construct() {
 		parent::__construct( 'FormEdit' );
 	}
@@ -52,7 +49,7 @@ class PFFormEdit extends UnlistedSpecialPage {
 			if ( $i++ > 0 ) {
 				$text .= ', ';
 			}
-			$altFormURL = $fe_url . '/' . rawurlencode( $alt_form ) . '/' . rawurlencode( $target_name );
+			$altFormURL = $fe_url . '/' . $alt_form . '/' . $target_name;
 			$text .= Html::element( 'a',
 				array( 'href' => $altFormURL ),
 				str_replace( '_', ' ', $alt_form )
@@ -148,7 +145,7 @@ class PFFormEdit extends UnlistedSpecialPage {
 			} else {
 				$pageTitle = wfMessage( 'pf_formedit_createtitle', $result[ 'form' ], $targetName )->text();
 			}
-		} elseif ( count( $alt_forms ) > 0 ) {
+		} elseif ( $alt_forms ) {
 			// We use the 'creating' message here, instead of
 			// 'pf_formedit_createtitlenotarget', to differentiate
 			// between a page with no (default) form, and one with
@@ -156,7 +153,7 @@ class PFFormEdit extends UnlistedSpecialPage {
 			// "Creating ..." and "Create ...", respectively.
 			// Does this make any difference? Who knows.
 			$pageTitle = wfMessage( 'creating', $targetName )->text();
-		} elseif ( $result[ 'form' ] == '' ) {  // FIXME: This looks weird; a simple else should be enough, right?
+		} elseif ( $result[ 'form' ] == '' ) { // FIXME: This looks weird; a simple else should be enough, right?
 			// display error message if the form is not specified in the URL
 			$pageTitle = wfMessage( 'formedit' )->text();
 			$text .= Html::element( 'p', array( 'class' => 'error' ), wfMessage( 'pf_formedit_badurl' )->text() ) . "\n";
@@ -164,7 +161,7 @@ class PFFormEdit extends UnlistedSpecialPage {
 		}
 
 		$out->setPageTitle( $pageTitle );
-		if ( count( $alt_forms ) > 0 ) {
+		if ( $alt_forms ) {
 			$text .= '<div class="infoMessage">';
 			if ( $result[ 'form' ] != '' ) {
 				$text .= wfMessage( 'pf_formedit_altforms' )->escaped();

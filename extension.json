@@ -1,7 +1,7 @@
 {
 	"@Note": "When updating this file please also update PageForms.php with the same changes.",
 	"name": "Page Forms",
-	"version": "4.3.1",
+	"version": "4.5.1",
 	"author": [
 		"Yaron Koren",
 		"Stephan Gambke",
@@ -40,13 +40,15 @@
 			"editrestrictedfields": true
 		},
 		"user": {
-			"createclass": true
+			"createclass": true,
+			"multipageedit": true
 		}
 	},
 	"AvailableRights": [
 		"viewedittab",
 		"editrestrictedfields",
-		"createclass"
+		"createclass",
+		"multipageedit"
 	],
 	"Actions": {
 		"formedit": "PFFormEditAction",
@@ -56,7 +58,7 @@
 		"Forms": "PFForms",
 		"CreateForm": "PFCreateForm",
 		"Templates": "PFTemplates",
-		"EditUsingSpreadsheet": "PFEditUsingSpreadsheet",
+		"MultiPageEdit": "PFMultiPageEdit",
 		"CreateTemplate": "PFCreateTemplate",
 		"CreateClass": "PFCreateClass",
 		"CreateCategory": "PFCreateCategory",
@@ -86,7 +88,7 @@
 		"PFForms": "specials/PF_Forms.php",
 		"PFCreateForm": "specials/PF_CreateForm.php",
 		"PFTemplates": "specials/PF_Templates.php",
-		"PFEditUsingSpreadsheet": "specials/PF_EditUsingSpreadsheet.php",
+		"PFMultiPageEdit": "specials/PF_MultiPageEdit.php",
 		"PFCreateTemplate": "specials/PF_CreateTemplate.php",
 		"PFCreateClass": "specials/PF_CreateClass.php",
 		"PFCreateCategory": "specials/PF_CreateCategory.php",
@@ -98,7 +100,7 @@
 		"PFUploadWindow": "specials/PF_UploadWindow.php",
 		"PFTemplateField": "includes/PF_TemplateField.php",
 		"TemplatesPage": "specials/PF_Templates.php",
-		"SpreadsheetTemplatesPage": "specials/PF_EditUsingSpreadsheet.php",
+		"SpreadsheetTemplatesPage": "specials/PF_MultiPageEdit.php",
 		"FormsPage": "specials/PF_Forms.php",
 		"PFForm": "includes/PF_Form.php",
 		"PFTemplate": "includes/PF_Template.php",
@@ -164,9 +166,10 @@
 			"dependencies": [
 				"jquery.ui.core",
 				"jquery.ui.autocomplete",
-				"jquery.ui.sortable",
+				"ext.pageforms.sortable",
 				"ext.pageforms.autogrow",
 				"mediawiki.util",
+				"mediawiki.api",
 				"ext.pageforms.select2",
 				"ext.pageforms.wikieditor"
 			],
@@ -203,15 +206,29 @@
 				"ext.pageforms.browser"
 			]
 		},
-		"ext.pageforms.dynatree": {
-			"dependencies": [
-				"jquery.ui.widget"
-			],
+		"ext.pageforms.fancytree.dep": {
 			"scripts": [
-				"libs/jquery.dynatree.js",
-				"libs/PF_dynatree.js"
+				"libs/jquery.fancytree.ui-deps.js"
 			],
-			"styles": "skins/ui.dynatree.css"
+			"styles": "skins/skin-win8/ui.fancytree.css"
+
+		},
+		"ext.pageforms.fancytree": {
+			"scripts": [
+				"libs/jquery.fancytree.js",
+				"libs/PF_tree.js"
+			],
+			"styles": "skins/skin-win8/ui.fancytree.css",
+			"dependencies": [
+				"ext.pageforms.fancytree.dep",
+				"jquery.ui.widget",
+				"jquery.ui.position"
+			]
+		},
+		"ext.pageforms.sortable": {
+			"scripts": [
+				"libs/Sortable.js"
+			]
 		},
 		"ext.pageforms.autogrow": {
 			"scripts": [
@@ -326,6 +343,7 @@
 			],
 			"dependencies": [
 				"ext.pageforms",
+				"jquery.ui.sortable",
 				"mediawiki.jqueryMsg"
 			],
 			"messages": [
@@ -345,7 +363,9 @@
 				"skins/jsgrid/theme.css"
 			],
 			"dependencies": [
-				"jquery.ui.sortable"
+				"ext.pageforms.select2",
+				"jquery.ui.sortable",
+				"mediawiki.language.months"
 			],
 			"messages": [
 				"htmlform-yes",
@@ -417,6 +437,7 @@
 		"PageContentSave": [
 			"PFFormUtils::purgeCache"
 		],
+		"PageContentSaveComplete": "PFHooks::setPostEditCookie",
 		"ParserFirstCallInit": [
 			"PFHooks::registerFunctions"
 		],
@@ -429,12 +450,10 @@
 		"EditPage::importFormData": [
 			"PFHooks::showFormPreview"
 		],
+		"CargoTablesActionLinks": "PFHooks::addToCargoTablesLinks",
 		"TinyMCEDisable": "PFHooks::disableTinyMCE",
 		"CanonicalNamespaces": [
 			"PFHooks::registerNamespaces"
-		],
-		"UnitTestsList": [
-			"PFHooks::onUnitTestsList"
 		],
 		"ResourceLoaderRegisterModules": [
 			"PFHooks::registerModules"
@@ -463,6 +482,10 @@
 		"PageFormsAutocompleteValues": [],
 		"PageFormsGridValues": [],
 		"PageFormsGridParams": [],
+		"PageFormsContLangYes": null,
+		"PageFormsContLangNo": null,
+		"PageFormsContLangMonths": [],
+		"PageFormsHeightForMinimizingInstances": 800,
 		"PageFormsFieldProperties": [],
 		"PageFormsCargoFields": [],
 		"PageFormsDependentFields": [],
@@ -479,7 +502,8 @@
 			"DisabledDates": null,
 			"HighlightedDates": null,
 			"_merge_strategy": "array_plus"
-		}
+		},
+		"PageFormsAutoeditNamespaces": [ 0 ]
 	},
 	"manifest_version": 1
 }

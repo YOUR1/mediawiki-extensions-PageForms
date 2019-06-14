@@ -23,7 +23,7 @@ class PFFormEditAction extends Action {
 
 	/**
 	 * The main action entry point.  Do all output for display and send it to the context
-	 * output.  Do not use globals $wgOut, $wgRequest, etc, in implementations; use
+	 * output. Do not use globals $wgOut, $wgRequest, etc, in implementations; use
 	 * $this->getOutput(), etc.
 	 * @throws ErrorPageError
 	 * @return false
@@ -130,8 +130,8 @@ class PFFormEditAction extends Action {
 		array_splice( $tab_keys, $edit_tab_location, 0, 'formedit' );
 		array_splice( $tab_values, $edit_tab_location, 0, array( $form_edit_tab ) );
 		$content_actions = array();
-		for ( $i = 0; $i < count( $tab_keys ); $i++ ) {
-			$content_actions[$tab_keys[$i]] = $tab_values[$i];
+		foreach ( $tab_keys as $i => $key ) {
+			$content_actions[$key] = $tab_values[$i];
 		}
 
 		if ( ! $obj->getUser()->isAllowed( 'viewedittab' ) ) {

@@ -223,7 +223,7 @@ END;
 	 * to display and work correctly.
 	 *
 	 * Accepts an optional Parser instance, or uses $wgOut if omitted.
-	 * @param Parser $parser
+	 * @param Parser|null $parser
 	 */
 	public static function addFormRLModules( $parser = null ) {
 		global $wgOut, $wgPageFormsSimpleUpload, $wgVersion,
@@ -250,7 +250,7 @@ END;
 			// templates makes that tricky (every form input needs
 			// to re-apply the JS on a new instance) - it can be
 			// done via JS hooks, but it hasn't been done yet.
-			'ext.pageforms.dynatree',
+			'ext.pageforms.fancytree',
 			'ext.pageforms.imagepreview',
 			'ext.pageforms.autogrow',
 			'ext.pageforms.checkboxes',
@@ -299,7 +299,7 @@ END;
 
 	/**
 	 * Creates a dropdown of possible form names.
-	 * @param array $form_names
+	 * @param array|null $form_names
 	 * @return string
 	 */
 	public static function formDropdownHTML( $form_names = null ) {
@@ -375,10 +375,13 @@ END;
 		// Turn each pipe within double curly brackets into another,
 		// unused character (here, "\1"), then do the explode, then
 		// convert them back.
-		$pattern = '/({{.*)\|(.*}})/';
-		while ( preg_match( $pattern, $str, $matches ) ) {
-			$str = preg_replace( $pattern, "$1" . "\1" . "$2", $str );
-		}
+		// regex adapted from:
+		// https://www.regular-expressions.info/recurse.html
+		$pattern = '/{{(?>[^{}]|(?R))*?}}/'; // needed to fix highlighting - <?
+		$str = preg_replace_callback( $pattern, function ( $match ) {
+			$hasPipe = strpos( $match[0], '|' );
+			return $hasPipe ? str_replace( "|", "\1", $match[0] ) : $match[0];
+		}, $str );
 		return array_map( array( 'PFUtils', 'convertBackToPipes' ), self::smartSplitFormTag( $str ) );
 	}
 

@@ -14,9 +14,6 @@
  */
 class PFFormStart extends SpecialPage {
 
-	/**
-	 * Constructor
-	 */
 	function __construct() {
 		parent::__construct( 'FormStart' );
 	}
@@ -66,7 +63,7 @@ class PFFormStart extends SpecialPage {
 			if ( $page_name !== '' ) {
 				// Append the namespace prefix to the page name,
 				// if this namespace was not already entered.
-				if ( strpos( $page_name, $target_namespace . ':' ) === false && !is_null( $target_namespace ) ) {
+				if ( $target_namespace != '' && strpos( $page_name, $target_namespace . ':' ) === false ) {
 					$page_name = $target_namespace . ':' . $page_name;
 				}
 				// If there was no page title, it's probably an

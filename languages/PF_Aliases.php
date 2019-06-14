@@ -6,7 +6,6 @@
  * @ingroup Extensions
  * @ingroup PF
  */
-// @codingStandardsIgnoreFile
 
 $specialPageAliases = array();
 
@@ -17,7 +16,7 @@ $specialPageAliases['en'] = array(
 	'CreateForm' => array( 'CreateForm' ),
 	'CreateProperty' => array( 'CreateProperty' ),
 	'CreateTemplate' => array( 'CreateTemplate' ),
-	'EditUsingSpreadsheet' => array( 'EditUsingSpreadsheet' ),
+	'MultiPageEdit' => array( 'MultiPageEdit' ),
 	'FormEdit' => array( 'FormEdit', 'AddData', 'EditData' ),
 	'FormStart' => array( 'FormStart', 'AddPage' ),
 	'Forms' => array( 'Forms' ),
