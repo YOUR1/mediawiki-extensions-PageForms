@@ -1,7 +1,7 @@
 {
-	"@Note": "When updating this file please also update PageForms.php with the same changes.",
-	"name": "Page Forms",
-	"version": "4.5.1",
+	"name": "PageForms",
+	"namemsg": "pageforms-name",
+	"version": "4.9.5",
 	"author": [
 		"Yaron Koren",
 		"Stephan Gambke",
@@ -30,7 +30,7 @@
 		"PFHooks::initialize"
 	],
 	"requires": {
-		"MediaWiki": ">= 1.27.0"
+		"MediaWiki": ">= 1.29.0"
 	},
 	"GroupPermissions": {
 		"*": {
@@ -68,7 +68,7 @@
 		"UploadWindow": "PFUploadWindow"
 	},
 	"JobClasses": {
-		"createPage": "PFCreatePageJob"
+		"pageFormsCreatePage": "PFCreatePageJob"
 	},
 	"APIModules": {
 		"pfautocomplete": "PFAutocompleteAPI",
@@ -99,9 +99,6 @@
 		"PFUploadSourceField": "specials/PF_UploadSourceField.php",
 		"PFUploadWindow": "specials/PF_UploadWindow.php",
 		"PFTemplateField": "includes/PF_TemplateField.php",
-		"TemplatesPage": "specials/PF_Templates.php",
-		"SpreadsheetTemplatesPage": "specials/PF_MultiPageEdit.php",
-		"FormsPage": "specials/PF_Forms.php",
 		"PFForm": "includes/PF_Form.php",
 		"PFTemplate": "includes/PF_Template.php",
 		"PFTemplateInForm": "includes/PF_TemplateInForm.php",
@@ -164,14 +161,14 @@
 				"skins/PF_jquery_ui_overrides.css"
 			],
 			"dependencies": [
-				"jquery.ui.core",
-				"jquery.ui.autocomplete",
+				"ext.pageforms.jqui.autocomplete",
 				"ext.pageforms.sortable",
 				"ext.pageforms.autogrow",
 				"mediawiki.util",
 				"mediawiki.api",
 				"ext.pageforms.select2",
-				"ext.pageforms.wikieditor"
+				"ext.pageforms.wikieditor",
+				"ext.pageforms.editwarning"
 			],
 			"messages": [
 				"pf_formerrors_header",
@@ -182,6 +179,7 @@
 				"pf_bad_url_error",
 				"pf_bad_email_error",
 				"pf_bad_number_error",
+				"pf_bad_integer_error",
 				"pf_bad_date_error",
 				"pf_modified_input_error",
 				"pf_pipe_error"
@@ -221,8 +219,7 @@
 			"styles": "skins/skin-win8/ui.fancytree.css",
 			"dependencies": [
 				"ext.pageforms.fancytree.dep",
-				"jquery.ui.widget",
-				"jquery.ui.position"
+				"ext.pageforms.jqui.fancytree.deps"
 			]
 		},
 		"ext.pageforms.sortable": {
@@ -292,7 +289,7 @@
 				"libs/PF_datepicker.js"
 			],
 			"dependencies": [
-				"jquery.ui.datepicker",
+				"ext.pageforms.jqui.datepicker",
 				"ext.pageforms.main"
 			]
 		},
@@ -343,7 +340,7 @@
 			],
 			"dependencies": [
 				"ext.pageforms",
-				"jquery.ui.sortable",
+				"ext.pageforms.jqui.sortable",
 				"mediawiki.jqueryMsg"
 			],
 			"messages": [
@@ -353,6 +350,52 @@
 				"pf-select2-selection-too-big"
 			]
 		},
+		"ext.pageforms.fullcalendar.jquery1": {
+			"scripts": [
+				"libs/FullCalendar-2.9.1/fullcalendar.js",
+				"libs/PF_FullCalendar.js"
+			],
+			"styles": [
+				"skins/FullCalendar-2.9.1/fullcalendar.css",
+				"skins/PF_FullCalendar.css"
+			],
+			"dependencies": [
+				"ext.pageforms.select2",
+				"ext.pageforms.jqui.sortable",
+				"ext.pageforms.fancytree",
+				"ext.pageforms",
+				"moment",
+				"mediawiki.jqueryMsg"
+			],
+			"messages": [
+				"pf-calendar-createevent",
+				"pf-calendar-deleteevent",
+				"pf-calendar-updateevent"
+			]
+		},
+		"ext.pageforms.fullcalendar.jquery3": {
+			"scripts": [
+				"libs/FullCalendar-3.9.0/fullcalendar.js",
+				"libs/PF_FullCalendar.js"
+			],
+			"styles": [
+				"skins/FullCalendar-3.9.0/fullcalendar.css",
+				"skins/PF_FullCalendar.css"
+			],
+			"dependencies": [
+				"ext.pageforms.select2",
+				"ext.pageforms.jqui.sortable",
+				"ext.pageforms.fancytree",
+				"ext.pageforms",
+				"moment",
+				"mediawiki.jqueryMsg"
+			],
+			"messages": [
+				"pf-calendar-createevent",
+				"pf-calendar-deleteevent",
+				"pf-calendar-updateevent"
+			]
+		},
 		"ext.pageforms.jsgrid": {
 			"scripts": [
 				"libs/jsgrid.js",
@@ -360,14 +403,16 @@
 			],
 			"styles": [
 				"skins/jsgrid/jsgrid.css",
-				"skins/jsgrid/theme.css"
+				"skins/jsgrid/theme.css",
+				"skins/PF_jsGrid.css"
 			],
 			"dependencies": [
 				"ext.pageforms.select2",
-				"jquery.ui.sortable",
+				"ext.pageforms.jqui.sortable",
 				"mediawiki.language.months"
 			],
 			"messages": [
+				"pf-resultstoshow",
 				"htmlform-yes",
 				"htmlform-no"
 			]
@@ -384,6 +429,13 @@
 		"ext.pageforms": {
 			"scripts": [
 				"libs/ext.pf.js"
+			]
+		},
+		"ext.pageforms.editwarning": {
+			"scripts": "libs/PF_editWarning.js",
+			"dependencies": [
+				"mediawiki.confirmCloseWindow",
+				"jquery.textSelection"
 			]
 		},
 		"ext.pageforms.PF_CreateProperty": {
@@ -431,36 +483,24 @@
 			"PFFormEditAction::displayTab",
 			"PFHelperFormAction::displayTab"
 		],
-		"ArticlePurge": [
-			"PFFormUtils::purgeCache"
-		],
-		"PageContentSave": [
-			"PFFormUtils::purgeCache"
-		],
-		"PageContentSaveComplete": "PFHooks::setPostEditCookie",
-		"ParserFirstCallInit": [
-			"PFHooks::registerFunctions"
-		],
-		"MakeGlobalVariablesScript": [
-			"PFHooks::setGlobalJSVariables"
-		],
-		"PageSchemasRegisterHandlers": [
-			"PFPageSchemas::registerClass"
-		],
-		"EditPage::importFormData": [
-			"PFHooks::showFormPreview"
-		],
+		"ArticlePurge": "PFFormUtils::purgeCache",
+		"PageContentSave": "PFFormUtils::purgeCache",
+		"ParserFirstCallInit": "PFHooks::registerFunctions",
+		"MakeGlobalVariablesScript": "PFHooks::setGlobalJSVariables",
+		"PageSchemasRegisterHandlers": "PFPageSchemas::registerClass",
+		"EditPage::importFormData": "PFHooks::showFormPreview",
+		"HtmlPageLinkRendererEnd": "PFFormLinker::setBrokenLink",
 		"CargoTablesActionLinks": "PFHooks::addToCargoTablesLinks",
+		"CargoTablesSetAllowedActions": "PFHooks::addToCargoTablesColumns",
+		"CargoTablesSetActionLinks": "PFHooks::addToCargoTablesRow",
 		"TinyMCEDisable": "PFHooks::disableTinyMCE",
-		"CanonicalNamespaces": [
-			"PFHooks::registerNamespaces"
-		],
-		"ResourceLoaderRegisterModules": [
-			"PFHooks::registerModules"
-		]
+		"CanonicalNamespaces": "PFHooks::registerNamespaces",
+		"ResourceLoaderRegisterModules": "PFHooks::registerModules"
 	},
 	"config": {
+		"PageFormsVisualEditorMaxHeight": 400,
 		"PageFormsUseDisplayTitle": true,
+		"PageFormsShowExpandAllLink": false,
 		"PageFormsSimpleUpload": false,
 		"PageFormsMaxAutocompleteValues": 1000,
 		"PageFormsMaxLocalAutocompleteValues": 100,
@@ -480,6 +520,8 @@
 		"PageFormsGoogleMapsKey": null,
 		"PageFormsShowOnSelect": [],
 		"PageFormsAutocompleteValues": [],
+		"PageFormsCalendarParams": [],
+		"PageFormsCalendarValues": [],
 		"PageFormsGridValues": [],
 		"PageFormsGridParams": [],
 		"PageFormsContLangYes": null,

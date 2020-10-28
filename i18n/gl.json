@@ -2,11 +2,13 @@
 	"@metadata": {
 		"authors": [
 			"Alma",
+			"Banjo",
+			"Elisardojm",
+			"Fitoschido",
+			"Iváns",
 			"McDutchie",
 			"Toliño",
-			"Xosé",
-			"Elisardojm",
-			"Banjo"
+			"Xosé"
 		]
 	},
 	"pageforms-desc": "Formularios para crear e editar páxinas wiki",
@@ -172,7 +174,6 @@
 	"pf_formedit_edittitle": "Editar $1: $2",
 	"pf_formedit_morethanoneform": "'''Aviso:''' Hai máis dun formulario definido por defecto para esta páxina.",
 	"pf_formedit_formwarning": "Aviso: Esta páxina [[$1|xa existe]], pero non usa este formulario.",
-	"pf_formedit_mismatchedbrackets": "Aviso: Esta páxina contén parénteses, corchetes ou chaves sen pechar, de modo que o formulario non manexará a páxina correctamente. <a href=\"$1\">Arranxe o erro no texto fonte</a> antes de continuar.",
 	"pf_formedit_remove": "Eliminar esta instancia",
 	"pf_formedit_addanotherabove": "Engadir outra instancia por riba desta",
 	"pf_formedit_addanother": "Engadir outro",
@@ -210,6 +211,7 @@
 	"pf_bad_url_error": "debe ter un correcto formato URL, comezando con 'http'",
 	"pf_bad_email_error": "debe ter un enderezo de correo electrónico cun formato válido",
 	"pf_bad_number_error": "debe ser un número válido",
+	"pf_bad_integer_error": "ha de ser un enteiro",
 	"pf_bad_date_error": "debe ser unha data válida",
 	"pf_pipe_error": "\"|\" non está permitido, excepto entre {{...}} o [[...]]",
 	"uploadwindow": "Ventá de carga",
@@ -240,7 +242,7 @@
 	"action-viewedittab": "ver a lapela \"{{int:edit}}\" nas páxinas editables mediante formulario",
 	"tooltip-ca-formedit": "Editar esta páxina cun formulario",
 	"pf-select2-no-matches": "Non hai coincidencias",
-	"pf-select2-searching": "Buscando…",
+	"pf-select2-searching": "Procurando…",
 	"pf-select2-input-too-short": "Por favor insira $1 ou máis caracteres.",
 	"pf-select2-selection-too-big": "Este campo non acepta máis de {{PLURAL:$1|$1 valor|$1 valores}}.",
 	"pf-maps-enteraddress": "Introduza o enderezo aquí",
@@ -251,7 +253,7 @@
 	"pf-datepicker-next": "Seguinte",
 	"pf-datepicker-today": "Hoxe",
 	"pf-datepicker-firstdayofweek": "1",
-	"pf-datepicker-dateformat": "A cadea de formato de data. Olle a [https://www.mediawiki.org/w/index.php?title=Extension:Semantic_Forms_Inputs&fromsection=Date_picker#Parameters documentación en liña] para obter máis información.",
+	"pf-datepicker-dateformat": "A cadea de formato de data. Olle a [https://www.mediawiki.org/wiki/Extension:Page_Forms/Input_types/Datepicker#Parameters documentación en liña] para obter máis información.",
 	"pf-datepicker-weekstart": "O primeiro día da semana (0 = domingo, 1 = luns...).",
 	"pf-datepicker-firstdate": "A primeira data que se pode elixir (en formato aaa/mm/dd).",
 	"pf-datepicker-lastdate": "A última data que se pode elixir (en formato aaa/mm/dd).",

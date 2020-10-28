@@ -69,11 +69,17 @@
 
 		previewHeight = newPreviewHeight;
 
+		$( function() {
+			window.dispatchEvent( new Event( 'resize' ) ); // It fixes form preview
+		} );
+
 		return false;
 	};
 
 	/**
 	 * Called when the server has sent the preview
+	 *
+	 * @param result
 	 */
 	var resultReceivedHandler = function handleResultReceived( result ) {
 
@@ -137,15 +143,13 @@
 
 			if ( mw.util.getParamValue( 'form' ) ) {
 				data.form = mw.util.getParamValue( 'form' );
-			}
-			else if ( parts.length > 1 ) { // found a formname
+			} else if ( parts.length > 1 ) { // found a formname
 				data.form = parts[1];
 			}
 
 			if ( mw.util.getParamValue( 'target' ) ) {
 				data.target = mw.util.getParamValue( 'target' );
-			}
-			else if ( parts.length > 2 ) { // found a pagename
+			} else if ( parts.length > 2 ) { // found a pagename
 				// Put the name back together, if it contains slashes.
 				data.target = parts.slice(2).join( '/' );
 			}

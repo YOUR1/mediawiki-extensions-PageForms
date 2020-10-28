@@ -24,7 +24,7 @@ class PFPageSchemas extends PSExtensionHandler {
 	 * @return string[]|null
 	 */
 	public static function createPageSchemasObject( $tagName, $xml ) {
-		$pfarray = array();
+		$pfarray = [];
 
 		if ( $tagName == "standardInputs" ) {
 			foreach ( $xml->children() as $tag => $child ) {
@@ -100,7 +100,7 @@ class PFPageSchemas extends PSExtensionHandler {
 		$xml = '';
 		$isStandardInputsOpen = false;
 		foreach ( $wgRequest->getValues() as $var => $val ) {
-			$val = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $val );
+			$val = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $val );
 			if ( $var == 'pf_form_name' ) {
 				$formName = $val;
 			} elseif ( $var == 'pf_page_name_formula' ) {
@@ -172,10 +172,10 @@ class PFPageSchemas extends PSExtensionHandler {
 	public static function createTemplateXMLFromForm() {
 		global $wgRequest;
 
-		$xmlPerTemplate = array();
+		$xmlPerTemplate = [];
 		$templateNum = -1;
 		foreach ( $wgRequest->getValues() as $var => $val ) {
-			$val = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $val );
+			$val = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $val );
 			if ( substr( $var, 0, 18 ) == 'pf_template_label_' ) {
 				$templateNum = substr( $var, 18 );
 				$xml = '<pageforms_TemplateDetails>';
@@ -200,10 +200,10 @@ class PFPageSchemas extends PSExtensionHandler {
 	public static function createFieldXMLFromForm() {
 		global $wgRequest;
 
-		$xmlPerField = array();
+		$xmlPerField = [];
 		$fieldNum = -1;
 		foreach ( $wgRequest->getValues() as $var => $val ) {
-			$val = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $val );
+			$val = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $val );
 			if ( substr( $var, 0, 14 ) == 'pf_input_type_' ) {
 				$fieldNum = substr( $var, 14 );
 				$xml = '<pageforms_FormInput>';
@@ -239,11 +239,11 @@ class PFPageSchemas extends PSExtensionHandler {
 	 */
 	public static function createPageSectionXMLFromForm() {
 		global $wgRequest;
-		$xmlPerPageSection = array();
+		$xmlPerPageSection = [];
 		$pageSectionNum = -1;
 
 		foreach ( $wgRequest->getValues() as $var => $val ) {
-			$val = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $val );
+			$val = str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $val );
 			if ( substr( $var, 0, 26 ) == 'pf_pagesection_key_values_' ) {
 				$pageSectionNum = substr( $var, 26 );
 				$xml = "";
@@ -291,11 +291,11 @@ class PFPageSchemas extends PSExtensionHandler {
 	}
 
 	public static function getSchemaEditingHTML( $pageSchemaObj ) {
-		$form_array = array();
+		$form_array = [];
 		$hasExistingValues = false;
-		if ( !is_null( $pageSchemaObj ) ) {
+		if ( $pageSchemaObj !== null ) {
 			$form_array = $pageSchemaObj->getObject( 'pageforms_Form' );
-			if ( !is_null( $form_array ) ) {
+			if ( $form_array !== null ) {
 				$hasExistingValues = true;
 			}
 		}
@@ -307,74 +307,73 @@ class PFPageSchemas extends PSExtensionHandler {
 		$editTitle = PageSchemas::getValueFromObject( $form_array, 'EditTitle' );
 
 		// Inputs
-		if ( !is_null( $pageSchemaObj ) ) {
+		if ( $pageSchemaObj !== null ) {
 			$standardInputs = $pageSchemaObj->getObject( 'standardInputs' );
 		} else {
-			$standardInputs = array();
+			$standardInputs = [];
 		}
 
 		$freeTextLabel = html_entity_decode( PageSchemas::getValueFromObject( $form_array, 'freeTextLabel' ) );
 
-		$text = "\t<p>" . wfMessage( 'ps-namelabel' )->escaped() . ' ' . Html::input( 'pf_form_name', $formName, 'text', array( 'size' => 15 ) ) . "</p>\n";
+		$text = "\t<p>" . wfMessage( 'ps-namelabel' )->escaped() . ' ' . Html::input( 'pf_form_name', $formName, 'text', [ 'size' => 15 ] ) . "</p>\n";
 		// The checkbox isn't actually a field in the page schema -
 		// we set it based on whether or not a page formula has been
 		// specified.
-		$twoStepProcessAttrs = array( 'id' => 'pf-two-step-process' );
-		if ( is_null( $pageNameFormula ) ) {
+		$twoStepProcessAttrs = [ 'id' => 'pf-two-step-process' ];
+		if ( $pageNameFormula === null ) {
 			$twoStepProcessAttrs['checked'] = true;
 		}
 		$text .= '<p>' . Html::input( 'pf_two_step_process', null, 'checkbox', $twoStepProcessAttrs );
 		$text .= ' Users must enter the page name before getting to the form (default)';
 		$text .= "</p>\n";
 		$text .= '<div class="editSchemaMinorFields">';
-		$text .= "\t<p id=\"pf-page-name-formula\">" . wfMessage( 'pf-pageschemas-pagenameformula' )->escaped() . ' ' . Html::input( 'pf_page_name_formula', $pageNameFormula, 'text', array( 'size' => 30 ) ) . "</p>\n";
-		$text .= "\t<p>" . wfMessage( 'pf-pageschemas-createtitle' )->escaped() . ' ' . Html::input( 'pf_create_title', $createTitle, 'text', array( 'size' => 25 ) ) . "</p>\n";
-		$text .= "\t<p id=\"pf-edit-title\">" . wfMessage( 'pf-pageschemas-edittitle' )->escaped() . ' ' . Html::input( 'pf_edit_title', $editTitle, 'text', array( 'size' => 25 ) ) . "</p>\n";
+		$text .= "\t<p id=\"pf-page-name-formula\">" . wfMessage( 'pf-pageschemas-pagenameformula' )->escaped() . ' ' . Html::input( 'pf_page_name_formula', $pageNameFormula, 'text', [ 'size' => 30 ] ) . "</p>\n";
+		$text .= "\t<p>" . wfMessage( 'pf-pageschemas-createtitle' )->escaped() . ' ' . Html::input( 'pf_create_title', $createTitle, 'text', [ 'size' => 25 ] ) . "</p>\n";
+		$text .= "\t<p id=\"pf-edit-title\">" . wfMessage( 'pf-pageschemas-edittitle' )->escaped() . ' ' . Html::input( 'pf_edit_title', $editTitle, 'text', [ 'size' => 25 ] ) . "</p>\n";
 
 		$text .= "Free text label: " . Html::input( 'pf_fi_free_text_label', ( ( empty( $freeTextLabel ) ) ? wfMessage( 'pf_form_freetextlabel' )->inContentLanguage()->text() : $freeTextLabel ), 'text' ) . "</p><p>";
 
-		// Inputs
 		$text .= "<p>Define form buttons and inputs (all will be enabled if none are selected): &nbsp;</p><p>";
 
 		// Free text
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_free_text', '1', 'checkbox', array( 'id' => 'pf_fi_free_text', 'checked' => ( isset( $standardInputs['inputFreeText'] ) ) ? $standardInputs['inputFreeText'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_free_text' ), 'Free text input' );
+		$text .= Html::input( 'pf_fi_free_text', '1', 'checkbox', [ 'id' => 'pf_fi_free_text', 'checked' => ( isset( $standardInputs['inputFreeText'] ) ) ? $standardInputs['inputFreeText'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_free_text' ], 'Free text input' );
 		$text .= "&nbsp;</span>";
 		// Summary
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_summary', '1', 'checkbox', array( 'id' => 'pf_fi_summary', 'checked' => ( isset( $standardInputs['inputSummary'] ) ) ? $standardInputs['inputSummary'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_summary' ), 'Summary input' );
+		$text .= Html::input( 'pf_fi_summary', '1', 'checkbox', [ 'id' => 'pf_fi_summary', 'checked' => ( isset( $standardInputs['inputSummary'] ) ) ? $standardInputs['inputSummary'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_summary' ], 'Summary input' );
 		$text .= "&nbsp;</span>";
 		// Minor edit
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_minor_edit', '1', 'checkbox', array( 'id' => 'pf_fi_minor_edit', 'checked' => ( isset( $standardInputs['inputMinorEdit'] ) ) ? $standardInputs['inputMinorEdit'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_minor_edit' ), 'Minor edit input' );
+		$text .= Html::input( 'pf_fi_minor_edit', '1', 'checkbox', [ 'id' => 'pf_fi_minor_edit', 'checked' => ( isset( $standardInputs['inputMinorEdit'] ) ) ? $standardInputs['inputMinorEdit'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_minor_edit' ], 'Minor edit input' );
 		$text .= "&nbsp;</span>";
 		// Watch
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_watch', '1', 'checkbox', array( 'id' => 'pf_fi_watch', 'checked' => ( isset( $standardInputs['inputWatch'] ) ) ? $standardInputs['inputWatch'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_watch' ), 'Watch input' );
+		$text .= Html::input( 'pf_fi_watch', '1', 'checkbox', [ 'id' => 'pf_fi_watch', 'checked' => ( isset( $standardInputs['inputWatch'] ) ) ? $standardInputs['inputWatch'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_watch' ], 'Watch input' );
 		$text .= "&nbsp;</span>";
 		// Save
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_save', '1', 'checkbox', array( 'id' => 'pf_fi_save', 'checked' => ( isset( $standardInputs['inputSave'] ) ) ? $standardInputs['inputSave'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_save' ), 'Save input' );
+		$text .= Html::input( 'pf_fi_save', '1', 'checkbox', [ 'id' => 'pf_fi_save', 'checked' => ( isset( $standardInputs['inputSave'] ) ) ? $standardInputs['inputSave'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_save' ], 'Save input' );
 		$text .= "&nbsp;</span>";
 		// Preview
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_preview', '1', 'checkbox', array( 'id' => 'pf_fi_preview', 'checked' => ( isset( $standardInputs['inputPreview'] ) ) ? $standardInputs['inputPreview'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_preview' ), 'Preview input' );
+		$text .= Html::input( 'pf_fi_preview', '1', 'checkbox', [ 'id' => 'pf_fi_preview', 'checked' => ( isset( $standardInputs['inputPreview'] ) ) ? $standardInputs['inputPreview'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_preview' ], 'Preview input' );
 		$text .= "&nbsp;</span>";
 		// Changes
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_changes', '1', 'checkbox', array( 'id' => 'pf_fi_changes', 'checked' => ( isset( $standardInputs['inputChanges'] ) ) ? $standardInputs['inputChanges'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_changes' ), 'Changes input' );
+		$text .= Html::input( 'pf_fi_changes', '1', 'checkbox', [ 'id' => 'pf_fi_changes', 'checked' => ( isset( $standardInputs['inputChanges'] ) ) ? $standardInputs['inputChanges'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_changes' ], 'Changes input' );
 		$text .= "&nbsp;</span>";
 		// Cancel
 		$text .= '<span>';
-		$text .= Html::input( 'pf_fi_cancel', '1', 'checkbox', array( 'id' => 'pf_fi_cancel', 'checked' => ( isset( $standardInputs['inputCancel'] ) ) ? $standardInputs['inputCancel'] : null ) );
-		$text .= Html::rawElement( 'label', array( 'for' => 'pf_fi_cancel' ), 'Cancel input' );
+		$text .= Html::input( 'pf_fi_cancel', '1', 'checkbox', [ 'id' => 'pf_fi_cancel', 'checked' => ( isset( $standardInputs['inputCancel'] ) ) ? $standardInputs['inputCancel'] : null ] );
+		$text .= Html::rawElement( 'label', [ 'for' => 'pf_fi_cancel' ], 'Cancel input' );
 		$text .= "&nbsp;</span>";
 
 		$text .= "</p>";
@@ -383,18 +382,18 @@ class PFPageSchemas extends PSExtensionHandler {
 		global $wgOut;
 		// Separately, add Javascript for getting the checkbox to
 		// hide certain fields.
-		$wgOut->addModules( array( 'ext.pageforms.PF_PageSchemas' ) );
+		$wgOut->addModules( [ 'ext.pageforms.PF_PageSchemas' ] );
 
-		return array( $text, $hasExistingValues );
+		return [ $text, $hasExistingValues ];
 	}
 
 	public static function getTemplateEditingHTML( $psTemplate ) {
 		$hasExistingValues = false;
 		$templateLabel = null;
 		$addAnotherText = null;
-		if ( !is_null( $psTemplate ) ) {
+		if ( $psTemplate !== null ) {
 			$form_array = $psTemplate->getObject( 'pageforms_TemplateDetails' );
-			if ( !is_null( $form_array ) ) {
+			if ( $form_array !== null ) {
 				$hasExistingValues = true;
 				$templateLabel = PageSchemas::getValueFromObject( $form_array, 'Label' );
 				$addAnotherText = PageSchemas::getValueFromObject( $form_array, 'AddAnotherText' );
@@ -402,10 +401,10 @@ class PFPageSchemas extends PSExtensionHandler {
 		}
 
 		$text = "\t<p>" . "The following fields are useful if there can be multiple instances of this template." . "</p>\n";
-		$text .= "\t<p>" . wfMessage( 'exif-label' )->escaped() . ': ' . Html::input( 'pf_template_label_num', $templateLabel, 'text', array( 'size' => 15 ) ) . "</p>\n";
-		$text .= "\t<p>" . 'Text of button to add another instance (default is "Add another"):' . ' ' . Html::input( 'pf_template_addanother_num', $addAnotherText, 'text', array( 'size' => 25 ) ) . "</p>\n";
+		$text .= "\t<p>" . wfMessage( 'exif-label' )->escaped() . ': ' . Html::input( 'pf_template_label_num', $templateLabel, 'text', [ 'size' => 15 ] ) . "</p>\n";
+		$text .= "\t<p>" . 'Text of button to add another instance (default is "Add another"):' . ' ' . Html::input( 'pf_template_addanother_num', $addAnotherText, 'text', [ 'size' => 25 ] ) . "</p>\n";
 
-		return array( $text, $hasExistingValues );
+		return [ $text, $hasExistingValues ];
 	}
 
 	/**
@@ -415,22 +414,22 @@ class PFPageSchemas extends PSExtensionHandler {
 	 * @return array
 	 */
 	public static function getFieldEditingHTML( $psField ) {
-		$fieldValues = array();
+		$fieldValues = [];
 		$hasExistingValues = false;
 		$inputType = null;
 		$inputDesc = null;
 		$inputDescTooltipMode = null;
 		$inputBeforeText = null;
-		if ( !is_null( $psField ) ) {
+		if ( $psField !== null ) {
 			$fieldValues = $psField->getObject( 'pageforms_FormInput' );
-			if ( !is_null( $fieldValues ) ) {
+			if ( $fieldValues !== null ) {
 				$hasExistingValues = true;
 				$inputType = PageSchemas::getValueFromObject( $fieldValues, 'InputType' );
 				$inputDesc = PageSchemas::getValueFromObject( $fieldValues, 'Description' );
 				$inputDescTooltipMode = PageSchemas::getValueFromObject( $fieldValues, 'DescriptionTooltipMode' );
 				$inputBeforeText = PageSchemas::getValueFromObject( $fieldValues, 'TextBeforeField' );
 			} else {
-				$fieldValues = array();
+				$fieldValues = [];
 			}
 		}
 
@@ -438,17 +437,17 @@ class PFPageSchemas extends PSExtensionHandler {
 		$possibleInputTypes = $wgPageFormsFormPrinter->getAllInputTypes();
 		$inputTypeDropdownHTML = Html::element( 'option', null, null );
 		foreach ( $possibleInputTypes as $possibleInputType ) {
-			$inputTypeOptionAttrs = array();
+			$inputTypeOptionAttrs = [];
 			if ( $possibleInputType == $inputType ) {
 				$inputTypeOptionAttrs['selected'] = true;
 			}
 			$inputTypeDropdownHTML .= Html::element( 'option', $inputTypeOptionAttrs, $possibleInputType ) . "\n";
 		}
-		$inputTypeDropdown = Html::rawElement( 'select', array( 'name' => 'pf_input_type_num' ), $inputTypeDropdownHTML );
+		$inputTypeDropdown = Html::rawElement( 'select', [ 'name' => 'pf_input_type_num' ], $inputTypeDropdownHTML );
 		$text = '<p>' . wfMessage( 'pf-pageschemas-inputtype' )->escaped() . ' ' . $inputTypeDropdown . '</p>';
 
 		$text .= "\t" . '<p>' . wfMessage( 'pf-pageschemas-otherparams', 'size=20, mandatory' )->escaped() . '</p>' . "\n";
-		$paramValues = array();
+		$paramValues = [];
 		foreach ( $fieldValues as $param => $value ) {
 			if ( !empty( $param ) && $param != 'InputType' && $param != 'Description' && $param != 'DescriptionTooltipMode' && $param != 'TextBeforeField' ) {
 				if ( !empty( $value ) ) {
@@ -462,34 +461,35 @@ class PFPageSchemas extends PSExtensionHandler {
 			$paramValues[$i] = str_replace( ',', '\,', $paramAndVal );
 		}
 		$param_value_str = implode( ', ', $paramValues );
-		$inputParamsAttrs = array( 'size' => 80 );
+		$inputParamsAttrs = [ 'size' => 80 ];
 		$inputParamsInput = Html::input( 'pf_key_values_num', $param_value_str, 'text', $inputParamsAttrs );
 		$text .= "\t<p>$inputParamsInput</p>\n";
 
 		$text .= '<div class="editSchemaMinorFields">' . "\n";
-		$inputBeforeTextPrint = Html::input( 'pf_input_befo_num', $inputBeforeText, 'text', array( 'size' => 80 ) );
+		$inputBeforeTextPrint = Html::input( 'pf_input_befo_num', $inputBeforeText, 'text', [ 'size' => 80 ] );
 		$text .= "\t<p>Text that will be printed before the field: $inputBeforeTextPrint</p>\n";
 
-		$inputDescription = Html::input( 'pf_input_desc_num', $inputDesc, 'text', array( 'size' => 80 ) );
-		$inputDescriptionTooltipMode = Html::input( 'pf_input_desctool_num', $inputDescTooltipMode, 'checkbox', array( 'checked' => ( $inputDescTooltipMode ) ? 'checked' : null ) );
-		$text .= "\t<p>Field description: $inputDescription<br>$inputDescriptionTooltipMode Show description as pop-up tooltip</p>\n";
+		$inputDescriptionLabel = wfMessage( 'pf-pageschemas-inputdescription' )->parse();
+		$inputDescription = Html::input( 'pf_input_desc_num', $inputDesc, 'text', [ 'size' => 80 ] );
+		$inputDescriptionTooltipMode = Html::input( 'pf_input_desctool_num', $inputDescTooltipMode, 'checkbox', [ 'checked' => ( $inputDescTooltipMode ) ? 'checked' : null ] );
+		$text .= "\t<p>$inputDescriptionLabel $inputDescription<br>$inputDescriptionTooltipMode Show description as pop-up tooltip</p>\n";
 
 		// @HACK to make input parsing easier.
 		$text .= Html::hidden( 'pf_input_finish_num', 1 );
 
 		$text .= "</div>\n";
 
-		return array( $text, $hasExistingValues );
+		return [ $text, $hasExistingValues ];
 	}
 
 	public static function getPageSectionEditingHTML( $psPageSection ) {
-		$otherParams = array();
+		$otherParams = [];
 
-		if ( !is_null( $psPageSection ) ) {
+		if ( $psPageSection !== null ) {
 			$otherParams = $psPageSection->getObject( 'pageforms_PageSection' );
 		}
-		$paramValues = array();
-		if ( !is_null( $otherParams ) ) {
+		$paramValues = [];
+		if ( $otherParams !== null ) {
 			foreach ( $otherParams as $param => $value ) {
 				if ( !empty( $param ) ) {
 					if ( !empty( $value ) ) {
@@ -506,7 +506,7 @@ class PFPageSchemas extends PSExtensionHandler {
 		}
 		$param_value_str = implode( ', ', $paramValues );
 		$text = "\t" . '<p>' . wfMessage( 'pf-pageschemas-otherparams', 'rows=10, mandatory' )->escaped() . '</p>' . "\n";
-		$inputParamsInput = Html::input( 'pf_pagesection_key_values_num', $param_value_str, 'text', array( 'size' => 80 ) );
+		$inputParamsInput = Html::input( 'pf_pagesection_key_values_num', $param_value_str, 'text', [ 'size' => 80 ] );
 		$text .= "\t<p>$inputParamsInput</p>\n";
 
 		return $text;
@@ -514,7 +514,7 @@ class PFPageSchemas extends PSExtensionHandler {
 
 	public static function getFormName( $pageSchemaObj ) {
 		$mainFormInfo = self::getMainFormInfo( $pageSchemaObj );
-		if ( is_null( $mainFormInfo ) || !array_key_exists( 'name', $mainFormInfo ) ) {
+		if ( $mainFormInfo === null || !array_key_exists( 'name', $mainFormInfo ) ) {
 			return null;
 		}
 		return $mainFormInfo['name'];
@@ -530,7 +530,7 @@ class PFPageSchemas extends PSExtensionHandler {
 		$xml = $pageSchemaObj->getXML();
 		foreach ( $xml->children() as $tag => $child ) {
 			if ( $tag == "pageforms_Form" ) {
-				$pfarray = array();
+				$pfarray = [];
 				$formName = (string)$child->attributes()->name;
 				$pfarray['name'] = $formName;
 				foreach ( $child->children() as $tag => $formelem ) {
@@ -545,33 +545,34 @@ class PFPageSchemas extends PSExtensionHandler {
 				return $pfarray;
 			}
 		}
-		return array();
+		return [];
 	}
 
 	public static function getFormFieldInfo( $psTemplate, $template_fields ) {
-		$form_fields = array();
+		$form_fields = [];
 		$fieldsInfo = $psTemplate->getFields();
 		foreach ( $fieldsInfo as $i => $psField ) {
 			$fieldFormArray = $psField->getObject( 'pageforms_FormInput' );
-			if ( !is_null( $fieldFormArray ) ) {
-				$formField = PFFormField::create( $template_fields[$i] );
-				foreach ( $fieldFormArray as $var => $val ) {
-					if ( $var == 'InputType' ) {
-						$formField->setInputType( $val );
-					} elseif ( $var == 'mandatory' ) {
-						$formField->setIsMandatory( true );
-					} elseif ( $var == 'hidden' ) {
-						$formField->setIsHidden( true );
-					} elseif ( $var == 'restricted' ) {
-						$formField->setIsRestricted( true );
-					} elseif ( in_array( $var, array( 'Description', 'DescriptionTooltipMode', 'TextBeforeField' ) ) ) {
-						$formField->setDescriptionArg( $var, $val );
-					} else {
-						$formField->setFieldArg( $var, $val );
-					}
-				}
-				$form_fields[] = $formField;
+			if ( $fieldFormArray == null ) {
+				continue;
 			}
+			$formField = PFFormField::create( $template_fields[$i] );
+			foreach ( $fieldFormArray as $var => $val ) {
+				if ( $var == 'InputType' ) {
+					$formField->setInputType( $val );
+				} elseif ( $var == 'mandatory' ) {
+					$formField->setIsMandatory( true );
+				} elseif ( $var == 'hidden' ) {
+					$formField->setIsHidden( true );
+				} elseif ( $var == 'restricted' ) {
+					$formField->setIsRestricted( true );
+				} elseif ( in_array( $var, [ 'Description', 'DescriptionTooltipMode', 'TextBeforeField' ] ) ) {
+					$formField->setDescriptionArg( $var, $val );
+				} else {
+					$formField->setFieldArg( $var, $val );
+				}
+			}
+			$form_fields[] = $formField;
 		}
 		return $form_fields;
 	}
@@ -579,19 +580,22 @@ class PFPageSchemas extends PSExtensionHandler {
 	public static function getPageSection( $psPageSection ) {
 		$pageSection = PFPageSection::create( $psPageSection->getSectionName() );
 		$pageSectionArray = $psPageSection->getObject( 'pageforms_PageSection' );
-		if ( !is_null( $pageSectionArray ) ) {
-			foreach ( $pageSectionArray as $var => $val ) {
-				if ( $var == 'mandatory' ) {
-					$pageSection->setIsMandatory( true );
-				} elseif ( $var == 'hidden' ) {
-					$pageSection->setIsHidden( true );
-				} elseif ( $var == 'restricted' ) {
-					$pageSection->setIsRestricted( true );
-				} else {
-					$pageSection->setSectionArgs( $var, $val );
-				}
+		if ( $pageSectionArray == null ) {
+			return null;
+		}
+
+		foreach ( $pageSectionArray as $var => $val ) {
+			if ( $var == 'mandatory' ) {
+				$pageSection->setIsMandatory( true );
+			} elseif ( $var == 'hidden' ) {
+				$pageSection->setIsHidden( true );
+			} elseif ( $var == 'restricted' ) {
+				$pageSection->setIsRestricted( true );
+			} else {
+				$pageSection->setSectionArgs( $var, $val );
 			}
 		}
+
 		return $pageSection;
 	}
 
@@ -602,7 +606,7 @@ class PFPageSchemas extends PSExtensionHandler {
 	 * @return Title[]
 	 */
 	public static function getPagesToGenerate( $pageSchemaObj ) {
-		$genPageList = array();
+		$genPageList = [];
 		$psTemplates = $pageSchemaObj->getTemplates();
 		foreach ( $psTemplates as $psTemplate ) {
 			$title = Title::makeTitleSafe( NS_TEMPLATE, $psTemplate->getName() );
@@ -625,12 +629,12 @@ class PFPageSchemas extends PSExtensionHandler {
 	 */
 	public static function getFieldsFromTemplateSchema( $psTemplate ) {
 		$psFields = $psTemplate->getFields();
-		$templateFields = array();
+		$templateFields = [];
 		foreach ( $psFields as $psField ) {
 			if ( defined( 'SMW_VERSION' ) ) {
 				$prop_array = $psField->getObject( 'semanticmediawiki_Property' );
 				$propertyName = PageSchemas::getValueFromObject( $prop_array, 'name' );
-				if ( !is_null( $prop_array ) && empty( $propertyName ) ) {
+				if ( $prop_array !== null && empty( $propertyName ) ) {
 					$propertyName = $psField->getName();
 				}
 			} else {
@@ -679,7 +683,7 @@ class PFPageSchemas extends PSExtensionHandler {
 		$formItems, $formDataFromSchema, $categoryName ) {
 		global $wgUser;
 
-		$input = array();
+		$input = [];
 		if ( array_key_exists( 'inputFreeText', $formDataFromSchema ) ) {
 			$input['free text'] = '{{{standard input|free text|rows=10}}}';
 		}
@@ -722,12 +726,12 @@ class PFPageSchemas extends PSExtensionHandler {
 			$form->setEditTitle( $formDataFromSchema['EditTitle'] );
 		}
 		$formContents = $form->createMarkup( $input, $freeTextLabel );
-		$params = array();
+		$params = [];
 		$params['user_id'] = $wgUser->getId();
 		$params['page_text'] = $formContents;
 		$job = new PSCreatePageJob( $formTitle, $params );
 
-		$jobs = array( $job );
+		$jobs = [ $job ];
 		JobQueueGroup::singleton()->push( $jobs );
 	}
 
@@ -740,8 +744,8 @@ class PFPageSchemas extends PSExtensionHandler {
 		global $wgUser;
 
 		$psFormItems = $pageSchemaObj->getFormItemsList();
-		$form_items = array();
-		$jobs = array();
+		$form_items = [];
+		$jobs = [];
 		$templateHackUsed = false;
 		$isCategoryNameSet = false;
 
@@ -797,14 +801,15 @@ class PFPageSchemas extends PSExtensionHandler {
 
 				// Set Cargo table, if one was set in the schema.
 				$cargoArray = $psTemplate->getObject( 'cargo_TemplateDetails' );
-				if ( !is_null( $cargoArray ) ) {
-					$pfTemplate->mCargoTable = PageSchemas::getValueFromObject( $cargoArray, 'Table' );
+				if ( $cargoArray !== null ) {
+					$cargoTable = PageSchemas::getValueFromObject( $cargoArray, 'Table' );
+					$pfTemplate->setCargoTable( $cargoTable );
 				}
 
 				$templateText = $pfTemplate->createText();
 
 				if ( in_array( $fullTemplateName, $selectedPages ) ) {
-					$params = array();
+					$params = [];
 					$params['user_id'] = $wgUser->getId();
 					$params['page_text'] = $templateText;
 					$jobs[] = new PSCreatePageJob( $templateTitle, $params );
@@ -829,12 +834,12 @@ class PFPageSchemas extends PSExtensionHandler {
 					null,
 					$form_fields
 				);
-				$form_items[] = array( 'type' => 'template', 'name' => $form_template->getTemplateName(), 'item' => $form_template );
+				$form_items[] = [ 'type' => 'template', 'name' => $form_template->getTemplateName(), 'item' => $form_template ];
 			} elseif ( $psFormItem['type'] == 'Section' ) {
 				$psPageSection = $psFormItem['item'];
 				$form_section = self::getPageSection( $psPageSection );
 				$form_section->setSectionLevel( $psPageSection->getSectionLevel() );
-				$form_items[] = array( 'type' => 'section', 'name' => $form_section->getSectionName(), 'item' => $form_section );
+				$form_items[] = [ 'type' => 'section', 'name' => $form_section->getSectionName(), 'item' => $form_section ];
 			}
 
 		}
@@ -842,8 +847,8 @@ class PFPageSchemas extends PSExtensionHandler {
 		// Create the "!" hack template, if it's necessary
 		if ( $templateHackUsed ) {
 			$templateTitle = Title::makeTitleSafe( NS_TEMPLATE, '!' );
-			if ( ! $templateTitle->exists() ) {
-				$params = array();
+			if ( !$templateTitle->exists() ) {
+				$params = [];
 				$params['user_id'] = $wgUser->getId();
 				$params['page_text'] = '|';
 				$jobs[] = new PSCreatePageJob( $templateTitle, $params );
@@ -870,11 +875,11 @@ class PFPageSchemas extends PSExtensionHandler {
 		foreach ( $schemaXML->children() as $tag => $child ) {
 			if ( $tag == "pageforms_Form" ) {
 				$formName = $child->attributes()->name;
-				$values = array();
+				$values = [];
 				foreach ( $child->children() as $tagName => $prop ) {
 					$values[$tagName] = (string)$prop;
 				}
-				return array( $formName, $values );
+				return [ $formName, $values ];
 			}
 		}
 		return null;
@@ -882,7 +887,7 @@ class PFPageSchemas extends PSExtensionHandler {
 
 	public static function getTemplateValues( $psTemplate ) {
 		// TODO - fix this.
-		$values = array();
+		$values = [];
 		if ( $psTemplate instanceof PSTemplate ) {
 			$psTemplate = $psTemplate->getXML();
 		}
@@ -911,7 +916,7 @@ class PFPageSchemas extends PSExtensionHandler {
 			return null;
 		}
 
-		$displayValues = array();
+		$displayValues = [];
 		foreach ( $templateValues as $key => $value ) {
 			if ( $key == 'Label' ) {
 				$propName = wfMessage( 'exif-label' )->escaped();
@@ -920,11 +925,11 @@ class PFPageSchemas extends PSExtensionHandler {
 			}
 			$displayValues[$propName] = $value;
 		}
-		return array( null, $displayValues );
+		return [ null, $displayValues ];
 	}
 
 	public static function getFieldDisplayString() {
-		return 'Form input';
+		return wfMessage( 'pf-pageschemas-forminput' )->parse();
 	}
 
 	public static function getPageSectionDisplayString() {
@@ -940,7 +945,7 @@ class PFPageSchemas extends PSExtensionHandler {
 		foreach ( $fieldXML->children() as $tag => $child ) {
 			if ( $tag == "pageforms_FormInput" ) {
 				$inputName = $child->attributes()->name;
-				$values = array();
+				$values = [];
 				foreach ( $child->children() as $prop ) {
 					if ( $prop->getName() == 'InputType' ) {
 						$propName = 'Input type';
@@ -949,7 +954,7 @@ class PFPageSchemas extends PSExtensionHandler {
 					}
 					$values[$propName] = (string)$prop;
 				}
-				return array( $inputName, $values );
+				return [ $inputName, $values ];
 			}
 		}
 		return null;
@@ -959,12 +964,12 @@ class PFPageSchemas extends PSExtensionHandler {
 		foreach ( $pageSectionXML->children() as $tag => $child ) {
 			if ( $tag == "pageforms_PageSection" ) {
 				$inputName = $child->attributes()->name;
-				$values = array();
+				$values = [];
 				foreach ( $child->children() as $prop ) {
 					$propName = (string)$prop->attributes()->name;
 					$values[$propName] = (string)$prop;
 				}
-				return array( $inputName, $values );
+				return [ $inputName, $values ];
 			}
 		}
 		return null;

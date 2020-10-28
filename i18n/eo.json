@@ -1,10 +1,11 @@
 {
 	"@metadata": {
 		"authors": [
-			"Michawiki",
-			"Yekrats",
 			"KuboF",
-			"Psychoslave"
+			"Michawiki",
+			"Psychoslave",
+			"Robin van der Vliet",
+			"Yekrats"
 		]
 	},
 	"pageforms-desc": "Formularoj por aldonado kaj redaktado de semantikaj datumoj",
@@ -78,9 +79,10 @@
 	"pf_runquery_additionalquery": "Aldona serĉomendo",
 	"pf_formerrors_header": "Estis eraroj kun via kampara enigo, jene:",
 	"pf_blank_error": "ne povas esti malplena",
-	"pf_bad_url_error": "nepre havas la korektan URL-formaton, komence kun 'http'",
+	"pf_bad_url_error": "nepre havu la ĝustan URL-formaton, komence kun 'http'",
 	"pf_bad_email_error": "devas havi validan formaton de retpoŝta adreso",
 	"pf_bad_number_error": "devas esti valida nombro",
+	"pf_bad_integer_error": "devas esti valida enjero",
 	"pf_bad_date_error": "devas esti valida dato",
 	"uploadwindow": "Alŝuta fenestro",
 	"pf_deletionlog": "Protokolo pri forigado",

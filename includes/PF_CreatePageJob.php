@@ -5,6 +5,8 @@
  * @ingroup PF
  */
 
+use MediaWiki\MediaWikiServices;
+
 /**
  * Background job to create a new page, for use by the 'CreateClass' special
  * page.
@@ -14,51 +16,67 @@
  */
 class PFCreatePageJob extends Job {
 
-	function __construct( $title, $params = '', $id = 0 ) {
-		parent::__construct( 'createPage', $title, $params, $id );
+	function __construct( Title $title, array $params ) {
+		parent::__construct( 'pageFormsCreatePage', $title, $params );
+		$this->removeDuplicates = true;
 	}
 
 	/**
-	 * Run a createPage job
+	 * Run a pageFormsCreatePage job
 	 * @return bool success
 	 */
 	function run() {
-		if ( is_null( $this->title ) ) {
-			$this->error = "createPage: Invalid title";
+		if ( $this->title === null ) {
+			$this->error = "pageFormsCreatePage: Invalid title";
 			return false;
 		}
 
-		$wikiPage = new WikiPage( $this->title );
+		$wikiPage = WikiPage::factory( $this->title );
 		if ( !$wikiPage ) {
-			$this->error = 'createPage: Wiki page not found "' . $this->title->getPrefixedDBkey() . '"';
+			$this->error = 'pageFormsCreatePage: Wiki page not found "' . $this->title->getPrefixedDBkey() . '"';
 			return false;
 		}
 
-		$page_text = $this->params['page_text'];
-		// change global $wgUser variable to the one
-		// specified by the job only for the extent of this
-		// replacement
-		global $wgUser;
-		$actual_user = $wgUser;
-		$wgUser = User::newFromId( $this->params['user_id'] );
-		$edit_summary = '';
+		$pageText = $this->params['page_text'];
 		if ( array_key_exists( 'edit_summary', $this->params ) ) {
-			$edit_summary = $this->params['edit_summary'];
-		}
-
-		// It's strange that doEditContent() doesn't
-		// automatically attach the 'bot' flag when the user
-		// is a bot...
-		if ( $wgUser->isAllowed( 'bot' ) ) {
-			$flags = EDIT_FORCE_BOT;
+			$editSummary = $this->params['edit_summary'];
 		} else {
-			$flags = 0;
+			$editSummary = '';
 		}
+		$user = User::newFromId( $this->params['user_id'] );
 
-		$new_content = new WikitextContent( $page_text );
-		$wikiPage->doEditContent( $new_content, $edit_summary, $flags );
+		self::createOrModifyPage( $wikiPage, $pageText, $editSummary, $user );
 
-		$wgUser = $actual_user;
 		return true;
 	}
+
+	public static function createOrModifyPage( $wikiPage, $pageText, $editSummary, $user ) {
+		$newContent = new WikitextContent( $pageText );
+
+		// It's strange that doEditContent() doesn't automatically
+		// attach the 'bot' flag when the user is a bot...
+		// @TODO - is all this code still necessary for MW 1.32+?
+		$flags = 0;
+		if ( method_exists( 'MediaWiki\Permissions\PermissionManager', 'userHasRight' ) ) {
+			// MW 1.34+
+			$permissionManager = MediaWikiServices::getInstance()->getPermissionManager();
+			if ( $permissionManager->userHasRight( $user, 'bot' ) ) {
+				$flags = EDIT_FORCE_BOT;
+			}
+		} else {
+			if ( $user->isAllowed( 'bot' ) ) {
+				$flags = EDIT_FORCE_BOT;
+			}
+		}
+
+		if ( class_exists( 'PageUpdater' ) ) {
+			// MW 1.32+
+			$updater = $wikiPage->newPageUpdater( $user );
+			$updater->setContent( SlotRecord::MAIN, $newContent );
+			$updater->saveRevision( CommentStoreComment::newUnsavedComment( $editSummary ), $flags );
+		} else {
+			$wikiPage->doEditContent( $newContent, $editSummary, $flags, $originalRevId = false, $user );
+		}
+	}
+
 }

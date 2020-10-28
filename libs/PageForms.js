@@ -396,7 +396,7 @@ function showDiv( div_id, instanceWrapperDiv, initPage ) {
 	.addClass('shownByPF')
 
 	.find(".disabledByPF")
-	.removeAttr('disabled')
+	.prop('disabled', false)
 	.removeClass('disabledByPF');
 
 	elem.each( function() {
@@ -625,6 +625,9 @@ $.fn.addErrorMessage = function(msg, val) {
 	this.find('input').addClass('inputError');
 	this.find('select2-container').addClass('inputError');
 	this.append($('<div>').addClass( 'errorMessage' ).text( mw.msg( msg, val ) ));
+	// If this is part of a minimized multiple-template instance, add a
+	// red border around the instance rectangle to make it easier to find.
+	this.parents( '.multipleTemplateInstance.minimized' ).css( 'border', '1px solid red' );
 };
 
 $.fn.isAtMaxInstances = function() {
@@ -811,8 +814,8 @@ $.fn.validateUniqueField = function() {
 };
 
 $.fn.validateMandatoryComboBox = function() {
-	var combobox = this.find( "input.pfComboBox" );
-	if (combobox.val() === '') {
+	var combobox = this.find('.mandatoryField');
+	if (combobox.val() === null) {
 		this.addErrorMessage( 'pf_blank_error' );
 		return false;
 	} else {
@@ -831,10 +834,9 @@ $.fn.validateMandatoryDateField = function() {
 	}
 };
 
-// Special handling for radiobuttons, because what's being checked
-// is the first radiobutton, which has an empty value.
 $.fn.validateMandatoryRadioButton = function() {
-	if (this.find("[value='']").is(':checked')) {
+	var checkedValue = this.find("input:checked").val();
+	if ( !checkedValue || checkedValue == '' ) {
 		this.addErrorMessage( 'pf_blank_error' );
 		return false;
 	} else {
@@ -895,6 +897,16 @@ $.fn.validateNumberField = function() {
 		return true;
 	} else {
 		this.addErrorMessage( 'pf_bad_number_error' );
+		return false;
+	}
+};
+
+$.fn.validateIntegerField = function() {
+	var fieldVal = this.find("input").val();
+	if ( fieldVal === '' || fieldVal == parseInt( fieldVal, 10 ) ) {
+		return true;
+	} else {
+		this.addErrorMessage( 'pf_bad_integer_error' );
 		return false;
 	}
 };
@@ -1094,6 +1106,11 @@ window.validateAll = function () {
 			num_errors += 1;
 		}
 	});
+	$("span.integerInput").not(".hiddenByPF").each( function() {
+		if (! $(this).validateIntegerField() ) {
+			num_errors += 1;
+		}
+	});
 	$("span.dateInput").not(".hiddenByPF").each( function() {
 		if (! $(this).validateDateField() ) {
 			num_errors += 1;
@@ -1173,7 +1190,7 @@ $.fn.possiblyMinimizeAllOpenInstances = function() {
 		var instance = $(this);
 		instance.addClass('minimized');
 		var valuesStr = '';
-		instance.find( "input[type != 'hidden'][type != 'button'], select, textarea" ).each( function() {
+		instance.find( "input[type != 'hidden'][type != 'button'], select, textarea, div.ve-ce-surface" ).each( function() {
 			// If the set of fields to be displayed was specified in
 			// the form definition, check against that list.
 			if ( allDisplayedFields !== null ) {
@@ -1189,6 +1206,10 @@ $.fn.possiblyMinimizeAllOpenInstances = function() {
 			}
 
 			var curVal = $(this).val();
+			if ( $(this).hasClass('ve-ce-surface') ) {
+				// Special handling for VisualEditor/VEForAll textareas.
+				curVal = $(this).text();
+			}
 			if ( typeof curVal !== 'string' || curVal === '' ) {
 				return;
 			}
@@ -1219,6 +1240,8 @@ var num_elements = 0;
 
 /**
  * Functions for multiple-instance templates.
+ *
+ * @param addAboveCurInstance
  */
 $.fn.addInstance = function( addAboveCurInstance ) {
 	var wgPageFormsShowOnSelect = mw.config.get( 'wgPageFormsShowOnSelect' );
@@ -1272,7 +1295,7 @@ $.fn.addInstance = function( addAboveCurInstance ) {
 	.removeClass('hiddenByPF')
 
 	.find('.disabledByPF')
-	.removeAttr('disabled')
+	.prop('disabled', false)
 	.removeClass('disabledByPF');
 
 	// Make internal ID unique for the relevant form elements, and replace
@@ -1344,10 +1367,6 @@ $.fn.addInstance = function( addAboveCurInstance ) {
 
 	new_div.find('span').attr('id', function() {
 		return this.id.replace(/span_/g, 'span_' + num_elements + '_');
-	});
-
-	new_div.find('label').attr('for', function() {
-		return this.htmlFor.replace(/input_/g, 'input_' + num_elements + '_');
 	});
 
 	// Add the new instance.
@@ -1466,6 +1485,8 @@ $.fn.setDependentAutocompletion = function( dependentField, baseField, baseValue
 /**
  * Called on a 'base' field (e.g., for a country) - sets the autocompletion
  * for its 'dependent' field (e.g., for a city).
+ *
+ * @param partOfMultiple
  */
 $.fn.setAutocompleteForDependentField = function( partOfMultiple ) {
 	var curValue = $(this).val();
@@ -1481,6 +1502,8 @@ $.fn.setAutocompleteForDependentField = function( partOfMultiple ) {
 			dependent_on_me.push(dependentFieldPair[1]);
 		}
 	}
+	// @TODO - change to $.uniqueSort() once support for MW 1.28 is
+	// removed (and jQuery >= 3 is thus guaranteed).
 	dependent_on_me = $.unique(dependent_on_me);
 
 	var self = this;
@@ -1514,6 +1537,8 @@ $.fn.setAutocompleteForDependentField = function( partOfMultiple ) {
  * Initialize all the JS-using elements contained within this block - can be
  * called for either the entire HTML body, or for a div representing an
  * instance of a multiple-instance template.
+ *
+ * @param partOfMultiple
  */
 $.fn.initializeJSElements = function( partOfMultiple ) {
 	var fancyBoxSettings;
@@ -1622,6 +1647,11 @@ $.fn.initializeJSElements = function( partOfMultiple ) {
 		};
 	}
 
+	// Only defined if $wgPageFormsSimpleUpload == true.
+	if ( typeof this.initializeSimpleUpload === 'function' ) {
+		this.initializeSimpleUpload();
+	}
+
 	if ( partOfMultiple ) {
 		this.find('.pfFancyBox').fancybox(fancyBoxSettings);
 		this.find('.autocompleteInput').attachAutocomplete();
@@ -1668,7 +1698,7 @@ $.fn.initializeJSElements = function( partOfMultiple ) {
 			myThis.find(".visualeditor").not(".multipleTemplateWrapper .visualeditor").applyVisualEditor();
 		}
 	} else {
-		$(document).bind('VEForAllLoaded', function(e) {
+		$(document).on('VEForAllLoaded', function(e) {
 			if ( partOfMultiple ) {
 				myThis.find(".visualeditor").applyVisualEditor();
 			} else {
@@ -1689,7 +1719,7 @@ $.fn.initializeJSElements = function( partOfMultiple ) {
 			});
 		}
 	} else {
-		$(document).bind('TinyMCELoaded', function(e) {
+		$(document).on('TinyMCELoaded', function(e) {
 			if ( partOfMultiple ) {
 				myThis.find(".tinymce").each( function() {
 					mwTinyMCEInit( '#' + $(this).attr('id') );
@@ -1737,6 +1767,8 @@ $(document).ready( function() {
 	// jQuery's .ready() function is being called before the resource was actually loaded.
 	// This is a workaround for https://phabricator.wikimedia.org/T216805.
 	setTimeout( function(){
+		// "Mask" to prevent users from clicking while form is still loading.
+		$('#loadingMask').css({'width': $(document).width(),'height': $(document).height()});
 
 		// register init functions
 		var initFunctionData = mw.config.get( 'ext.pf.initFunctionData' );
@@ -1783,15 +1815,16 @@ $(document).ready( function() {
 			});
 		});
 
-	}, 10 );
+		// If the form is submitted, validate everything!
+		$('#pfForm').submit( function() {
+			return validateAll();
+		} );
 
-	// If the form is submitted, validate everything!
-	$('#pfForm').submit( function() {
-		return validateAll();
-	} );
+		// We are all done - remove the loading spinner.
+		$('.loadingImage').remove();
+	}, 0 );
 
-	// We are all done - remove the loading spinner.
-	$('.loadingImage').remove();
+	mw.hook('pf.formSetupAfter').fire();
 });
 
 // If some part of the form is clicked, minimize any multiple-instance
@@ -1833,6 +1866,21 @@ $('form#pfForm').click( function(e) {
 		instance.find('.instanceMain').fadeIn();
 		instance.find('.fieldValuesDisplay').remove();
 	}
+});
+
+$('#pf-expand-all a').click(function( event ) {
+	event.preventDefault();
+
+	// Page Forms minimized template instances.
+	$('.minimized').each( function() {
+		$(this).removeClass('minimized');
+		$(this).find('.fieldValuesDisplay').html('');
+		$(this).find('.instanceMain').fadeIn();
+		$(this).find('.fieldValuesDisplay').remove();
+        });
+
+	// Standard MediaWiki "collapsible" sections.
+	$('div.mw-collapsed a.mw-collapsible-text').click();
 });
 
 }( jQuery, mediaWiki ) );

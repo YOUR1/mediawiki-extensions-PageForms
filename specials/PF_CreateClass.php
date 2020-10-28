@@ -45,9 +45,9 @@ class PFCreateClass extends SpecialPage {
 			$out->addWikiMsg( 'pf_createclass_missingvalues' );
 			return;
 		}
-		$fields = array();
-		$jobs = array();
-		$allowedValuesForFields = array();
+		$fields = [];
+		$jobs = [];
+		$allowedValuesForFields = [];
 		// Cycle through all the rows passed in.
 		for ( $i = 1; $req->getVal( "field_name_$i" ) != ''; $i++ ) {
 			// Go through the query values, setting the appropriate
@@ -86,12 +86,13 @@ class PFCreateClass extends SpecialPage {
 
 			// Create the property, and make a job for it.
 			if ( defined( 'SMW_VERSION' ) && !empty( $property_name ) ) {
-				$full_text = PFCreateProperty::createPropertyText( $property_type, $allowed_values );
 				$property_title = Title::makeTitleSafe( SMW_NS_PROPERTY, $property_name );
-				$params = array();
-				$params['user_id'] = $user->getId();
-				$params['page_text'] = $full_text;
-				$params['edit_summary'] = wfMessage( 'pf_createproperty_editsummary', $property_type )->inContentLanguage()->text();
+				$full_text = PFCreateProperty::createPropertyText( $property_type, $allowed_values );
+				$params = [
+					'user_id' => $user->getId(),
+					'page_text' => $full_text,
+					'edit_summary' => $this->msg( 'pf_createproperty_editsummary', $property_type )->inContentLanguage()->text()
+				];
 				$jobs[] = new PFCreatePageJob( $property_title, $params );
 			}
 		}
@@ -100,14 +101,15 @@ class PFCreateClass extends SpecialPage {
 		$connectingProperty = trim( $req->getVal( 'connecting_property' ) );
 		if ( defined( 'SMW_VERSION' ) && $connectingProperty != '' ) {
 			global $smwgContLang;
+			$property_title = Title::makeTitleSafe( SMW_NS_PROPERTY, $connectingProperty );
 			$datatypeLabels = $smwgContLang->getDatatypeLabels();
 			$property_type = $datatypeLabels['_wpg'];
 			$full_text = PFCreateProperty::createPropertyText( $property_type, $allowed_values );
-			$property_title = Title::makeTitleSafe( SMW_NS_PROPERTY, $connectingProperty );
-			$params = array();
-			$params['user_id'] = $user->getId();
-			$params['page_text'] = $full_text;
-			$params['edit_summary'] = wfMessage( 'pf_createproperty_editsummary', $property_type )->inContentLanguage()->text();
+			$params = [
+				'user_id' => $user->getId(),
+				'page_text' => $full_text,
+				'edit_summary' => $this->msg( 'pf_createproperty_editsummary', $property_type )->inContentLanguage()->text()
+			];
 			$jobs[] = new PFCreatePageJob( $property_title, $params );
 		}
 
@@ -116,7 +118,7 @@ class PFCreateClass extends SpecialPage {
 		$template_format = $req->getVal( "template_format" );
 		$pfTemplate = new PFTemplate( $template_name, $fields );
 		if ( defined( 'CARGO_VERSION' ) && $use_cargo ) {
-			$pfTemplate->mCargoTable = $cargo_table;
+			$pfTemplate->setCargoTable( $cargo_table );
 		}
 		if ( defined( 'SMW_VERSION' ) && $template_multiple ) {
 			$pfTemplate->setConnectingProperty( $connectingProperty );
@@ -127,14 +129,13 @@ class PFCreateClass extends SpecialPage {
 		$full_text = $pfTemplate->createText();
 
 		$template_title = Title::makeTitleSafe( NS_TEMPLATE, $template_name );
+		$template_page = WikiPage::factory( $template_title );
 		$edit_summary = '';
-		$template_page = new WikiPage( $template_title );
-		$content = new WikitextContent( $full_text );
-		$template_page->doEditContent( $content, $edit_summary );
+		PFCreatePageJob::createOrModifyPage( $template_page, $full_text, $edit_summary, $user );
 
 		// Create the form, and make a job for it.
 		if ( $form_name != '' ) {
-			$formFields = array();
+			$formFields = [];
 			foreach ( $fields as $field ) {
 				$formField = PFFormField::create( $field );
 				$fieldName = $field->getFieldName();
@@ -145,18 +146,23 @@ class PFCreateClass extends SpecialPage {
 				$formFields[] = $formField;
 			}
 			$form_template = PFTemplateInForm::create( $template_name, '', false, false, $formFields );
-			$form_items = array();
-			$form_items[] = array(
+			$form_items = [];
+			$form_items[] = [
 				'type' => 'template',
 				'name' => $form_template->getTemplateName(),
 				'item' => $form_template
-			);
-			$form = PFForm::create( $form_name, $form_items );
-			$full_text = $form->createMarkup();
+			];
+
 			$form_title = Title::makeTitleSafe( PF_NS_FORM, $form_name );
-			$params = array();
-			$params['user_id'] = $user->getId();
-			$params['page_text'] = $full_text;
+			$form = PFForm::create( $form_name, $form_items );
+			if ( $category_name != '' ) {
+				$form->setAssociatedCategory( $category_name );
+			}
+			$full_text = $form->createMarkup();
+			$params = [
+				'user_id' => $user->getId(),
+				'page_text' => $full_text
+			];
 			$jobs[] = new PFCreatePageJob( $form_title, $params );
 		}
 
@@ -164,9 +170,10 @@ class PFCreateClass extends SpecialPage {
 		if ( $category_name != '' ) {
 			$full_text = PFCreateCategory::createCategoryText( $form_name, $category_name, '' );
 			$category_title = Title::makeTitleSafe( NS_CATEGORY, $category_name );
-			$params = array();
-			$params['user_id'] = $user->getId();
-			$params['page_text'] = $full_text;
+			$params = [
+				'user_id' => $user->getId(),
+				'page_text' => $full_text
+			];
 			$jobs[] = new PFCreatePageJob( $category_title, $params );
 		}
 
@@ -191,7 +198,7 @@ class PFCreateClass extends SpecialPage {
 
 		$numStartingRows = 5;
 		$out->addJsConfigVars( '$numStartingRows', $numStartingRows );
-		$out->addModules( array( 'ext.pageforms.PF_CreateClass' ) );
+		$out->addModules( [ 'ext.pageforms.PF_CreateClass' ] );
 
 		$createAll = $req->getCheck( 'createAll' );
 		if ( $createAll ) {
@@ -215,17 +222,13 @@ class PFCreateClass extends SpecialPage {
 			$possibleTypes = $wgCargoFieldTypes;
 			$specialBGColor = '';
 		} else {
-			$possibleTypes = array();
+			$possibleTypes = [];
 		}
 
 		// Make links to all the other 'Create...' pages, in order to
 		// link to them at the top of the page.
-		$creation_links = array();
-		if ( method_exists( $this, 'getLinkRenderer' ) ) {
-			$linkRenderer = $this->getLinkRenderer();
-		} else {
-			$linkRenderer = null;
-		}
+		$creation_links = [];
+		$linkRenderer = $this->getLinkRenderer();
 		if ( defined( 'SMW_VERSION' ) ) {
 			$creation_links[] = PFUtils::linkForSpecialPage( $linkRenderer, 'CreateProperty' );
 		}
@@ -235,55 +238,56 @@ class PFCreateClass extends SpecialPage {
 
 		$text = '<form id="createClassForm" action="" method="post">' . "\n";
 		$text .= "\t" . Html::rawElement( 'p', null,
-				wfMessage( 'pf_createclass_docu' )
+				$this->msg( 'pf_createclass_docu' )
 					->rawParams( $wgLang->listToText( $creation_links ) )
 					->escaped() ) . "\n";
-		$templateNameLabel = wfMessage( 'pf_createtemplate_namelabel' )->escaped();
-		$templateNameInput = Html::input( 'template_name', null, 'text', array( 'size' => 30 ) );
+		$templateNameLabel = $this->msg( 'pf_createtemplate_namelabel' )->escaped();
+		$templateNameInput = Html::input( 'template_name', null, 'text', [ 'size' => 30 ] );
 		$text .= "\t" . Html::rawElement( 'p', null, $templateNameLabel . ' ' . $templateNameInput ) . "\n";
 
 		$templateInfo = '';
 		if ( defined( 'CARGO_VERSION' ) && !defined( 'SMW_VERSION' ) ) {
 			$templateInfo .= "\t<p><label>" .
-				Html::check( 'use_cargo', true, array( 'id' => 'use_cargo' ) ) .
-				' ' . wfMessage( 'pf_createtemplate_usecargo' )->escaped() .
+				Html::check( 'use_cargo', true, [ 'id' => 'use_cargo' ] ) .
+				' ' . $this->msg( 'pf_createtemplate_usecargo' )->escaped() .
 				"</label></p>\n";
-			$cargo_table_label = wfMessage( 'pf_createtemplate_cargotablelabel' )->escaped();
-			$templateInfo .= "\t" . Html::rawElement( 'p', array( 'id' => 'cargo_table_input' ),
-				Html::element( 'label', array( 'for' => 'cargo_table' ), $cargo_table_label ) . ' ' .
-				Html::element( 'input', array( 'size' => '30', 'name' => 'cargo_table', 'id' => 'cargo_table' ), null )
+			$cargo_table_label = $this->msg( 'pf_createtemplate_cargotablelabel' )->escaped();
+			$templateInfo .= "\t" . Html::rawElement( 'p', [ 'id' => 'cargo_table_input' ],
+				Html::element( 'label', [ 'for' => 'cargo_table' ], $cargo_table_label ) . ' ' .
+				Html::element( 'input', [ 'size' => '30', 'name' => 'cargo_table', 'id' => 'cargo_table' ], null )
 			) . "\n";
 		}
-		$templateInfo .= PFCreateTemplate::printTemplateStyleInput( 'template_format' );
+		$createTemplatePage = new PFCreateTemplate();
+		$templateInfo .= $createTemplatePage->printTemplateStyleInput( 'template_format' );
 		$templateInfo .= Html::rawElement( 'p', null,
-			Html::element( 'input', array(
+			Html::element( 'input', [
 				'type' => 'checkbox',
 				'name' => 'template_multiple',
 				'id' => 'template_multiple',
 				'class' => "disableFormAndCategoryInputs",
-			) ) . ' ' . wfMessage( 'pf_createtemplate_multipleinstance' )->escaped() ) . "\n";
+			] ) . ' ' . $this->msg( 'pf_createtemplate_multipleinstance' )->escaped() ) . "\n";
 		// Either #set_internal or #subobject will be added to the
 		// template, depending on whether Semantic Internal Objects is
 		// installed.
 		global $smwgDefaultStore;
 		if ( defined( 'SIO_VERSION' ) || $smwgDefaultStore == "SMWSQLStore3" ) {
 			$templateInfo .= Html::rawElement( 'div',
-				array(
+				[
 					'id' => 'connecting_property_div',
 					'style' => 'display: none;',
-				),
-				wfMessage( 'pf_createtemplate_connectingproperty' )->escaped() . "\n" .
-				Html::element( 'input', array(
+				],
+				$this->msg( 'pf_createtemplate_connectingproperty' )->escaped() . "\n" .
+				Html::element( 'input', [
 					'type' => 'text',
 					'name' => 'connecting_property',
-				) ) ) . "\n";
+				] ) ) . "\n";
 		}
 		$text .= Html::rawElement( 'blockquote', null, $templateInfo );
 
-		$form_name_input = Html::element( 'input', array( 'size' => '30', 'name' => 'form_name', 'id' => 'form_name' ), null );
-		$text .= "\t<p><label>" . wfMessage( 'pf_createclass_nameinput' )->escaped() . " $form_name_input</label></p>\n";
-		$category_name_input = Html::element( 'input', array( 'size' => '30', 'name' => 'category_name', 'id' => 'category_name' ), null );
-		$text .= "\t<p><label>" . wfMessage( 'pf_createcategory_name' )->escaped() . " $category_name_input</label></p>\n";
+		$form_name_input = Html::element( 'input', [ 'size' => '30', 'name' => 'form_name', 'id' => 'form_name' ], null );
+		$text .= "\t<p><label>" . $this->msg( 'pf_createclass_nameinput' )->escaped() . " $form_name_input</label></p>\n";
+		$category_name_input = Html::element( 'input', [ 'size' => '30', 'name' => 'category_name', 'id' => 'category_name' ], null );
+		$text .= "\t<p><label>" . $this->msg( 'pf_createcategory_name' )->escaped() . " $category_name_input</label></p>\n";
 		$text .= "\t" . Html::element( 'br', null, null ) . "\n";
 		$text .= <<<END
 	<div>
@@ -291,7 +295,7 @@ class PFCreateClass extends SpecialPage {
 
 END;
 		if ( defined( 'SMW_VERSION' ) ) {
-			$property_label = wfMessage( 'smw_pp_type' )->escaped();
+			$property_label = $this->msg( 'smw_pp_type' )->escaped();
 			$text .= <<<END
 		<tr>
 			<th colspan="3" />
@@ -301,8 +305,8 @@ END;
 END;
 		}
 
-		$field_name_label = wfMessage( 'pf_createtemplate_fieldname' )->escaped();
-		$list_of_values_label = wfMessage( 'pf_createclass_listofvalues' )->escaped();
+		$field_name_label = $this->msg( 'pf_createtemplate_fieldname' )->escaped();
+		$list_of_values_label = $this->msg( 'pf_createclass_listofvalues' )->escaped();
 		$text .= <<<END
 		<tr>
 			<th colspan="2">$field_name_label</th>
@@ -310,31 +314,14 @@ END;
 
 END;
 		if ( defined( 'SMW_VERSION' ) ) {
-			$property_name_label = wfMessage( 'pf_createproperty_propname' )->escaped();
-			$text .= <<<END
-			<th style="background: $specialBGColor; padding: 4px;">$property_name_label</th>
-
-END;
+			$text .= $this->displayTableHeader( $specialBGColor, 'pf_createproperty_propname' );
 		}
-
 		if ( defined( 'CARGO_VERSION' ) || defined( 'SMW_VERSION' ) ) {
-			$type_label = wfMessage( 'pf_createproperty_proptype' )->escaped();
-			$text .= <<<END
-			<th style="background: $specialBGColor; padding: 4px;">$type_label</th>
-
-END;
+			$text .= $this->displayTableHeader( $specialBGColor, 'pf_createproperty_proptype' );
 		}
-		$allowed_values_label = wfMessage( 'pf_createclass_allowedvalues' )->escaped();
-		$text .= <<<END
-			<th style="background: $specialBGColor; padding: 4px;">$allowed_values_label</th>
-
-END;
-		if ( defined( 'CARGO_VERSION' ) ) {
-			$is_hierarchy_label = wfMessage( 'pf_createclass_ishierarchy' )->escaped();
-			$text .= <<<END
-			<th style="background: $specialBGColor; padding: 4px;">$is_hierarchy_label</th>
-
-END;
+		$text .= $this->displayTableHeader( $specialBGColor, 'pf_createclass_allowedvalues' );
+		if ( defined( 'CARGO_VERSION' ) && !defined( 'SMW_VERSION' ) ) {
+			$text .= $this->displayTableHeader( $specialBGColor, 'pf_createclass_ishierarchy' );
 		}
 		$text .= <<<END
 			</tr>
@@ -359,22 +346,16 @@ END;
 
 END;
 			if ( defined( 'SMW_VERSION' ) ) {
-				$text .= <<<END
-			<td style="background: $specialBGColor; padding: 4px;"><input type="text" size="25" name="property_name_$n" /></td>
-
-END;
+				$propertyInput = Html::input( "property_name_$n", null, 'text', [ 'size' => '25' ] );
+				$text .= Html::rawElement( 'td', [ 'style' => "background: $specialBGColor; padding: 4px;" ], $propertyInput );
 			}
 			if ( defined( 'CARGO_VERSION' ) || defined( 'SMW_VERSION' ) ) {
-				$text .= <<<END
-			<td style="background: $specialBGColor; padding: 4px;">
-
-END;
 				$typeDropdownBody = '';
 				foreach ( $possibleTypes as $typeName ) {
 					$typeDropdownBody .= "\t\t\t\t<option>$typeName</option>\n";
 				}
-				$text .= "\t\t\t\t" . Html::rawElement( 'select', array( 'name' => "property_type_$n" ), $typeDropdownBody ) . "\n";
-				$text .= "</td>";
+				$typeDropdown = "\t\t\t\t" . Html::rawElement( 'select', [ 'name' => "property_type_$n" ], $typeDropdownBody ) . "\n";
+				$text .= Html::rawElement( 'td', [ 'style' => "background: $specialBGColor; padding: 4px;" ], $typeDropdown );
 			}
 
 			$text .= <<<END
@@ -382,17 +363,20 @@ END;
 			<input type="text" size="25" name="allowed_values_$n" />
 END;
 			if ( defined( 'CARGO_VERSION' ) ) {
-				$text .= <<<END
-				<textarea class="hierarchy_structure" rows="10" cols="20" name="hierarchy_structure_$n" style="display: none;"></textarea>
-END;
+				$text .= Html::element( 'textarea', [
+						'class' => 'hierarchy_structure',
+						'rows' => '10',
+						'cols' => '20',
+						'name' => "hierarchy_structure_$n",
+						'style' => 'display: none'
+					], null );
 			}
 			$text .= <<<END
 			</td>
 END;
 			if ( defined( 'CARGO_VERSION' ) ) {
-				$text .= <<<END
-				<td style="text-align: center;"><input type="checkbox" name="is_hierarchy_$n" /></td>
-END;
+				$isHierarchyInput = Html::input( "is_hierarchy_$n", null, 'checkbox' );
+				$text .= Html::rawElement( 'td', [ 'style' => 'text-align: center;' ], $isHierarchyInput );
 			}
 		}
 		$text .= <<<END
@@ -402,11 +386,11 @@ END;
 
 END;
 		$add_another_button = Html::element( 'input',
-			array(
+			[
 				'type' => 'button',
-				'value' => wfMessage( 'pf_formedit_addanother' )->text(),
+				'value' => $this->msg( 'pf_formedit_addanother' )->text(),
 				'class' => "createClassAddRow mw-ui-button mw-ui-progressive"
-			)
+			]
 		);
 		$text .= Html::rawElement( 'p', null, $add_another_button ) . "\n";
 		// Set 'title' as hidden field, in case there's no URL niceness
@@ -416,15 +400,20 @@ END;
 		$text .= "\t" . Html::hidden( 'csrf', $this->getUser()->getEditToken( 'CreateClass' ) ) . "\n";
 
 		$text .= Html::element( 'input',
-			array(
+			[
 				'type' => 'submit',
 				'name' => 'createAll',
-				'value' => wfMessage( 'Pf_createclass_create' )->text(),
+				'value' => $this->msg( 'Pf_createclass_create' )->text(),
 				'class' => 'mw-ui-button mw-ui-progressive'
-			)
+			]
 		);
 		$text .= "</form>\n";
 		$out->addHTML( $text );
+	}
+
+	private function displayTableHeader( $bgColor, $headerMsg ) {
+		$headerText = $this->msg( $headerMsg )->parse();
+		return Html::element( 'th', [ 'style' => "background: $bgColor; padding: 4px;" ], $headerText ) . "\n";
 	}
 
 	protected function getGroupName() {

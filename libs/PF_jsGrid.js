@@ -17,7 +17,7 @@
 	// Create month selector dropdown.
 	function buildSelect( currentMonth ) {
 		// Add blank as the first value in the array.
-		var monthNames = [''].concat(mw.language.months.abbrev);
+		var monthNames = [ '' ].concat(mw.language.months.abbrev);
 		var str = '<select class="pf_jsGrid_month" style=" width: 100% !important; font-size:14px;">';
 		for (var val = 0; val <= 12; val++) {
 			var val2;
@@ -51,14 +51,14 @@
 		},
 
 		insertTemplate: function(value) {
-			var html_day = '<div style="float:left; width:19%;"><label style="display:block; text-align:center; font- size:14px;">DD:</label><input class="pf_jsGrid_day" style=" font-size:14px; " type="text" value="" placeholder="DD"></input></div>';
-			var html_year = '<div style="float:left; width:29%;"><label style="display:block; text-align:center; width:29%; font-size:14px;">YYYY:</label><input class="pf_jsGrid_year" style=" font-size:14px; " type="text" value="" placeholder="YYYY"></input></div>';
-			var html_month = '<div style="float:left; width:48%; margin-left:2%; margin-right:2%;"><label style="display:block; text-align:center; font-size:14px;">MM:</label>' + buildSelect(0) + '</div>';
+			var htmlDay = '<div style="float:left; width:19%;"><label style="display:block; text-align:center; font- size:14px;">DD:</label><input class="pf_jsGrid_day" style=" font-size:14px; " type="text" value="" placeholder="DD"></input></div>';
+			var htmlYear = '<div style="float:left; width:29%;"><label style="display:block; text-align:center; width:29%; font-size:14px;">YYYY:</label><input class="pf_jsGrid_year" style=" font-size:14px; " type="text" value="" placeholder="YYYY"></input></div>';
+			var htmlMonth = '<div style="float:left; width:48%; margin-left:2%; margin-right:2%;"><label style="display:block; text-align:center; font-size:14px;">MM:</label>' + buildSelect(0) + '</div>';
 			var fullDateInputHTML = '<div class="pf_jsGrid_ymd_form">';
 			if ( mw.config.get('wgAmericanDates') ) { //check for date-style format.
-				fullDateInputHTML += html_month + html_day + html_year;
+				fullDateInputHTML += htmlMonth + htmlDay + htmlYear;
 			} else {
-				fullDateInputHTML += html_day + html_month + html_year;
+				fullDateInputHTML += htmlDay + htmlMonth + htmlYear;
 			}
 			fullDateInputHTML += '</div>';
 			this.fullDateInputInsertHTML = $( fullDateInputHTML );
@@ -66,9 +66,9 @@
 		},
 
 		editTemplate: function(value) {
-			var display_day_of_month = '';
-			var display_year = '';
-			var display_month = 0;
+			var displayDayOfMonth = '';
+			var displayYear = '';
+			var displayMonth = 0;
 			var dateValue, dateFormat;
 
 			// These both sometimes happen.
@@ -118,9 +118,9 @@
 			}
 			if ( value !== null ) {
 				var dateObject = new Date( dateValue );
-				display_day_of_month = dateObject.getDate();
-				display_year = dateObject.getFullYear();
-				display_month = dateObject.getMonth();
+				displayDayOfMonth = dateObject.getDate();
+				displayYear = dateObject.getFullYear();
+				displayMonth = dateObject.getMonth();
 			}
 			var fullDateInputHTML = '<div class="pf_jsGrid_ymd_form">';
 			var monthElement;
@@ -133,19 +133,19 @@
 				monthElement = buildSelect(0);
 			} else if ( dateFormat === 2 ) {
 				dayElement = '';
-				monthElement = buildSelect(display_month + 1);
+				monthElement = buildSelect(displayMonth + 1);
 			} else {
-				dayElement = display_day_of_month;
-				monthElement = buildSelect(display_month + 1);
+				dayElement = displayDayOfMonth;
+				monthElement = buildSelect(displayMonth + 1);
 			}
-			var html_day = '<div style="float:left; width:19%;"><label style="display:block; text-align:center; font-size:14px;">DD:</label><input class="pf_jsGrid_day" style=" font-size:14px; " type="text" value="' + dayElement + '" placeholder="DD"></input></div>';
-			var html_month = '<div style="float:left; width:48%; margin-left:2%; margin-right:2%;"><label style="display:block; text-align:center; font-size:14px;">MM:</label>' + monthElement + '</div>';
-			var html_year = '<div style="float:left; width:29%;"><label style="display:block; text-align:center; width:29%; font-size:14px;">YYYY:</label><input class="pf_jsGrid_year" style=" font-size:14px; " type="text" value=' + display_year + '></input></div>';
+			var htmlDay = '<div style="float:left; width:19%;"><label style="display:block; text-align:center; font-size:14px;">DD:</label><input class="pf_jsGrid_day" style=" font-size:14px; " type="text" value="' + dayElement + '" placeholder="DD"></input></div>';
+			var htmlMonth = '<div style="float:left; width:48%; margin-left:2%; margin-right:2%;"><label style="display:block; text-align:center; font-size:14px;">MM:</label>' + monthElement + '</div>';
+			var htmlYear = '<div style="float:left; width:29%;"><label style="display:block; text-align:center; width:29%; font-size:14px;">YYYY:</label><input class="pf_jsGrid_year" style=" font-size:14px; " type="text" value=' + displayYear + '></input></div>';
 
 			if ( mw.config.get('wgAmericanDates') ) { //check for date-style format.
-				fullDateInputHTML += html_month + html_day + html_year;
+				fullDateInputHTML += htmlMonth + htmlDay + htmlYear;
 			} else {
-				fullDateInputHTML += html_day + html_month + html_year;
+				fullDateInputHTML += htmlDay + htmlMonth + htmlYear;
 			}
 			fullDateInputHTML += '</div>';
 			this.fullDateInputEditHTML = $( fullDateInputHTML );
@@ -153,49 +153,49 @@
 		},
 
 		insertValue: function() {
-			var Insert_year = this.fullDateInputInsertHTML.find(".pf_jsGrid_year").val();
-			var Insert_month = this.fullDateInputInsertHTML.find(".pf_jsGrid_month").val();
-			var Insert_day_of_month = this.fullDateInputInsertHTML.find(".pf_jsGrid_day").val();
-			if ( Insert_year === undefined || Insert_year === "" ) {
+			var insertYear = this.fullDateInputInsertHTML.find(".pf_jsGrid_year").val();
+			var insertMonth = this.fullDateInputInsertHTML.find(".pf_jsGrid_month").val();
+			var insertDayOfMonth = this.fullDateInputInsertHTML.find(".pf_jsGrid_day").val();
+			if ( insertYear === undefined || insertYear === "" ) {
 				return null;
 			}
-			if ( Insert_month === '00' && Insert_day_of_month !== '' ) {
+			if ( insertMonth === '00' && insertDayOfMonth !== '' ) {
 				return null;
 			}
 			var ret, day, month;
 			if ( mw.config.get('wgAmericanDates') ) { //check for date-style format.
 				var monthNames = mw.config.get('wgPageFormsContLangMonths');
-				day = ( Insert_day_of_month === '' ) ? '' : Insert_day_of_month + ", ";
-				month = ( Insert_month === '00' ) ? '' : monthNames[parseInt( Insert_month )] + " ";
-				ret = month + day + Insert_year;
+				day = ( insertDayOfMonth === '' ) ? '' : insertDayOfMonth + ", ";
+				month = ( insertMonth === '00' ) ? '' : monthNames[parseInt( insertMonth )] + " ";
+				ret = month + day + insertYear;
 			} else {
-				day = ( Insert_day_of_month === '' ) ? '' : "/" + Insert_day_of_month;
-				month = ( Insert_month === '00' ) ? '' : "/" + Insert_month;
-				ret = Insert_year + month + day;
+				day = ( insertDayOfMonth === '' ) ? '' : "/" + insertDayOfMonth;
+				month = ( insertMonth === '00' ) ? '' : "/" + insertMonth;
+				ret = insertYear + month + day;
 			}
 			return ret;
 		},
 
 		editValue: function(value) {
-			var Edit_year = this.fullDateInputEditHTML.find(".pf_jsGrid_year").val();
-			var Edit_month = this.fullDateInputEditHTML.find(".pf_jsGrid_month").val();
-			var Edit_day_of_month = this.fullDateInputEditHTML.find(".pf_jsGrid_day").val();
-			if ( Edit_year === undefined || Edit_year === "" ) {
+			var editYear = this.fullDateInputEditHTML.find(".pf_jsGrid_year").val();
+			var editMonth = this.fullDateInputEditHTML.find(".pf_jsGrid_month").val();
+			var editDayOfMonth = this.fullDateInputEditHTML.find(".pf_jsGrid_day").val();
+			if ( editYear === undefined || editYear === "" ) {
 				return null;
 			}
-			if ( Edit_month === '00' && Edit_day_of_month !== '' ) {
+			if ( editMonth === '00' && editDayOfMonth !== '' ) {
 				return null;
 			}
 			var ret, day, month;
 			if ( mw.config.get('wgAmericanDates') ) { //check for date-style format.
 				var monthNames = mw.config.get('wgPageFormsContLangMonths');
-				day = ( Edit_day_of_month === '' ) ? '' : Edit_day_of_month + ", ";
-				month = ( Edit_month === '00' ) ? '' : monthNames[parseInt( Edit_month )] + " ";
-				ret = month + day + Edit_year;
+				day = ( editDayOfMonth === '' ) ? '' : editDayOfMonth + ", ";
+				month = ( editMonth === '00' ) ? '' : monthNames[parseInt( editMonth )] + " ";
+				ret = month + day + editYear;
 			} else {
-				day = ( Edit_day_of_month === '' ) ? '' : "/" + Edit_day_of_month;
-				month = ( Edit_month === '00' ) ? '' : "/" + Edit_month;
-				ret = Edit_year + month + day;
+				day = ( editDayOfMonth === '' ) ? '' : "/" + editDayOfMonth;
+				month = ( editMonth === '00' ) ? '' : "/" + editMonth;
+				ret = editYear + month + day;
 			}
 			return ret;
 		}
@@ -309,7 +309,9 @@
 			return false;
 		}
 
-		value = value.toLowerCase();
+		if ( typeof value === 'string' ) {
+			value = value.toLowerCase();
+		}
 		var possibleYesMessages = [
 			mw.config.get( 'wgPageFormsContLangYes' ).toLowerCase(),
 			// Add in '1', and some hardcoded English.
@@ -397,7 +399,7 @@
 
 		function getGridValues( pageNames ) {
 			return $.ajax({
-				url: baseUrl + '/api.php?action=query&format=json&prop=revisions&rvprop=content&formatversion=2&titles=' + pageNames,
+				url: baseUrl + '/api.php?action=query&format=json&prop=revisions&rvprop=content&rvslots=main&formatversion=2&titles=' + pageNames,
 				dataType: 'json',
 				type: 'POST',
 				headers: { 'Api-User-Agent': 'Example/1.0' }
@@ -405,19 +407,23 @@
 		}
 
 		function getTemplateCalls( pageContent, pageName ) {
-			var startDelimiter = '{{' + templateName.toLowerCase();
+			// Match all the template calls and their contents
+			var startDelimiter = '{{' + templateName.toLowerCase() + '\\b';
 			var endDelimiter = '}}';
+			var regex = new RegExp( startDelimiter, 'g' );
 			var contents = [];
-			var startFrom, contentStart, contentEnd;
-			startFrom = contentStart = contentEnd = 0;
-			while ( -1 !== ( contentStart = pageContent.toLowerCase().indexOf( startDelimiter, startFrom ) ) ) {
+			var contentStart, contentEnd;
+			contentStart = contentEnd = 0;
+			var match;
+			// Parse contents of individual templates
+			while ( ( match = regex.exec( pageContent.toLowerCase() ) ) !== null ) {
+				contentStart = match['index'];
 				contentEnd = pageContent.indexOf( endDelimiter, contentStart );
 				if ( contentEnd === -1 ) {
 					break;
 				}
-				var content = pageContent.substring( contentStart + startDelimiter.length, contentEnd );
+				var content = pageContent.substring( contentStart + startDelimiter.length - 2, contentEnd );
 				contents.push( 'page=' + pageName + content );
-				startFrom = contentEnd + 1;
 			}
 			return contents;
 		}
@@ -494,13 +500,7 @@
 			} );
 		}
 
-		var ooJSUIModule = 'oojs-ui-widgets';
-		if ( mw.loader.getVersion( 'oojs-ui-widgets' ) === null ) {
-			// MW < 1.29 (?)
-			ooJSUIModule = 'oojs-ui';
-		}
-
-		mw.loader.using( ooJSUIModule ).done( function () {
+		mw.loader.using( 'oojs-ui-widgets' ).done( function () {
 			$( function () {
 
 				var option1 = new OO.ui.ButtonOptionWidget( {
@@ -529,7 +529,7 @@
 				} );
 
 				var popupButton = new OO.ui.PopupButtonWidget( {
-				  label: 'Results to show',
+				  label: mw.msg( 'pf-resultstoshow' ),
 				  popup: {
 				    $content: buttonSelect.$element,
 				    padded: true,
@@ -622,7 +622,13 @@
 							var templateCalls = [];
 							data.query.pages.sort(function( a, b ){ return a.title.toUpperCase().localeCompare( b.title.toUpperCase() ); });
 							for (var i = 0; i < data.query.pages.length; i++) {
-								var pageContent = data.query.pages[i].revisions[0].content;
+								var curRevision = data.query.pages[i].revisions[0];
+								if ( curRevision.hasOwnProperty('slots') ) {
+									// MW 1.31+ (or maybe 1.32+)
+									var pageContent = curRevision.slots.main.content;
+								} else {
+									var pageContent = curRevision.content;
+								}
 								templateCalls = getTemplateCalls( pageContent, data.query.pages[i].title );
 								for ( const templateCall of templateCalls ) {
 									var fieldArray = templateCall.split( '|' );
@@ -922,5 +928,31 @@
 		});
 		return this;
 	};
+
+	function addHideColumnIcons() {
+		// Only show the "hide column" icons if there are 7 or more columns.
+		// @TODO - make this number a configurable setting.
+		if ( $("th.jsgrid-header-sortable").length < 7 ) {
+			return;
+		}
+		$("th.jsgrid-header-sortable").each( function( index ) {
+			// Skip "Page name" column.
+			if ( index == 0 ) {
+				return;
+			}
+			$(this).attr('data-column-name', $(this).text())
+				.append(' <span class="pf-jsgrid-column-hider">&#128473;</span>');
+		});
+		$(".pf-jsgrid-column-hider").click( function() {
+			var columnName = $(this).parent().attr('data-column-name');
+			$(".jsgrid").jsGrid("fieldOption", columnName, "visible", false);
+			// Making a column invisible causes all the column headers to
+			// be recreated, which makes all the "hide column" stuff go
+			// away, so we have to add it again.
+			addHideColumnIcons();
+		});
+	}
+
+	addHideColumnIcons();
 
 }( jQuery, mediaWiki, pf ) );

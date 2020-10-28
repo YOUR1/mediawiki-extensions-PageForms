@@ -13,7 +13,7 @@ class PFTree {
 
 	public function __construct( $curTitle ) {
 		$this->title = $curTitle;
-		$this->children = array();
+		$this->children = [];
 	}
 
 	public function addChild( $child ) {
@@ -70,6 +70,7 @@ class PFTree {
 
 	/**
 	 * Recursive function to populate a tree based on category information.
+	 * @param int $depth
 	 */
 	private function populateChildren( $depth ) {
 		if ( $depth == 0 ) {
@@ -86,32 +87,32 @@ class PFTree {
 	/**
 	 * Gets all the subcategories of the passed-in category.
 	 *
-	 * @TODO This might not belong in this class.
+	 * @todo This might not belong in this class.
 	 *
-	 * @param Title $title
+	 * @param string $categoryName
 	 * @return array
 	 */
 	private static function getSubcategories( $categoryName ) {
-		$dbr = wfGetDb( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 
-		$tables = array( 'page', 'categorylinks' );
-		$fields = array( 'page_id', 'page_namespace', 'page_title',
+		$tables = [ 'page', 'categorylinks' ];
+		$fields = [ 'page_id', 'page_namespace', 'page_title',
 			'page_is_redirect', 'page_len', 'page_latest', 'cl_to',
-			'cl_from' );
-		$where = array();
-		$joins = array();
-		$options = array( 'ORDER BY' => 'cl_type, cl_sortkey' );
+			'cl_from' ];
+		$where = [];
+		$joins = [];
+		$options = [ 'ORDER BY' => 'cl_type, cl_sortkey' ];
 
-		$joins['categorylinks'] = array( 'JOIN', 'cl_from = page_id' );
+		$joins['categorylinks'] = [ 'JOIN', 'cl_from = page_id' ];
 		$where['cl_to'] = str_replace( ' ', '_', $categoryName );
 		$options['USE INDEX']['categorylinks'] = 'cl_sortkey';
 
-		$tables = array_merge( $tables, array( 'category' ) );
-		$fields = array_merge( $fields, array( 'cat_id', 'cat_title', 'cat_subcats', 'cat_pages', 'cat_files' ) );
-		$joins['category'] = array( 'LEFT JOIN', array( 'cat_title = page_title', 'page_namespace' => NS_CATEGORY ) );
+		$tables = array_merge( $tables, [ 'category' ] );
+		$fields = array_merge( $fields, [ 'cat_id', 'cat_title', 'cat_subcats', 'cat_pages', 'cat_files' ] );
+		$joins['category'] = [ 'LEFT JOIN', [ 'cat_title = page_title', 'page_namespace' => NS_CATEGORY ] ];
 
 		$res = $dbr->select( $tables, $fields, $where, __METHOD__, $options, $joins );
-		$subcats = array();
+		$subcats = [];
 
 		foreach ( $res as $row ) {
 			$t = Title::newFromRow( $row );

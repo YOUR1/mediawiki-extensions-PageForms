@@ -13,11 +13,11 @@ class PFTextAreaWithAutocompleteInput extends PFTextAreaInput {
 	}
 
 	public static function getDefaultPropTypes() {
-		return array();
+		return [];
 	}
 
 	public static function getDefaultCargoTypes() {
-		return array();
+		return [];
 	}
 
 	public static function getParameters() {
@@ -29,14 +29,13 @@ class PFTextAreaWithAutocompleteInput extends PFTextAreaInput {
 	protected function getTextAreaAttributes() {
 		$textarea_attrs = parent::getTextAreaAttributes();
 
-		list( $autocompleteSettings, $remoteDataType, $delimiter ) = PFTextWithAutocompleteInput::setAutocompleteValues( $this->mOtherArgs );
+		$is_list = ( array_key_exists( 'is_list', $this->mOtherArgs ) && $this->mOtherArgs['is_list'] == true );
+		list( $autocompleteSettings, $remoteDataType, $delimiter ) = PFValuesUtils::setAutocompleteValues( $this->mOtherArgs, $is_list );
 
-		if ( !is_null( $remoteDataType ) ) {
+		if ( $remoteDataType !== null ) {
 			$textarea_attrs['autocompletedatatype'] = $remoteDataType;
 		}
-
 		$textarea_attrs['autocompletesettings'] = $autocompleteSettings;
-
 		$textarea_attrs['class'] .= ' autocompleteInput';
 
 		return $textarea_attrs;

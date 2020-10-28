@@ -1,17 +1,10 @@
 <?php
 /**
- * PFUploadWindow - used for uploading files from within a form.
- * This class is nearly identical to MediaWiki's SpecialUpload class, with
- * a few changes to remove skin CSS and HTML, and to populate the relevant
- * field in the form with the name of the uploaded form.
+ * Subclass of HTMLForm that provides the form section of Special:Upload.
  *
  * @author Yaron Koren
  * @file
  * @ingroup PF
- */
-
-/**
- * Sub class of HTMLForm that provides the form section of SpecialUpload
  */
 
 /**
@@ -26,7 +19,7 @@ class PFUploadForm extends HTMLForm {
 
 	protected $mSourceIds;
 
-	public function __construct( $options = array() ) {
+	public function __construct( $options = [] ) {
 		$this->mWatch = !empty( $options['watch'] );
 		$this->mForReUpload = !empty( $options['forreupload'] );
 		$this->mSessionKey = isset( $options['sessionkey'] )
@@ -42,17 +35,17 @@ class PFUploadForm extends HTMLForm {
 			+ $this->getDescriptionSection()
 			+ $this->getOptionsSection();
 
-		Hooks::run( 'UploadFormInitDescriptor', array( &$descriptor ) );
+		Hooks::run( 'UploadFormInitDescriptor', [ &$descriptor ] );
 		parent::__construct( $descriptor, 'upload' );
 
 		# Set some form properties
-		$this->setSubmitText( wfMessage( 'uploadbtn' )->text() );
+		$this->setSubmitText( $this->msg( 'uploadbtn' )->text() );
 		$this->setSubmitName( 'wpUpload' );
 		$this->setSubmitTooltip( 'upload' );
 		$this->setId( 'mw-upload-form' );
 
 		# Build a list of IDs for javascript insertion
-		$this->mSourceIds = array();
+		$this->mSourceIds = [];
 		foreach ( $sourceDescriptor as $key => $field ) {
 			if ( !empty( $field['id'] ) ) {
 				$this->mSourceIds[] = $field['id'];
@@ -71,33 +64,33 @@ class PFUploadForm extends HTMLForm {
 	 */
 	protected function getSourceSection() {
 		if ( $this->mSessionKey ) {
-			return array(
-				'SessionKey' => array(
+			return [
+				'SessionKey' => [
 					'id' => 'wpSessionKey',
 					'type' => 'hidden',
 					'default' => $this->mSessionKey,
-				),
-				'SourceType' => array(
+				],
+				'SourceType' => [
 					'id' => 'wpSourceType',
 					'type' => 'hidden',
 					'default' => 'Stash',
-				),
-			);
+				],
+			];
 		}
 
 		$canUploadByUrl = UploadFromUrl::isEnabled() && $this->getUser()->isAllowed( 'upload_by_url' );
 		$radio = $canUploadByUrl;
 		$selectedSourceType = strtolower( $this->getRequest()->getText( 'wpSourceType', 'File' ) );
 
-		$descriptor = array();
+		$descriptor = [];
 
 		if ( $this->mTextTop ) {
-			$descriptor['UploadFormTextTop'] = array(
+			$descriptor['UploadFormTextTop'] = [
 				'type' => 'info',
 				'section' => 'source',
 				'default' => $this->mTextTop,
 				'raw' => true,
-			);
+			];
 		}
 
 		$maxUploadSizeFile = ini_get( 'upload_max_filesize' );
@@ -113,43 +106,43 @@ class PFUploadForm extends HTMLForm {
 			}
 		}
 
-		$descriptor['UploadFile'] = array(
-				'class' => 'PFUploadSourceField',
-				'section' => 'source',
-				'type' => 'file',
-				'id' => 'wpUploadFile',
-				'label-message' => 'sourcefilename',
-				'upload-type' => 'File',
-				'radio' => &$radio,
-				'help' => wfMessage( 'upload-maxfilesize',
-						$this->getLanguage()->formatSize(
-							wfShorthandToInteger( $maxUploadSizeFile )
-						)
-					)->parse() . ' ' . wfMessage( 'upload_source_file' )->escaped(),
-				'checked' => $selectedSourceType == 'file',
-		);
+		$descriptor['UploadFile'] = [
+			'class' => 'PFUploadSourceField',
+			'section' => 'source',
+			'type' => 'file',
+			'id' => 'wpUploadFile',
+			'label-message' => 'sourcefilename',
+			'upload-type' => 'File',
+			'radio' => &$radio,
+			'help' => $this->msg( 'upload-maxfilesize',
+					$this->getLanguage()->formatSize(
+						wfShorthandToInteger( $maxUploadSizeFile )
+					)
+				)->parse() . ' ' . $this->msg( 'upload_source_file' )->escaped(),
+			'checked' => $selectedSourceType == 'file'
+		];
 		if ( $canUploadByUrl ) {
-			$descriptor['UploadFileURL'] = array(
+			$descriptor['UploadFileURL'] = [
 				'class' => 'UploadSourceField',
 				'section' => 'source',
 				'id' => 'wpUploadFileURL',
 				'label-message' => 'sourceurl',
 				'upload-type' => 'Url',
 				'radio' => &$radio,
-				'help' => wfMessage( 'upload-maxfilesize',
+				'help' => $this->msg( 'upload-maxfilesize',
 						$this->getLanguage()->formatSize( $maxUploadSizeURL )
-					)->parse() . ' ' . wfMessage( 'upload_source_url' )->escaped(),
+					)->parse() . ' ' . $this->msg( 'upload_source_url' )->escaped(),
 				'checked' => $selectedSourceType == 'url',
-			);
+			];
 		}
-		Hooks::run( 'UploadFormSourceDescriptors', array( &$descriptor, &$radio, $selectedSourceType ) );
+		Hooks::run( 'UploadFormSourceDescriptors', [ &$descriptor, &$radio, $selectedSourceType ] );
 
-		$descriptor['Extensions'] = array(
+		$descriptor['Extensions'] = [
 			'type' => 'info',
 			'section' => 'source',
 			'default' => $this->getExtensionsMessage(),
 			'raw' => true,
-		);
+		];
 		return $descriptor;
 	}
 
@@ -169,16 +162,16 @@ class PFUploadForm extends HTMLForm {
 				# Everything not permitted is banned
 				$extensionsList =
 					'<div id="mw-upload-permitted">' .
-						wfMessage( 'upload-permitted', $this->getLanguage()->commaList( $wgFileExtensions ) )->parse() .
+						$this->msg( 'upload-permitted', $this->getLanguage()->commaList( $wgFileExtensions ) )->parse() .
 					"</div>\n";
 			} else {
 				# We have to list both preferred and prohibited
 				$extensionsList =
 					'<div id="mw-upload-preferred">' .
-						wfMessage( 'upload-preferred', $this->getLanguage()->commaList( $wgFileExtensions ) )->parse() .
+						$this->msg( 'upload-preferred', $this->getLanguage()->commaList( $wgFileExtensions ) )->parse() .
 					"</div>\n" .
 					'<div id="mw-upload-prohibited">' .
-						wfMessage( 'upload-prohibited', $this->getLanguage()->commaList( $wgFileBlacklist ) )->parse() .
+						$this->msg( 'upload-prohibited', $this->getLanguage()->commaList( $wgFileBlacklist ) )->parse() .
 					"</div>\n";
 			}
 		} else {
@@ -195,15 +188,15 @@ class PFUploadForm extends HTMLForm {
 	 * @return array Descriptor array
 	 */
 	protected function getDescriptionSection() {
-		$descriptor = array(
-			'DestFile' => array(
+		$descriptor = [
+			'DestFile' => [
 				'type' => 'text',
 				'section' => 'description',
 				'id' => 'wpDestFile',
 				'label-message' => 'destfilename',
 				'size' => 60,
-			),
-			'UploadDescription' => array(
+			],
+			'UploadDescription' => [
 				'type' => 'textarea',
 				'section' => 'description',
 				'id' => 'wpUploadDescription',
@@ -212,29 +205,29 @@ class PFUploadForm extends HTMLForm {
 					: 'fileuploadsummary',
 				'cols' => 80,
 				'rows' => 4,
-			),
+			],
 /*
 			'EditTools' => array(
 				'type' => 'edittools',
 				'section' => 'description',
 			),
 */
-			'License' => array(
+			'License' => [
 				'type' => 'select',
 				'class' => 'Licenses',
 				'section' => 'description',
 				'id' => 'wpLicense',
 				'label-message' => 'license',
-			),
-		);
+			],
+		];
 
 		if ( $this->mTextAfterSummary ) {
-			$descriptor['UploadFormTextAfterSummary'] = array(
+			$descriptor['UploadFormTextAfterSummary'] = [
 				'type' => 'info',
 				'section' => 'description',
 				'default' => $this->mTextAfterSummary,
 				'raw' => true,
-			);
+			];
 		}
 
 		if ( $this->mForReUpload ) {
@@ -243,18 +236,18 @@ class PFUploadForm extends HTMLForm {
 
 		global $wgUseCopyrightUpload;
 		if ( $wgUseCopyrightUpload ) {
-			$descriptor['UploadCopyStatus'] = array(
+			$descriptor['UploadCopyStatus'] = [
 				'type' => 'text',
 				'section' => 'description',
 				'id' => 'wpUploadCopyStatus',
 				'label-message' => 'filestatus',
-			);
-			$descriptor['UploadSource'] = array(
+			];
+			$descriptor['UploadSource'] = [
 				'type' => 'text',
 				'section' => 'description',
 				'id' => 'wpUploadSource',
 				'label-message' => 'filesource',
-			);
+			];
 		}
 
 		return $descriptor;
@@ -267,27 +260,27 @@ class PFUploadForm extends HTMLForm {
 	 * @return array Descriptor array
 	 */
 	protected function getOptionsSection() {
-		$descriptor = array(
-			'Watchthis' => array(
+		$descriptor = [
+			'Watchthis' => [
 				'type' => 'check',
 				'id' => 'wpWatchthis',
 				'label-message' => 'watchthisupload',
 				'section' => 'options',
-			)
-		);
+			]
+		];
 		if ( !$this->mHideIgnoreWarning ) {
-			$descriptor['IgnoreWarning'] = array(
+			$descriptor['IgnoreWarning'] = [
 				'type' => 'check',
 				'id' => 'wpIgnoreWarning',
 				'label-message' => 'ignorewarnings',
 				'section' => 'options',
-			);
+			];
 		}
-		$descriptor['DestFileWarningAck'] = array(
+		$descriptor['DestFileWarningAck'] = [
 			'type' => 'hidden',
 			'id' => 'wpDestFileWarningAck',
 			'default' => $this->mDestWarningAck ? '1' : '',
-		);
+		];
 
 		return $descriptor;
 	}
@@ -301,19 +294,18 @@ class PFUploadForm extends HTMLForm {
 		// disable output - we'll print out the page manually,
 		// taking the body created by the form, plus the necessary
 		// Javascript files, and turning them into an HTML page
-		global $wgTitle, $wgLanguageCode,
-		$wgXhtmlDefaultNamespace, $wgXhtmlNamespaces, $wgContLang;
+		global $wgTitle, $wgLanguageCode, $wgXhtmlDefaultNamespace, $wgXhtmlNamespaces;
 
 		$out = $this->getOutput();
 
 		$out->disable();
 		$wgTitle = SpecialPage::getTitleFor( 'Upload' );
 
-		$out->addModules( array(
+		$out->addModules( [
 			'mediawiki.action.edit', // For <charinsert> support
 			'mediawiki.special.upload', // Extras for thumbnail and license preview.
 			'mediawiki.legacy.upload', // For backward compatibility (this was removed 2014-09-10)
-		) );
+		] );
 
 		$text = <<<END
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -322,7 +314,7 @@ END;
 		foreach ( $wgXhtmlNamespaces as $tag => $ns ) {
 			$text .= "xmlns:{$tag}=\"{$ns}\" ";
 		}
-		$dir = $wgContLang->isRTL() ? "rtl" : "ltr";
+		$dir = PFUtils::getContLang()->isRTL() ? "rtl" : "ltr";
 		$text .= "xml:lang=\"{$wgLanguageCode}\" lang=\"{$wgLanguageCode}\" dir=\"{$dir}\">";
 
 		$text .= <<<END
@@ -347,7 +339,7 @@ END;
 
 		$this->mMaxUploadSize['*'] = UploadBase::getMaxUploadSize();
 
-		$scriptVars = array(
+		$scriptVars = [
 			'wgAjaxUploadDestCheck' => $config->get( 'AjaxUploadDestCheck' ),
 			'wgAjaxLicensePreview' => $config->get( 'AjaxLicensePreview' ),
 			'wgUploadAutoFill' => !$this->mForReUpload &&
@@ -359,7 +351,7 @@ END;
 			'wgStrictFileExtensions' => $config->get( 'StrictFileExtensions' ),
 			'wgCapitalizeUploads' => MWNamespace::isCapitalized( NS_FILE ),
 			'wgMaxUploadSize' => $this->mMaxUploadSize,
-		);
+		];
 
 		$out = $this->getOutput();
 		$out->addJsConfigVars( $scriptVars );

@@ -30,7 +30,7 @@ class PFFormStart extends SpecialPage {
 		$params = $req->getVal( 'params' );
 
 		// If the query string did not contain a form name, try the URL.
-		if ( ! $form_name ) {
+		if ( !$form_name ) {
 			$queryparts = explode( '/', $query, 2 );
 			$form_name = isset( $queryparts[0] ) ? $queryparts[0] : '';
 			// If a target was specified, it means we should
@@ -56,7 +56,7 @@ class PFFormStart extends SpecialPage {
 			$page_name = trim( $req->getVal( 'page_name' ) );
 			// This form can be used to create a sub-page for an
 			// existing page
-			if ( !is_null( $super_page ) && $super_page !== '' ) {
+			if ( $super_page !== null && $super_page !== '' ) {
 				$page_name = "$super_page/$page_name";
 			}
 
@@ -72,7 +72,7 @@ class PFFormStart extends SpecialPage {
 				// message.
 				$page_title = Title::newFromText( $page_name );
 				if ( !$page_title ) {
-					$out->addHTML( wfMessage( 'pf_formstart_badtitle', $page_name )->escaped() );
+					$out->addHTML( $this->msg( 'pf_formstart_badtitle', $page_name )->escaped() );
 					return;
 				} else {
 					$this->doRedirect( $form_name, $page_name, $params );
@@ -82,12 +82,14 @@ class PFFormStart extends SpecialPage {
 		}
 
 		if ( ( !$form_title || !$form_title->exists() ) && ( $form_name !== '' ) ) {
-			$text = Html::rawElement( 'p', array( 'class' => 'error' ), wfMessage( 'pf_formstart_badform', PFUtils::linkText( PF_NS_FORM, $form_name ) )->parse() ) . "\n";
+			$linkToForm = PFUtils::linkText( PF_NS_FORM, $form_name );
+			$badFormMsg = $this->msg( 'pf_formstart_badform', $linkToForm )->parse();
+			$text = Html::rawElement( 'p', [ 'class' => 'error' ], $badFormMsg ) . "\n";
 		} else {
 			if ( $form_name === '' ) {
-				$description = wfMessage( 'pf_formstart_noform_docu', $form_name )->escaped();
+				$description = $this->msg( 'pf_formstart_noform_docu', $form_name )->escaped();
 			} else {
-				$description = wfMessage( 'pf_formstart_docu', $form_name )->escaped();
+				$description = $this->msg( 'pf_formstart_docu', $form_name )->escaped();
 			}
 
 			$text = <<<END
@@ -99,14 +101,19 @@ END;
 			// If no form was specified, display a dropdown letting
 			// the user choose the form.
 			if ( $form_name === '' ) {
-				$text .= PFUtils::formDropdownHTML();
+				try {
+					$text .= PFUtils::formDropdownHTML();
+				} catch ( MWException $e ) {
+					$out->addHTML( Html::element( 'div', [ 'class' => 'error' ], $e->getMessage() ) );
+					return;
+				}
 			}
 
 			$text .= "\t</p>\n";
 			$text .= Html::hidden( 'namespace', $target_namespace );
 			$text .= Html::hidden( 'super_page', $super_page );
 			$text .= Html::hidden( 'params', $params );
-			$text .= "\n\t" . Html::input( null, wfMessage( 'pf_formstart_createoredit' )->text(), 'submit' ) . "\n";
+			$text .= "\n\t" . Html::input( null, $this->msg( 'pf_formstart_createoredit' )->text(), 'submit' ) . "\n";
 			$text .= "\t</form>\n";
 		}
 		$out->addHTML( $text );
@@ -119,10 +126,10 @@ END;
 	 * @return string
 	 */
 	static function getFormEditURL( $formName, $targetName ) {
-		$fe = SpecialPageFactory::getPage( 'FormEdit' );
+		$fe = PFUtils::getSpecialPage( 'FormEdit' );
 		// Special handling for forms whose name contains a slash.
 		if ( strpos( $formName, '/' ) !== false ) {
-			return $fe->getPageTitle()->getLocalURL( array( 'form' => $formName, 'target' => $targetName ) );
+			return $fe->getPageTitle()->getLocalURL( [ 'form' => $formName, 'target' => $targetName ] );
 		}
 		return $fe->getPageTitle( "$formName/$targetName" )->getLocalURL();
 	}
@@ -169,7 +176,7 @@ END;
 					// name), so we can make a nice query
 					// string snippet out of the whole
 					// thing.
-					$wrapperArray = array( $key => $val );
+					$wrapperArray = [ $key => $val ];
 					$redirect_url .= urldecode( http_build_query( $wrapperArray ) );
 				} elseif ( $key == 'preload' || $key == 'returnto' ) {
 					$redirect_url .= ( strpos( $redirect_url, '?' ) > - 1 ) ? '&' : '?';
@@ -178,7 +185,7 @@ END;
 			}
 		}
 
-		if ( !is_null( $params ) && $params !== '' ) {
+		if ( $params !== null && $params !== '' ) {
 			$redirect_url .= ( strpos( $redirect_url, '?' ) > - 1 ) ? '&' : '?';
 			$redirect_url .= $params;
 		}
@@ -188,10 +195,10 @@ END;
 		// Show "loading" animated image while people wait for the
 		// redirect.
 		global $wgPageFormsScriptPath;
-		$text = "\t" . Html::rawElement( 'p', array( 'style' => "position: absolute; left: 45%; top: 45%;" ), Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ) ) );
-		$text .= "\t" . Html::element( 'meta', array( 'http-equiv' => 'refresh', 'content' => "0; url=$redirect_url" ) );
+		$loadingImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ] );
+		$text = "\t" . Html::rawElement( 'p', [ 'style' => "position: absolute; left: 45%; top: 45%;" ], $loadingImage );
+		$text .= "\t" . Html::element( 'meta', [ 'http-equiv' => 'refresh', 'content' => "0; url=$redirect_url" ] );
 		$out->addHTML( $text );
-		return;
 	}
 
 	protected function getGroupName() {

@@ -9,9 +9,9 @@
  * Represents the structured contents of a wiki page.
  */
 class PFWikiPage {
-	private $mComponents = array();
-	private $mEmbeddedTemplateDefs = array();
-	private $mEmbeddedTemplateCalls = array();
+	private $mComponents = [];
+	private $mEmbeddedTemplateDefs = [];
+	private $mEmbeddedTemplateCalls = [];
 	private $mFreeTextOnlyInclude = false;
 
 	function addTemplate( $templateInForm ) {
@@ -21,7 +21,7 @@ class PFWikiPage {
 			$embedInTemplate = $templateInForm->getEmbedInTemplate();
 			$embedInParam = $templateInForm->getEmbedInField();
 			if ( $embedInTemplate != null && $embedInParam != null ) {
-				$this->mEmbeddedTemplateDefs[] = array( $embedInTemplate, $embedInParam, $templateName );
+				$this->mEmbeddedTemplateDefs[] = [ $embedInTemplate, $embedInParam, $templateName ];
 			}
 		}
 	}
@@ -84,7 +84,7 @@ class PFWikiPage {
 				if ( $component instanceof PFWikiPageTemplate ) {
 					if ( $embeddedTemplateName == $component->getName() ) {
 						if ( !array_key_exists( $embeddedTemplateName, $this->mEmbeddedTemplateCalls ) ) {
-							$this->mEmbeddedTemplateCalls[$embeddedTemplateName] = array();
+							$this->mEmbeddedTemplateCalls[$embeddedTemplateName] = [];
 						}
 						$this->mEmbeddedTemplateCalls[$embeddedTemplateName][] = $component;
 					}
@@ -104,7 +104,10 @@ class PFWikiPage {
 			$paramValue = $templateParam->getValue();
 
 			// If there's no value, skip this param.
-			if ( $embeddedTemplateName == '' && $paramValue == '' ) {
+			if ( $embeddedTemplateName == '' &&
+				// Filter out blank values, but not '0'.
+				( $paramValue === '' || $paramValue === null )
+			) {
 				continue;
 			}
 

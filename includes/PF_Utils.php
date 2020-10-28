@@ -7,26 +7,31 @@
  * @ingroup PF
  */
 
+use MediaWiki\MediaWikiServices;
+
 class PFUtils {
+	/**
+	 * Get a content language (old $wgContLang) object. For MW < 1.32,
+	 * return the global.  For all others, use MediaWikiServices.
+	 *
+	 * @return Language
+	 */
+	public static function getContLang() {
+		if ( method_exists( "MediaWiki\\MediaWikiServices", "getContentLanguage" ) ) {
+			return MediaWikiServices::getInstance()->getContentLanguage();
+		} else {
+			global $wgContLang;
+			return $wgContLang;
+		}
+	}
 
 	/**
-	 * Helper function for backward compatibility.
-	 * @param LinkRenderer $linkRenderer
-	 * @param string $title
-	 * @param string|null $msg
-	 * @param array $attrs
-	 * @param array $params
-	 * @return string
+	 * Get a parser object.
+	 *
+	 * @return Parser
 	 */
-	public static function makeLink( $linkRenderer, $title, $msg = null, $attrs = array(), $params = array() ) {
-		if ( !is_null( $linkRenderer ) ) {
-			// MW 1.28+
-			// Is there a makeLinkKnown() method? We'll just do it
-			// manually.
-			return $linkRenderer->makeLink( $title, $msg, $attrs, $params, array( 'known' ) );
-		} else {
-			return Linker::linkKnown( $title, $msg, $attrs, $params );
-		}
+	public static function getParser() {
+		return MediaWikiServices::getInstance()->getParser();
 	}
 
 	/**
@@ -36,8 +41,8 @@ class PFUtils {
 	 * @return string
 	 */
 	public static function linkForSpecialPage( $linkRenderer, $specialPageName ) {
-		$specialPage = SpecialPageFactory::getPage( $specialPageName );
-		return self::makeLink( $linkRenderer, $specialPage->getPageTitle(),
+		$specialPage = self::getSpecialPage( $specialPageName );
+		return $linkRenderer->makeKnownLink( $specialPage->getPageTitle(),
 			htmlspecialchars( $specialPage->getDescription() ) );
 	}
 
@@ -54,8 +59,7 @@ class PFUtils {
 			$namespace .= ':';
 		}
 		if ( MWNamespace::isCapitalized( $title->getNamespace() ) ) {
-			global $wgContLang;
-			return $namespace . $wgContLang->ucfirst( $title->getPartialURL() );
+			return $namespace . self::getContLang()->ucfirst( $title->getPartialURL() );
 		} else {
 			return $namespace . $title->getPartialURL();
 		}
@@ -73,8 +77,7 @@ class PFUtils {
 			$namespace .= ':';
 		}
 		if ( MWNamespace::isCapitalized( $title->getNamespace() ) ) {
-			global $wgContLang;
-			return $namespace . $wgContLang->ucfirst( $title->getText() );
+			return $namespace . self::getContLang()->ucfirst( $title->getText() );
 		} else {
 			return $namespace . $title->getText();
 		}
@@ -95,17 +98,24 @@ class PFUtils {
 		}
 	}
 
+	public static function getSpecialPage( $pageName ) {
+		if ( class_exists( 'MediaWiki\Special\SpecialPageFactory' ) ) {
+			// MW 1.32+
+			return MediaWikiServices::getInstance()
+				->getSpecialPageFactory()
+				->getPage( $pageName );
+		} else {
+			return SpecialPageFactory::getPage( $pageName );
+		}
+	}
+
 	/**
-	 * Helper function to get the SMW data store for different versions
-	 * of SMW.
+	 * Helper function to get the SMW data store, if SMW is installed.
 	 * @return Store|null
 	 */
 	public static function getSMWStore() {
 		if ( class_exists( '\SMW\StoreFactory' ) ) {
-			// SMW 1.9+
 			return \SMW\StoreFactory::getStore();
-		} elseif ( function_exists( 'smwfGetStore' ) ) {
-			return smwfGetStore();
 		} else {
 			return null;
 		}
@@ -120,10 +130,10 @@ class PFUtils {
 	 */
 	public static function linkText( $namespace, $name, $text = null ) {
 		$title = Title::makeTitleSafe( $namespace, $name );
-		if ( is_null( $title ) ) {
+		if ( $title === null ) {
 			return $name; // TODO maybe report an error here?
 		}
-		if ( is_null( $text ) ) {
+		if ( $text === null ) {
 			return '[[:' . $title->getPrefixedText() . '|' . $name . ']]';
 		} else {
 			return '[[:' . $title->getPrefixedText() . '|' . $text . ']]';
@@ -180,11 +190,8 @@ END;
 
 		if ( $wgUser->isLoggedIn() ) {
 			$edit_token = $wgUser->getEditToken();
-		} elseif ( class_exists( '\MediaWiki\Session\Token' ) ) {
-			// MW 1.27+
-			$edit_token = \MediaWiki\Session\Token::SUFFIX;
 		} else {
-			$edit_token = EDIT_TOKEN_SUFFIX;
+			$edit_token = \MediaWiki\Session\Token::SUFFIX;
 		}
 		$form_body .= Html::hidden( 'wpEditToken', $edit_token );
 		$form_body .= Html::hidden( $action, null );
@@ -197,12 +204,12 @@ END;
 		}
 		$text .= Html::rawElement(
 			'form',
-			array(
+			[
 				'id' => 'editform',
 				'name' => 'editform',
 				'method' => 'post',
 				'action' => $title instanceof Title ? $title->getLocalURL( 'action=submit' ) : $title
-			),
+			],
 			$form_body
 		);
 
@@ -214,7 +221,7 @@ END;
 	</script>
 
 END;
-		Hooks::run( 'PageForms::PrintRedirectForm', array( $is_save, $is_preview, $is_diff, &$text ) );
+		Hooks::run( 'PageForms::PrintRedirectForm', [ $is_save, $is_preview, $is_diff, &$text ] );
 		return $text;
 	}
 
@@ -238,7 +245,7 @@ END;
 			$output = $parser->getOutput();
 		}
 
-		$mainModules = array(
+		$mainModules = [
 			'ext.pageforms.main',
 			'ext.pageforms.submit',
 			'ext.smw.tooltips',
@@ -256,12 +263,14 @@ END;
 			'ext.pageforms.checkboxes',
 			'ext.pageforms.select2',
 			'ext.pageforms.rating'
-		);
+		];
 
 		if ( version_compare( $wgVersion, '1.30', '<' ) || $wgUsejQueryThree === false ) {
 			$mainModules[] = 'ext.pageforms.fancybox.jquery1';
+			$mainModules[] = 'ext.pageforms.fullcalendar.jquery1';
 		} else {
 			$mainModules[] = 'ext.pageforms.fancybox.jquery3';
+			$mainModules[] = 'ext.pageforms.fullcalendar.jquery3';
 		}
 
 		if ( $wgPageFormsSimpleUpload ) {
@@ -270,8 +279,8 @@ END;
 
 		$output->addModules( $mainModules );
 
-		$otherModules = array();
-		Hooks::run( 'PageForms::AddRLModules', array( &$otherModules ) );
+		$otherModules = [];
+		Hooks::run( 'PageForms::AddRLModules', [ &$otherModules ] );
 		foreach ( $otherModules as $rlModule ) {
 			$output->addModules( $rlModule );
 		}
@@ -282,18 +291,22 @@ END;
 	 * @return string[]
 	 */
 	public static function getAllForms() {
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		$res = $dbr->select( 'page',
 			'page_title',
-			array( 'page_namespace' => PF_NS_FORM,
-				'page_is_redirect' => false ),
+			[ 'page_namespace' => PF_NS_FORM,
+				'page_is_redirect' => false ],
 			__METHOD__,
-			array( 'ORDER BY' => 'page_title' ) );
-		$form_names = array();
+			[ 'ORDER BY' => 'page_title' ] );
+		$form_names = [];
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$form_names[] = str_replace( '_', ' ', $row[0] );
 		}
 		$dbr->freeResult( $res );
+		if ( count( $form_names ) == 0 ) {
+			// This case requires special handling in the UI.
+			throw new MWException( wfMessage( 'pf-noforms-error' )->parse() );
+		}
 		return $form_names;
 	}
 
@@ -303,9 +316,14 @@ END;
 	 * @return string
 	 */
 	public static function formDropdownHTML( $form_names = null ) {
-		global $wgContLang;
-		$namespace_labels = $wgContLang->getNamespaces();
-		$form_label = $namespace_labels[PF_NS_FORM];
+		$namespaceStrings = self::getContLang()->getNamespaces();
+		$formNSString = $namespaceStrings[PF_NS_FORM];
+		$dropdownLabel = Html::rawElement(
+			'label',
+			[ 'for' => 'formSelector' ],
+			$formNSString . wfMessage( 'colon-separator' )->escaped()
+		);
+
 		if ( $form_names === null ) {
 			$form_names = self::getAllForms();
 		}
@@ -313,7 +331,13 @@ END;
 		foreach ( $form_names as $form_name ) {
 			$select_body .= "\t" . Html::element( 'option', null, $form_name ) . "\n";
 		}
-		return "\t" . Html::rawElement( 'label', array( 'for' => 'formSelector' ), $form_label . wfMessage( 'colon-separator' )->escaped() ) . "\n" . Html::rawElement( 'select', array( 'id' => 'formSelector', 'name' => 'form' ), $select_body ) . "\n";
+		$dropdownHTML = Html::rawElement(
+			'select',
+			[ 'id' => 'formSelector', 'name' => 'form' ],
+			$select_body
+		);
+
+		return "\t" . $dropdownLabel . "\n" . $dropdownHTML . "\n";
 	}
 
 	/**
@@ -335,16 +359,16 @@ END;
 	 */
 	static function smartSplitFormTag( $string ) {
 		if ( $string == '' ) {
-			return array();
+			return [];
 		}
 
 		$delimiter = '|';
-		$returnValues = array();
+		$returnValues = [];
 		$numOpenCurlyBrackets = 0;
 		$curReturnValue = '';
 
 		for ( $i = 0; $i < strlen( $string ); $i++ ) {
-			$curChar = $string{$i};
+			$curChar = $string[$i];
 			if ( $curChar == '{' ) {
 				$numOpenCurlyBrackets++;
 			} elseif ( $curChar == '}' ) {
@@ -382,7 +406,7 @@ END;
 			$hasPipe = strpos( $match[0], '|' );
 			return $hasPipe ? str_replace( "|", "\1", $match[0] ) : $match[0];
 		}, $str );
-		return array_map( array( 'PFUtils', 'convertBackToPipes' ), self::smartSplitFormTag( $str ) );
+		return array_map( [ 'PFUtils', 'convertBackToPipes' ], self::smartSplitFormTag( $str ) );
 	}
 
 	/**

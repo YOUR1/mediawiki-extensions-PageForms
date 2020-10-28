@@ -1,4 +1,7 @@
 <?php
+
+use MediaWiki\MediaWikiServices;
+
 /**
  * Handles the formcreate action - used for helper forms for creating
  * properties, forms, etc..
@@ -45,14 +48,12 @@ class PFHelperFormAction extends Action {
 	 * @return bool
 	 */
 	static function displayTab( $obj, &$links ) {
-		if ( method_exists( $obj, 'getTitle' ) ) {
-			$title = $obj->getTitle();
-		} else {
-			$title = $obj->mTitle;
-		}
+		$title = $obj->getTitle();
+		$user = $obj->getUser();
+
 		// Make sure that this page is in one of the relevant
 		// namespaces, and that it doesn't exist yet.
-		$namespacesWithHelperForms = array( NS_TEMPLATE, PF_NS_FORM, NS_CATEGORY );
+		$namespacesWithHelperForms = [ NS_TEMPLATE, PF_NS_FORM, NS_CATEGORY ];
 		if ( defined( 'SMW_NS_PROPERTY' ) ) {
 			$namespacesWithHelperForms[] = SMW_NS_PROPERTY;
 		}
@@ -67,7 +68,7 @@ class PFHelperFormAction extends Action {
 		// The tab should show up automatically for properties and
 		// forms, but not necessarily for templates and categories,
 		// since some of them might be outside of the SMW/PF system.
-		if ( in_array( $title->getNamespace(), array( NS_TEMPLATE, NS_CATEGORY ) ) ) {
+		if ( in_array( $title->getNamespace(), [ NS_TEMPLATE, NS_CATEGORY ] ) ) {
 			global $wgPageFormsShowTabsForAllHelperForms;
 			if ( !$wgPageFormsShowTabsForAllHelperForms ) {
 				return true;
@@ -76,17 +77,21 @@ class PFHelperFormAction extends Action {
 
 		$content_actions = &$links['views'];
 
-		if ( $obj->getUser()->isAllowed( 'edit' ) && $title->userCan( 'edit' ) ) {
-			$form_create_tab_text = 'pf_formcreate';
+		if ( method_exists( 'MediaWiki\Permissions\PermissionManager', 'userCan' ) ) {
+			// MW 1.33+
+			$permissionManager = MediaWikiServices::getInstance()->getPermissionManager();
+			$userCanEdit = $permissionManager->userCan( 'edit', $user, $title );
 		} else {
-			$form_create_tab_text = 'pf_viewform';
+			$userCanEdit = $title->userCan( 'edit', $user ) && $user->isAllowed( 'edit' );
 		}
+		$form_create_tab_text = ( $userCanEdit ) ? 'pf_formcreate' : 'pf_viewform';
+
 		$class_name = ( $obj->getRequest()->getVal( 'action' ) == 'formcreate' ) ? 'selected' : '';
-		$form_create_tab = array(
+		$form_create_tab = [
 			'class' => $class_name,
 			'text' => wfMessage( $form_create_tab_text )->text(),
 			'href' => $title->getLocalURL( 'action=formcreate' )
-		);
+		];
 
 		// Find the location of the 'create' tab, and add 'create
 		// with form' right before it.
@@ -111,13 +116,13 @@ class PFHelperFormAction extends Action {
 			$edit_tab_location = - 1;
 		}
 		array_splice( $tab_keys, $edit_tab_location, 0, 'formedit' );
-		array_splice( $tab_values, $edit_tab_location, 0, array( $form_create_tab ) );
-		$content_actions = array();
+		array_splice( $tab_values, $edit_tab_location, 0, [ $form_create_tab ] );
+		$content_actions = [];
 		foreach ( $tab_keys as $i => $key ) {
 			$content_actions[$key] = $tab_values[$i];
 		}
 
-		if ( ! $obj->getUser()->isAllowed( 'viewedittab' ) ) {
+		if ( !$obj->getUser()->isAllowed( 'viewedittab' ) ) {
 			// The tab can have either of these two actions.
 			unset( $content_actions['edit'] );
 			unset( $content_actions['viewsource'] );
