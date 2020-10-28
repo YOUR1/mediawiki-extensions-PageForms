@@ -2,12 +2,12 @@
 	"@metadata": {
 		"authors": [
 			"Dvdgmz",
+			"Fitoschido",
 			"Paucabot",
 			"SMP",
 			"Solde",
-			"Toniher",
 			"Ssola",
-			"Fitoschido"
+			"Toniher"
 		]
 	},
 	"pageforms-desc": "Formularis per crear i editar pàgines wiki",
@@ -74,6 +74,9 @@
 	"pf_multipageedit_docu": "Seleccioneu una de les plantilles següents per modificar totes les pàgines que el continguin. També poden crear-se pàgines noves que utilitzin la plantilla seleccionada.",
 	"pf_multipageedit_with-name": "Edita més d'una pàgina de la plantilla: $1",
 	"forms": "Formularis",
+	"pf-calendar-createevent": "Crea un esdeveniment",
+	"pf-calendar-deleteevent": "Suprimeix l’esdeveniment",
+	"pf-calendar-updateevent": "Actualitza l’esdeveniment",
 	"pf_forms_docu": "Els formularis següents ja existeixen al wiki.",
 	"pf_forminputs_mandatory": "Obligatori",
 	"pf_forminputs_restricted": "Només els administradors poden editar aquesta entrada",
@@ -180,7 +183,6 @@
 	"pf_formedit_edittitle": "Edita $1: $2",
 	"pf_formedit_morethanoneform": "'''Avís:''' s'ha definit més d'un formulari per defecte en aquesta pàgina.",
 	"pf_formedit_formwarning": "Avís: La pàgina [[$1|ja existeix]], però no fa servir aquest formulari.",
-	"pf_formedit_mismatchedbrackets": "Avís: la pàgina conté claus o claudàtors que no s'han tancat, per tant el formulari no podrà gestionar correctament la pàgina. <a href=\"$1\">Arregleu-ne l'error en el text del codi</a> abans de procedir.",
 	"pf_formedit_remove": "Suprimeix aquesta instància",
 	"pf_formedit_addanotherabove": "Afegeix una altra instància sobre d'aquesta",
 	"pf_formedit_addanother": "Afegeix-ne un altre",
@@ -218,6 +220,7 @@
 	"pf_bad_url_error": "ha de tenir un format de URL correcte, començant per 'http'",
 	"pf_bad_email_error": "ha de tenir un format vàlid d'adreça de correu electrònic",
 	"pf_bad_number_error": "ha de ser un nombre vàlid",
+	"pf_bad_integer_error": "ha de ser un nombre enter",
 	"pf_bad_date_error": "ha de ser una data vàlida",
 	"pf_modified_input_error": "Cal aprovar o rebujar la modificació",
 	"pf_pipe_error": "No es permet «|», excepte entre {{...}}, [[...]] o etiquetes especials",
@@ -261,7 +264,7 @@
 	"pf-datepicker-prev": "Anterior",
 	"pf-datepicker-next": "Següent",
 	"pf-datepicker-today": "Avui",
-	"pf-datepicker-dateformat": "La cadena de format de data. Vegeu la [https://www.mediawiki.org/w/index.php?title=Extension:Semantic_Forms_Inputs&fromsection=Date_picker#Parameters documentació en línia] per a més informació.",
+	"pf-datepicker-dateformat": "La cadena de format de data. Vegeu la [https://www.mediawiki.org/wiki/Extension:Page_Forms/Input_types/Datepicker#Parameters documentació en línia] per a més informació.",
 	"pf-datepicker-weekstart": "El primer dia de la setmana (0 - diumenge, 1 - dilluns, ...).",
 	"pf-datepicker-firstdate": "La primera data que es pot triar (en format yyyy/mm/dd).",
 	"pf-datepicker-lastdate": "La darrera data que es pot triar (en format yyyy/mm/dd).",

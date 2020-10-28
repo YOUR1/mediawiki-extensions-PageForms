@@ -10,34 +10,10 @@
 /**
  * @ingroup PFSpecialPages
  */
-class PFForms extends SpecialPage {
+class PFForms extends QueryPage {
 
-	function __construct() {
-		parent::__construct( 'Forms' );
-	}
-
-	function execute( $query ) {
-		$this->setHeaders();
-		list( $limit, $offset ) = $this->getRequest()->getLimitOffset();
-		$rep = new FormsPage();
-		return $rep->execute( $query );
-	}
-
-	protected function getGroupName() {
-		return 'pages';
-	}
-}
-
-/**
- * @ingroup PFSpecialPages
- */
-class FormsPage extends QueryPage {
 	public function __construct( $name = 'Forms' ) {
 		parent::__construct( $name );
-	}
-
-	function getName() {
-		return "Forms";
 	}
 
 	function isExpensive() {
@@ -57,11 +33,11 @@ class FormsPage extends QueryPage {
 	}
 
 	function getQueryInfo() {
-		return array(
-			'tables' => array( 'page' ),
-			'fields' => array( 'page_title AS title', 'page_title AS value' ),
-			'conds' => array( 'page_namespace' => PF_NS_FORM, 'page_is_redirect' => 0 )
-		);
+		return [
+			'tables' => [ 'page' ],
+			'fields' => [ 'page_title AS title', 'page_title AS value' ],
+			'conds' => [ 'page_namespace' => PF_NS_FORM, 'page_is_redirect' => 0 ]
+		];
 	}
 
 	function sortDescending() {
@@ -70,11 +46,10 @@ class FormsPage extends QueryPage {
 
 	function formatResult( $skin, $result ) {
 		$title = Title::makeTitle( PF_NS_FORM, $result->value );
-		if ( method_exists( $this, 'getLinkRenderer' ) ) {
-			$linkRenderer = $this->getLinkRenderer();
-		} else {
-			$linkRenderer = null;
-		}
-		return PFUtils::makeLink( $linkRenderer, $title, htmlspecialchars( $title->getText() ) );
+		return $this->getLinkRenderer()->makeKnownLink( $title, htmlspecialchars( $title->getText() ) );
+	}
+
+	protected function getGroupName() {
+		return 'pf_group';
 	}
 }

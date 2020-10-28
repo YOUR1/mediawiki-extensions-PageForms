@@ -19,7 +19,7 @@ class PFHooks {
 			return 1;
 		}
 
-		define( 'PF_VERSION', '4.5.1' );
+		define( 'PF_VERSION', '4.9.5' );
 
 		$GLOBALS['wgPageFormsIP'] = dirname( __DIR__ ) . '/../';
 
@@ -41,22 +41,21 @@ class PFHooks {
 	}
 
 	public static function initialize() {
+		global $wgHooks;
+
 		$GLOBALS['wgPageFormsPartialPath'] = '/extensions/PageForms';
 		$GLOBALS['wgPageFormsScriptPath'] = $GLOBALS['wgScriptPath'] . $GLOBALS['wgPageFormsPartialPath'];
 
-		// We have to have this hook called here, instead of in
-		// extension.json, because it's conditional.
-		if ( class_exists( 'MediaWiki\Linker\LinkRenderer' ) ) {
-			// MW 1.28+
-			$GLOBALS['wgHooks']['HtmlPageLinkRendererEnd'][] = 'PFFormLinker::setBrokenLink';
+		if ( class_exists( 'MediaWiki\HookContainer\HookContainer' ) ) {
+			// MW 1.35+
+			$wgHooks['PageSaveComplete'][] = 'PFHooks::setPostEditCookie';
 		} else {
-			$GLOBALS['wgHooks']['LinkEnd'][] = 'PFFormLinker::setBrokenLinkOld';
+			$wgHooks['PageContentSaveComplete'][] = 'PFHooks::setPostEditCookieOld';
 		}
-
 		// Admin Links hook needs to be called in a delayed way so that it
 		// will always be called after SMW's Admin Links addition; as of
 		// SMW 1.9, SMW delays calling all its hook functions.
-		$GLOBALS['wgHooks']['AdminLinks'][] = 'PFHooks::addToAdminLinks';
+		$wgHooks['AdminLinks'][] = 'PFHooks::addToAdminLinks';
 
 		// This global variable is needed so that other
 		// extensions can hook into it to add their own
@@ -73,31 +72,69 @@ class PFHooks {
 	 * @return bool Always true
 	 */
 	public static function registerModules( ResourceLoader &$resourceLoader ) {
+		global $wgVersion;
+
 		// These used to use a value of __DIR__ for 'localBasePath',
 		// but apparently in some installations that had a value of
 		// /PageForms/libs and in others just /PageForms, so we'll set
 		// the value here instead.
 		$pageFormsDir = __DIR__ . '/..';
 
-		if ( version_compare( $GLOBALS['wgVersion'], '1.26c', '>' ) && ExtensionRegistry::getInstance()->isLoaded( 'OpenLayers' ) ) {
-			$resourceLoader->register( array(
-				'ext.pageforms.maps' => array(
+		// Between MW 1.34 and 1.35, all the jquery.ui.* modules were
+		// merged into one big module, "jquery.ui". We create some
+		// "wrapper" modules here to cover both cases.
+		if ( version_compare( $wgVersion, '1.35', '>=' ) ) {
+			$jQueryUIModules = [
+				'ext.pageforms.jqui.autocomplete' => [
+					'dependencies' => 'jquery.ui'
+				],
+				'ext.pageforms.jqui.fancytree.deps' => [
+					'dependencies' => 'jquery.ui'
+				],
+				'ext.pageforms.jqui.datepicker' => [
+					'dependencies' => 'jquery.ui'
+				],
+				'ext.pageforms.jqui.sortable' => [
+					'dependencies' => 'jquery.ui'
+				]
+			];
+		} else {
+			$jQueryUIModules = [
+				'ext.pageforms.jqui.autocomplete' => [
+					'dependencies' => 'jquery.ui.autocomplete'
+				],
+				'ext.pageforms.jqui.fancytree.deps' => [
+					'dependencies' => [ 'jquery.ui.widget', 'jquery.ui.position' ]
+				],
+				'ext.pageforms.jqui.datepicker' => [
+					'dependencies' => 'jquery.ui.datepicker'
+				],
+				'ext.pageforms.jqui.sortable' => [
+					'dependencies' => 'jquery.ui.sortable'
+				]
+			];
+		}
+		$resourceLoader->register( $jQueryUIModules );
+
+		if ( ExtensionRegistry::getInstance()->isLoaded( 'OpenLayers' ) ) {
+			$resourceLoader->register( [
+				'ext.pageforms.maps' => [
 					'localBasePath' => $pageFormsDir,
 					'remoteExtPath' => 'PageForms',
 					'scripts' => '/libs/PF_maps.offline.js',
-					'dependencies' => array(
+					'dependencies' => [
 						'ext.openlayers.main',
-					),
-				),
-			) );
+					],
+				],
+			] );
 		} else {
-			$resourceLoader->register( array(
-				'ext.pageforms.maps' => array(
+			$resourceLoader->register( [
+				'ext.pageforms.maps' => [
 					'localBasePath' => $pageFormsDir,
 					'remoteExtPath' => 'PageForms',
 					'scripts' => '/libs/PF_maps.js',
-				),
-			) );
+				],
+			] );
 		}
 
 		return true;
@@ -130,36 +167,41 @@ class PFHooks {
 		return true;
 	}
 
-	static function registerFunctions( &$parser ) {
-		$parser->setFunctionHook( 'default_form', array( 'PFParserFunctions', 'renderDefaultForm' ) );
-		$parser->setFunctionHook( 'forminput', array( 'PFParserFunctions', 'renderFormInput' ) );
-		$parser->setFunctionHook( 'formlink', array( 'PFParserFunctions', 'renderFormLink' ) );
-		$parser->setFunctionHook( 'formredlink', array( 'PFParserFunctions', 'renderFormRedLink' ) );
-		$parser->setFunctionHook( 'queryformlink', array( 'PFParserFunctions', 'renderQueryFormLink' ) );
-		$parser->setFunctionHook( 'arraymap', array( 'PFParserFunctions', 'renderArrayMap' ), Parser::SFH_OBJECT_ARGS );
-		$parser->setFunctionHook( 'arraymaptemplate', array( 'PFParserFunctions', 'renderArrayMapTemplate' ), Parser::SFH_OBJECT_ARGS );
+	static function registerFunctions( Parser $parser ) {
+		$parser->setFunctionHook( 'default_form', [ 'PFParserFunctions', 'renderDefaultForm' ] );
+		$parser->setFunctionHook( 'forminput', [ 'PFParserFunctions', 'renderFormInput' ] );
+		$parser->setFunctionHook( 'formlink', [ 'PFParserFunctions', 'renderFormLink' ] );
+		$parser->setFunctionHook( 'formredlink', [ 'PFParserFunctions', 'renderFormRedLink' ] );
+		$parser->setFunctionHook( 'queryformlink', [ 'PFParserFunctions', 'renderQueryFormLink' ] );
+		$parser->setFunctionHook( 'arraymap', [ 'PFParserFunctions', 'renderArrayMap' ], Parser::SFH_OBJECT_ARGS );
+		$parser->setFunctionHook( 'arraymaptemplate', [ 'PFParserFunctions', 'renderArrayMapTemplate' ], Parser::SFH_OBJECT_ARGS );
 
-		$parser->setFunctionHook( 'autoedit', array( 'PFParserFunctions', 'renderAutoEdit' ) );
+		$parser->setFunctionHook( 'autoedit', [ 'PFParserFunctions', 'renderAutoEdit' ] );
 
 		return true;
 	}
 
 	static function setGlobalJSVariables( &$vars ) {
+		global $wgPageFormsTargetName;
 		global $wgPageFormsAutocompleteValues, $wgPageFormsAutocompleteOnAllChars;
 		global $wgPageFormsFieldProperties, $wgPageFormsCargoFields, $wgPageFormsDependentFields;
 		global $wgPageFormsGridValues, $wgPageFormsGridParams;
+		global $wgPageFormsCalendarValues, $wgPageFormsCalendarParams, $wgPageFormsCalendarHTML;
 		global $wgPageFormsContLangYes, $wgPageFormsContLangNo, $wgPageFormsContLangMonths;
 		global $wgPageFormsHeightForMinimizingInstances;
 		global $wgPageFormsShowOnSelect, $wgPageFormsScriptPath;
 		global $edgValues, $wgPageFormsEDSettings;
 		global $wgAmericanDates;
-		// global $wgPageFormsInitJSFunctions, $wgPageFormsValidationJSFunctions;
 
+		$vars['wgPageFormsTargetName'] = $wgPageFormsTargetName;
 		$vars['wgPageFormsAutocompleteValues'] = $wgPageFormsAutocompleteValues;
 		$vars['wgPageFormsAutocompleteOnAllChars'] = $wgPageFormsAutocompleteOnAllChars;
 		$vars['wgPageFormsFieldProperties'] = $wgPageFormsFieldProperties;
 		$vars['wgPageFormsCargoFields'] = $wgPageFormsCargoFields;
 		$vars['wgPageFormsDependentFields'] = $wgPageFormsDependentFields;
+		$vars['wgPageFormsCalendarValues'] = $wgPageFormsCalendarValues;
+		$vars['wgPageFormsCalendarParams'] = $wgPageFormsCalendarParams;
+		$vars['wgPageFormsCalendarHTML'] = $wgPageFormsCalendarHTML;
 		$vars['wgPageFormsGridValues'] = $wgPageFormsGridValues;
 		$vars['wgPageFormsGridParams'] = $wgPageFormsGridParams;
 		$vars['wgPageFormsContLangYes'] = $wgPageFormsContLangYes;
@@ -171,24 +213,14 @@ class PFHooks {
 		$vars['edgValues'] = $edgValues;
 		$vars['wgPageFormsEDSettings'] = $wgPageFormsEDSettings;
 		$vars['wgAmericanDates'] = $wgAmericanDates;
-		// $vars['wgPageFormsInitJSFunctions'] = $wgPageFormsInitJSFunctions;
-		// $vars['wgPageFormsValidationJSFunctions'] = $wgPageFormsValidationJSFunctions;
 
 		return true;
-	}
-
-	public static function registerProperty( $id, $typeid, $label ) {
-		if ( class_exists( 'SMWDIProperty' ) ) {
-			SMWDIProperty::registerProperty( $id, $typeid, $label, true );
-		} else {
-			SMWPropertyValue::registerProperty( $id, $typeid, $label, true );
-		}
 	}
 
 	public static function addToAdminLinks( &$admin_links_tree ) {
 		$data_structure_label = wfMessage( 'smw_adminlinks_datastructure' )->text();
 		$data_structure_section = $admin_links_tree->getSection( $data_structure_label );
-		if ( is_null( $data_structure_section ) ) {
+		if ( $data_structure_section === null ) {
 			$data_structure_section = new ALSection( wfMessage( 'pf-adminlinks-datastructure' )->text() );
 
 			// If we are here, it most likely means that SMW is
@@ -226,6 +258,21 @@ class PFHooks {
 			$pf_docu_label = wfMessage( 'adminlinks_documentation', $pf_name )->text();
 			$smw_docu_row->addItem( ALItem::newFromExternalLink( "https://www.mediawiki.org/wiki/Extension:Page_Forms", $pf_docu_label ) );
 		}
+
+		return true;
+	}
+
+	public static function addToCargoTablesColumns( $cargoTablesPage, &$allowedActions ) {
+		if ( !$cargoTablesPage->getUser()->isAllowed( 'multipageedit' ) ) {
+			return true;
+		}
+
+		$cargoTablesPage->getOutput()->addModuleStyles( [ 'oojs-ui.styles.icons-editing-core' ] );
+
+		$editColumn = [ 'edit' => [ 'ooui-icon' => 'edit', 'ooui-title' => 'edit' ] ];
+		$indexOfDrilldown = array_search( 'drilldown', array_keys( $allowedActions ) );
+		$pos = false === $indexOfDrilldown ? count( $allowedActions ) : $indexOfDrilldown + 1;
+		$allowedActions = array_merge( array_slice( $allowedActions, 0, $pos ), $editColumn, array_slice( $allowedActions, $pos ) );
 
 		return true;
 	}
@@ -275,21 +322,58 @@ class PFHooks {
 		$templateTitle = Title::newFromID( $templateIDs[0] );
 		$templateName = $templateTitle->getText();
 		if ( self::$mMultiPageEditPage == null ) {
-			self::$mMultiPageEditPage = new SpreadsheetTemplatesPage();
+			self::$mMultiPageEditPage = new PFMultiPageEdit();
+			self::$mMultiPageEditPage->setTemplateList();
 		}
 		$formName = self::$mMultiPageEditPage->getFormForTemplate( $templateName );
 		if ( $formName == null ) {
 			return true;
 		}
 
-		$sp = SpecialPageFactory::getPage( 'MultiPageEdit' );
+		$sp = PFUtils::getSpecialPage( 'MultiPageEdit' );
 		$editMsg = wfMessage( 'edit' )->text();
-		$text = PFUtils::makeLink( $linkRenderer = null, $sp->getPageTitle(), $editMsg, array(),
-			array( "template" => $templateName, "form" => $formName ) );
+		$linkParams = [ 'template' => $templateName, 'form' => $formName ];
+		$text = Linker::linkKnown( $sp->getPageTitle(), $editMsg, [], $linkParams );
 
 		$indexOfDrilldown = array_search( 'drilldown', array_keys( $actionLinks ) );
-		$pos = false === $indexOfDrilldown ? count( $array ) : $indexOfDrilldown + 1;
-		$actionLinks = array_merge( array_slice( $actionLinks, 0, $pos ), array( 'edit' => $text ), array_slice( $actionLinks, $pos ) );
+		$pos = false === $indexOfDrilldown ? count( $actionLinks ) : $indexOfDrilldown + 1;
+		$actionLinks = array_merge( array_slice( $actionLinks, 0, $pos ), [ 'edit' => $text ], array_slice( $actionLinks, $pos ) );
+		return true;
+	}
+
+	/**
+	 * Called by the CargoTablesSetActionLinks hook.
+	 *
+	 * Adds an "Edit" link to Special:CargoTables, pointing to Special:MultiPageEdit.
+	 *
+	 * @param SpecialPage $cargoTablesPage
+	 * @param array &$actionLinks Action links
+	 * @param string $tableName Cargo table name
+	 * @param bool $isReplacementTable Whether this table iss a replacement table
+	 * @param bool $hasReplacementTable Whether this table has a replacement table
+	 * @param string[] $templatesThatDeclareTables An array
+	 * @param string[] $templatesThatAttachToTables An array
+	 * @param string[] $actionList
+	 *
+	 * @return bool
+	 *
+	 * @since 4.8.1
+	 */
+	public static function addToCargoTablesRow( $cargoTablesPage, &$actionLinks, $tableName, $isReplacementTable, $hasReplacementTable, $templatesThatDeclareTables, $templatesThatAttachToTables, $actionList ) {
+		$cargoTablesPage->getOutput()->addModuleStyles( [ 'oojs-ui.styles.icons-editing-core' ] );
+
+		// For the sake of simplicity, this function basically just
+		// wraps around the previous hook function, for Cargo <= 2.4.
+		// That's why there's this awkward behavior of parsing links
+		// to get their URL. Hopefully this won't cause problems.
+		self::addToCargoTablesLinks( $actionLinks, $tableName, $isReplacementTable, $hasReplacementTable, $templatesThatDeclareTables, $templatesThatAttachToTables );
+
+		if ( array_key_exists( 'edit', $actionLinks ) ) {
+			preg_match( '/href="(.*?)"/', $actionLinks['edit'], $matches );
+			$mpeURL = html_entity_decode( $matches[1] );
+			$actionLinks['edit'] = $cargoTablesPage->getActionButton( 'edit', $mpeURL );
+		}
+
 		return true;
 	}
 
@@ -313,7 +397,7 @@ class PFHooks {
 	}
 
 	public static function showFormPreview( EditPage $editpage, WebRequest $request ) {
-		global $wgOut, $wgParser, $wgPageFormsFormPrinter;
+		global $wgOut, $wgPageFormsFormPrinter;
 
 		wfDebug( __METHOD__ . ": enter.\n" );
 
@@ -326,15 +410,21 @@ class PFHooks {
 			return true;
 		}
 
+		if ( method_exists( $wgOut, 'parseAsInterface' ) ) {
+			// MW 1.32+
+			$previewNote = $wgOut->parseAsInterface( wfMessage( 'pf-preview-note' )->text() );
+		} else {
+			$previewNote = $wgOut->parse( wfMessage( 'pf-preview-note' )->text() );
+		}
 		// The "pfForm" ID is there so the form JS will be activated.
 		$editpage->previewTextAfterContent .= Html::element( 'h2', null, wfMessage( 'pf-preview-header' )->text() ) . "\n" .
-			'<div id="pfForm" class="previewnote" style="font-weight: bold">' . $wgOut->parse( wfMessage( 'pf-preview-note' )->text() ) . "</div>\n<hr />\n";
+			'<div id="pfForm" class="previewnote" style="font-weight: bold">' . $previewNote . "</div>\n<hr />\n";
 
 		$form_definition = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $editpage->textbox1 );
 		list( $form_text, $data_text, $form_page_title, $generated_page_name ) =
 			$wgPageFormsFormPrinter->formHTML( $form_definition, null, false, null, null, "Page Forms form preview dummy title", null );
 
-		$parserOutput = $wgParser->getOutput();
+		$parserOutput = PFUtils::getParser()->getOutput();
 		if ( method_exists( $wgOut, 'addParserOutputMetadata' ) ) {
 			$wgOut->addParserOutputMetadata( $parserOutput );
 		} else {
@@ -349,7 +439,7 @@ class PFHooks {
 	}
 
 	/**
-	 * Called by the PageContentSaveComplete hook.
+	 * Called by the PageContentSaveComplete hook; used for MW < 1.35.
 	 *
 	 * Set a cookie after the page save so that a "Your edit was saved"
 	 * popup will appear after form-based saves, just as it does after
@@ -373,7 +463,7 @@ class PFHooks {
 	 *
 	 * @return bool
 	 */
-	public static function setPostEditCookie( &$wikiPage, &$user, $content, $summary, $isMinor, $isWatch, $section, &$flags, $revision, &$status, $baseRevId, $undidRevId = 0 ) {
+	public static function setPostEditCookieOld( &$wikiPage, &$user, $content, $summary, $isMinor, $isWatch, $section, &$flags, $revision, &$status, $baseRevId, $undidRevId = 0 ) {
 		if ( $revision == null ) {
 			return true;
 		}
@@ -381,7 +471,7 @@ class PFHooks {
 		// Have this take effect only if the save came from a form -
 		// we need to use a global variable to determine that.
 		global $wgPageFormsFormPrinter;
-		if ( property_exists( $wgPageFormsFormPrinter, 'mInputTypeHooks' ) ) {
+		if ( !property_exists( $wgPageFormsFormPrinter, 'mInputTypeHooks' ) ) {
 			return true;
 		}
 
@@ -391,4 +481,43 @@ class PFHooks {
 		$response->setCookie( $postEditKey, 'saved', time() + EditPage::POST_EDIT_COOKIE_DURATION );
 		return true;
 	}
+
+	/**
+	 * Called by the PageSaveComplete hook; used for MW >= 1.35.
+	 *
+	 * Set a cookie after the page save so that a "Your edit was saved"
+	 * popup will appear after form-based saves, just as it does after
+	 * standard saves. This code will be called after all saves, which
+	 * means that it will lead to redundant cookie-setting after normal
+	 * saves. However, there doesn't appear to be a way to to set the
+	 * cookie correctly only after form-based saves, unfortunately.
+	 *
+	 * @param WikiPage $wikiPage
+	 * @param MediaWiki\User\UserIdentity $user
+	 * @param string $summary
+	 * @param int $flags
+	 * @param MediaWiki\Revision\RevisionRecord $revisionRecord
+	 * @param MediaWiki\Storage\EditResult $editResult
+	 * @return bool
+	 */
+	public static function setPostEditCookie( WikiPage $wikiPage, MediaWiki\User\UserIdentity $user, string $summary, int $flags,
+		MediaWiki\Revision\RevisionRecord $revisionRecord, MediaWiki\Storage\EditResult $editResult ) {
+		if ( $revisionRecord == null ) {
+			return true;
+		}
+
+		// Have this take effect only if the save came from a form -
+		// we need to use a global variable to determine that.
+		global $wgPageFormsFormPrinter;
+		if ( !property_exists( $wgPageFormsFormPrinter, 'mInputTypeHooks' ) ) {
+			return true;
+		}
+
+		// Code based loosely on EditPage::setPostEditCookie().
+		$postEditKey = EditPage::POST_EDIT_COOKIE_KEY_PREFIX . $revisionRecord->getID();
+		$response = RequestContext::getMain()->getRequest()->response();
+		$response->setCookie( $postEditKey, 'saved', time() + EditPage::POST_EDIT_COOKIE_DURATION );
+		return true;
+	}
+
 }

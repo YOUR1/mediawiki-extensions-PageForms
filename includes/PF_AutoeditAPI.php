@@ -5,6 +5,9 @@
  * @ingroup PageForms
  */
 
+use MediaWiki\MediaWikiServices;
+use Wikimedia\AtEase\AtEase;
+
 /**
  * @ingroup PageForms
  */
@@ -35,7 +38,7 @@ class PFAutoeditAPI extends ApiBase {
 	 */
 	const DEBUG = 3;
 
-	private $mOptions = array();
+	private $mOptions = [];
 	private $mAction;
 	private $mStatus;
 	private $mIsAutoEdit = false;
@@ -113,28 +116,19 @@ class PFAutoeditAPI extends ApiBase {
 		} catch ( Exception $e ) {
 			// This has to be Exception, not MWException, due to
 			// DateTime errors and possibly others.
-			global $wgParser;
-			$this->logMessage( $wgParser->recursiveTagParseFully( $e->getMessage() ), $e->getCode() );
+			$this->logMessage( PFUtils::getParser()->recursiveTagParseFully( $e->getMessage() ), $e->getCode() );
 		}
 
 		$this->finalizeResults();
 		$this->setHeaders();
 	}
 
-	/**
-	 *
-	 */
 	function prepareAction() {
 		// Get options from the request, but keep the explicitly set options.
 		$data = $this->getRequest()->getValues();
 		$this->mOptions = PFUtils::array_merge_recursive_distinct( $data, $this->mOptions );
 
-		global $wgParser;
-		if ( $wgParser === null ) {
-			$wgParser = new Parser();
-		}
-
-		$wgParser->startExternalParse(
+		PFUtils::getParser()->startExternalParse(
 			null,
 			ParserOptions::newFromUser( $this->getUser() ),
 			Parser::OT_WIKI
@@ -213,7 +207,7 @@ class PFAutoeditAPI extends ApiBase {
 			$this->mOptions['target'] = $target->getPrefixedText();
 		}
 
-		Hooks::run( 'PageForms::SetTargetName', array( &$this->mOptions['target'], $hookQuery ) );
+		Hooks::run( 'PageForms::SetTargetName', [ &$this->mOptions['target'], $hookQuery ] );
 
 		// set html return status. If all goes well, this will not be changed
 		$this->mStatus = 200;
@@ -230,7 +224,7 @@ class PFAutoeditAPI extends ApiBase {
 		if ( $this->mOptions['form'] === '' ) {
 			$this->logMessage( 'No form specified. Will try to find the default form for the target page.', self::DEBUG );
 
-			$formNames = array();
+			$formNames = [];
 
 			// try explicitly set alternative forms
 			if ( array_key_exists( 'alt_form', $this->mOptions ) ) {
@@ -323,7 +317,7 @@ class PFAutoeditAPI extends ApiBase {
 		// set up form data:
 		// merge data coming from the web request on top of some defaults
 		$data = array_merge(
-				array(
+				[
 					'wpTextbox1' => $targetContent,
 					'wpUnicodeCheck' => 'ℳ𝒲♥𝓊𝓃𝒾𝒸ℴ𝒹ℯ',
 					'wpSummary' => '',
@@ -331,7 +325,7 @@ class PFAutoeditAPI extends ApiBase {
 					'wpEdittime' => '',
 					'wpEditToken' => isset( $this->mOptions[ 'token' ] ) ? $this->mOptions[ 'token' ] : $this->getUser()->getEditToken(),
 					'action' => 'submit',
-				),
+				],
 				$this->mOptions
 		);
 
@@ -374,15 +368,15 @@ class PFAutoeditAPI extends ApiBase {
 
 		$previewOutput = $editor->getPreviewText();
 
-		Hooks::run( 'EditPage::showEditForm:initial', array( &$editor, &$wgOut ) );
+		Hooks::run( 'EditPage::showEditForm:initial', [ &$editor, &$wgOut ] );
 
 		$this->getOutput()->setRobotPolicy( 'noindex,nofollow' );
 
 		// This hook seems slightly odd here, but makes things more
 		// consistent for extensions.
-		Hooks::run( 'OutputPageBeforeHTML', array( &$wgOut, &$previewOutput ) );
+		Hooks::run( 'OutputPageBeforeHTML', [ &$wgOut, &$previewOutput ] );
 
-		$this->getOutput()->addHTML( Html::rawElement( 'div', array( 'id' => 'wikiPreview' ), $previewOutput ) );
+		$this->getOutput()->addHTML( Html::rawElement( 'div', [ 'id' => 'wikiPreview' ], $previewOutput ) );
 
 		$this->setResultFromOutput();
 	}
@@ -400,16 +394,31 @@ class PFAutoeditAPI extends ApiBase {
 			$this->logMessage( wfMessage( 'pf_autoedit_redlinkexists' )->parse(), self::WARNING );
 		}
 
-		$permErrors = $title->getUserPermissionsErrors( 'edit', $this->getUser() );
+		$user = $this->getUser();
+
+		if ( class_exists( 'MediaWiki\Permissions\PermissionManager' ) ) {
+			// MW 1.33+
+			$permManager = MediaWikiServices::getInstance()->getPermissionManager();
+			$permErrors = $permManager->getPermissionErrors( 'edit', $user, $title );
+		} else {
+			$permManager = null;
+			$permErrors = $title->getUserPermissionsErrors( 'edit', $user );
+		}
 
 		// if this title needs to be created, user needs create rights
 		if ( !$title->exists() ) {
-			$permErrors = array_merge( $permErrors, wfArrayDiff2( $title->getUserPermissionsErrors( 'create', $this->getUser() ), $permErrors ) );
+			if ( $permManager != null ) {
+				// MW 1.33+
+				$permErrorsForCreate = $permManager->getPermissionErrors( 'create', $user, $title );
+			} else {
+				$permErrorsForCreate = $title->getUserPermissionsErrors( 'create', $user );
+			}
+			$permErrors = array_merge( $permErrors, wfArrayDiff2( $permErrorsForCreate, $permErrors ) );
 		}
 
 		if ( $permErrors ) {
 			// Auto-block user's IP if the account was "hard" blocked
-			$this->getUser()->spreadAnyEditBlock();
+			$user->spreadAnyEditBlock();
 
 			foreach ( $permErrors as $error ) {
 				$this->logMessage( call_user_func_array( 'wfMessage', $error )->parse() );
@@ -420,7 +429,7 @@ class PFAutoeditAPI extends ApiBase {
 
 		$resultDetails = false;
 		# Allow bots to exempt some edits from bot flagging
-		$bot = $this->getUser()->isAllowed( 'bot' ) && $editor->bot;
+		$bot = $user->isAllowed( 'bot' ) && $editor->bot;
 
 		$request = $editor->pfFauxRequest;
 		if ( $editor->tokenOk( $request ) ) {
@@ -471,17 +480,33 @@ class PFAutoeditAPI extends ApiBase {
 			case EditPage::AS_PARSE_ERROR: // Can't parse content
 
 				throw new MWException( $status->getHTML() );
-				return true; // fail
 
 			case EditPage::AS_SUCCESS_NEW_ARTICLE: // Article successfully created
 
 				$query = $resultDetails['redirect'] ? 'redirect=no' : '';
 				$anchor = isset( $resultDetails['sectionanchor'] ) ? $resultDetails['sectionanchor'] : '';
 
+				// Give extensions a chance to modify URL query on create
+				Hooks::run( 'ArticleUpdateBeforeRedirect', [ $editor->getArticle(), &$sectionanchor, &$extraQuery ] );
+
+				if ( $extraQuery ) {
+					if ( $query ) {
+						$query .= '&' . $extraQuery;
+					} else {
+						$query .= $extraQuery;
+					}
+				}
+
 				$redirect = $title->getFullURL( $query ) . $anchor;
 
 				$returnto = Title::newFromText( $this->getRequest()->getText( 'returnto' ) );
+				$reload = $this->getRequest()->getText( 'reload' );
 				if ( $returnto !== null ) {
+					// Purge the returnto page
+					$returntoPage = WikiPage::factory( $returnto );
+					if ( $returntoPage && $returntoPage->exists() && $reload ) {
+						$returntoPage->doPurge();
+					}
 					$redirect = $returnto->getFullURL();
 				}
 
@@ -495,7 +520,7 @@ class PFAutoeditAPI extends ApiBase {
 				$sectionanchor = $resultDetails['sectionanchor'];
 
 				// Give extensions a chance to modify URL query on update
-				Hooks::run( 'ArticleUpdateBeforeRedirect', array( $editor->getArticle(), &$sectionanchor, &$extraQuery ) );
+				Hooks::run( 'ArticleUpdateBeforeRedirect', [ $editor->getArticle(), &$sectionanchor, &$extraQuery ] );
 
 				if ( $resultDetails['redirect'] ) {
 					if ( $extraQuery == '' ) {
@@ -508,7 +533,13 @@ class PFAutoeditAPI extends ApiBase {
 				$redirect = $title->getFullURL( $extraQuery ) . $sectionanchor;
 
 				$returnto = Title::newFromText( $this->getRequest()->getText( 'returnto' ) );
+				$reload = $this->getRequest()->getText( 'reload' );
 				if ( $returnto !== null ) {
+					// Purge the returnto page
+					$returntoPage = WikiPage::factory( $returnto );
+					if ( $returntoPage && $returntoPage->exists() && $reload ) {
+						$returntoPage->doPurge();
+					}
 					$redirect = $returnto->getFullURL();
 				}
 
@@ -569,7 +600,7 @@ class PFAutoeditAPI extends ApiBase {
 		// set response text depending on the status and the requested action
 		if ( $this->mStatus === 200 ) {
 			if ( array_key_exists( 'ok text', $this->mOptions ) ) {
-				$responseText = MessageCache::singleton()->parse( $this->mOptions['ok text'], Title::newFromText( $this->mOptions['target'] ) )->getText();
+				$responseText = $this->getMessageCache()->parse( $this->mOptions['ok text'], Title::newFromText( $this->mOptions['target'] ) )->getText();
 			} elseif ( $this->mAction === self::ACTION_SAVE ) {
 				$responseText = wfMessage( 'pf_autoedit_success', $this->mOptions['target'], $this->mOptions['form'] )->parse();
 			} else {
@@ -578,7 +609,7 @@ class PFAutoeditAPI extends ApiBase {
 		} else {
 			// get errortext (or use default)
 			if ( array_key_exists( 'error text', $this->mOptions ) ) {
-				$responseText = MessageCache::singleton()->parse( $this->mOptions['error text'], Title::newFromText( $this->mOptions['target'] ) )->getText();
+				$responseText = $this->getMessageCache()->parse( $this->mOptions['error text'], Title::newFromText( $this->mOptions['target'] ) )->getText();
 			} elseif ( $this->mAction === self::ACTION_SAVE ) {
 				$responseText = wfMessage( 'pf_autoedit_fail', $this->mOptions['target'] )->parse();
 			} else {
@@ -593,7 +624,7 @@ class PFAutoeditAPI extends ApiBase {
 		}
 
 		$result->addValue( null, 'status', $this->mStatus, true );
-		$result->addValue( array( 'form' ), 'title', $this->mOptions['form'] );
+		$result->addValue( [ 'form' ], 'title', $this->mOptions['form'] );
 		$result->addValue( null, 'target', $this->mOptions['target'], true );
 	}
 
@@ -652,8 +683,10 @@ class PFAutoeditAPI extends ApiBase {
 		$targetName = str_replace( ' ', '_', $targetName );
 
 		// now run the parser on it
-		global $wgParser, $wgTitle;
-		$targetName = $wgParser->transformMsg( $targetName, new ParserOptions(), $wgTitle );
+		global $wgTitle;
+		$targetName = PFUtils::getParser()->transformMsg(
+			$targetName, new ParserOptions(), $wgTitle
+		);
 
 		$titleNumber = '';
 		$isRandom = false;
@@ -667,7 +700,8 @@ class PFAutoeditAPI extends ApiBase {
 				$randomNumHasPadding = array_key_exists( 2, $matches );
 				$randomNumDigits = ( array_key_exists( 3, $matches ) ? $matches[3] : $randomNumDigits );
 				$titleNumber = self::makeRandomNumber( $randomNumDigits, $randomNumHasPadding );
-			} elseif ( preg_match( '/{num.*start[_]*=[_]*([^;]*).*}/', $targetName, $matches ) ) {;				// get unique number start value
+			} elseif ( preg_match( '/{num.*start[_]*=[_]*([^;]*).*}/', $targetName, $matches ) ) {
+				// get unique number start value
 				// from target name; if it's not
 				// there, or it's not a positive
 				// number, start it out as blank
@@ -770,7 +804,7 @@ class PFAutoeditAPI extends ApiBase {
 	 * @throws MWException
 	 */
 	public function doAction() {
-		global $wgOut, $wgParser, $wgRequest, $wgPageFormsFormPrinter;
+		global $wgOut, $wgRequest, $wgPageFormsFormPrinter;
 
 		// If the wiki is read-only, do not save.
 		if ( wfReadOnly() ) {
@@ -850,9 +884,9 @@ class PFAutoeditAPI extends ApiBase {
 		// Allow extensions to set/change the preload text, for new
 		// pages.
 		if ( !$pageExists ) {
-			Hooks::run( 'PageForms::EditFormPreloadText', array( &$preloadContent, $targetTitle, $formTitle ) );
+			Hooks::run( 'PageForms::EditFormPreloadText', [ &$preloadContent, $targetTitle, $formTitle ] );
 		} else {
-			Hooks::run( 'PageForms::EditFormInitialText', array( &$preloadContent, $targetTitle, $formTitle ) );
+			Hooks::run( 'PageForms::EditFormInitialText', [ &$preloadContent, $targetTitle, $formTitle ] );
 		}
 
 		// Flag to keep track of formHTML() runs.
@@ -938,7 +972,7 @@ class PFAutoeditAPI extends ApiBase {
 			}
 
 			// Lets other code process additional form-definition syntax
-			Hooks::run( 'PageForms::WritePageData', array( $this->mOptions['form'], Title::newFromText( $this->mOptions['target'] ), &$targetContent ) );
+			Hooks::run( 'PageForms::WritePageData', [ $this->mOptions['form'], Title::newFromText( $this->mOptions['target'] ), &$targetContent ] );
 
 			$editor = $this->setupEditPage( $targetContent );
 
@@ -951,26 +985,38 @@ class PFAutoeditAPI extends ApiBase {
 				$this->doStore( $editor );
 			}
 		} elseif ( $this->mAction === self::ACTION_FORMEDIT ) {
-			$parserOutput = $wgParser->getOutput();
+			$parserOutput = PFUtils::getParser()->getOutput();
 			if ( method_exists( $wgOut, 'addParserOutputMetadata' ) ) {
 				$wgOut->addParserOutputMetadata( $parserOutput );
 			} else {
 				$wgOut->addParserOutputNoText( $parserOutput );
 			}
 
-			$this->getResult()->addValue( array( 'form' ), 'HTML', $formHTML );
+			$this->getResult()->addValue( [ 'form' ], 'HTML', $formHTML );
 		}
 	}
 
 	private function parseDataFromHTMLFrag( $html ) {
-		$data = array();
+		$data = [];
 		$doc = new DOMDocument();
 		$oldVal = libxml_disable_entity_loader( true );
-		@$doc->loadHTML(
+		if ( method_exists( AtEase::class, 'suppressWarnings' ) ) {
+			// MW >= 1.33
+			AtEase::suppressWarnings();
+		} else {
+			\MediaWiki\suppressWarnings();
+		}
+		$doc->loadHTML(
 			'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body>'
 			. $html
 			. '</body></html>'
 		);
+		if ( method_exists( AtEase::class, 'restoreWarnings' ) ) {
+			// MW >= 1.33
+			AtEase::restoreWarnings();
+		} else {
+			\MediaWiki\restoreWarnings();
+		}
 		libxml_disable_entity_loader( $oldVal );
 
 		// Process input tags.
@@ -1060,9 +1106,9 @@ class PFAutoeditAPI extends ApiBase {
 	/**
 	 * Parses data from a query string into the $data array
 	 *
-	 * @param Array $data
-	 * @param String $queryString
-	 * @return Array
+	 * @param array &$data
+	 * @param string $queryString
+	 * @return array
 	 */
 	private function parseDataFromQueryString( &$data, $queryString ) {
 		$params = explode( '&', $queryString );
@@ -1093,7 +1139,7 @@ class PFAutoeditAPI extends ApiBase {
 	 * @param bool $toplevel if this is a toplevel value.
 	 */
 	public static function addToArray( &$array, $key, $value, $toplevel = true ) {
-		$matches = array();
+		$matches = [];
 
 		if ( preg_match( '/^([^\[\]]*)\[([^\[\]]*)\](.*)/', $key, $matches ) ) {
 			// for some reason toplevel keys get their spaces encoded by MW.
@@ -1106,7 +1152,7 @@ class PFAutoeditAPI extends ApiBase {
 
 			// if subsequent element does not exist yet or is a string (we prefer arrays over strings)
 			if ( !array_key_exists( $key, $array ) || is_string( $array[$key] ) ) {
-				$array[$key] = array();
+				$array[$key] = [];
 			}
 
 			self::addToArray( $array[$key], $matches[2] . $matches[3], $value, false );
@@ -1123,6 +1169,19 @@ class PFAutoeditAPI extends ApiBase {
 	}
 
 	/**
+	 * Get a MessageCache depending on mediawiki version
+	 * @return MessageCache
+	 */
+	private function getMessageCache() {
+		if ( method_exists( MediaWikiServices::class, 'getMessageCache' ) ) {
+			// MW 1.34+
+			return MediaWikiServices::getInstance()->getMessageCache();
+		} else {
+			return MessageCache::singleton();
+		}
+	}
+
+	/**
 	 * Add error message to the ApiResult
 	 *
 	 * @param string $msg
@@ -1135,7 +1194,7 @@ class PFAutoeditAPI extends ApiBase {
 			$this->mStatus = 400;
 		}
 
-		$this->getResult()->addValue( array( 'errors' ), null, array( 'level' => $errorLevel, 'message' => $msg ) );
+		$this->getResult()->addValue( [ 'errors' ], null, [ 'level' => $errorLevel, 'message' => $msg ] );
 
 		return $msg;
 	}
@@ -1157,12 +1216,12 @@ class PFAutoeditAPI extends ApiBase {
 	 * @return array or false
 	 */
 	function getAllowedParams() {
-		return array(
+		return [
 			'form' => null,
 			'target' => null,
 			'query' => null,
 			'preload' => null
-		);
+		];
 	}
 
 	/**
@@ -1173,12 +1232,12 @@ class PFAutoeditAPI extends ApiBase {
 	 * @return array or false
 	 */
 	function getParamDescription() {
-		return array(
+		return [
 			'form' => 'The form to use.',
 			'target' => 'The target page.',
 			'query' => 'The query string.',
 			'preload' => 'The name of a page to preload'
-		);
+		];
 	}
 
 	/**
@@ -1204,10 +1263,10 @@ END;
 	 * @return string|string[]
 	 */
 	protected function getExamples() {
-		return array(
+		return [
 			'With query parameter:    api.php?action=pfautoedit&form=form-name&target=page-name&query=template-name[field-name-1]=field-value-1%26template-name[field-name-2]=field-value-2',
 			'Without query parameter: api.php?action=pfautoedit&form=form-name&target=page-name&template-name[field-name-1]=field-value-1&template-name[field-name-2]=field-value-2'
-		);
+		];
 	}
 
 	/**

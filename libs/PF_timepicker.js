@@ -112,8 +112,7 @@ window.PF_TP_init = function( inputID, params ) { // minTime, maxTime, interval,
 
 	if ( interv < 1 ) {
 		interv = 1;
-	}
-	else if ( interv > 60 ) {
+	} else if ( interv > 60 ) {
 		interv = 60;
 	}
 
@@ -225,7 +224,7 @@ window.PF_TP_init = function( inputID, params ) { // minTime, maxTime, interval,
 	// hide timepicker when input loses focus
 	inputShow
 	.blur(function() {
-		jQuery( '#' + inputID + '_tree ul' ).fadeOut( 'normal', function() {jQuery(this).hide();});
+		jQuery( '#' + inputID + '_tree ul' ).fadeOut( 'normal', function() { jQuery(this).hide(); });
 	});
 
 	if ( ! params.partOfDTP ) {

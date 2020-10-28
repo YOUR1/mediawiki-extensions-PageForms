@@ -48,11 +48,9 @@ class PFFormEditAction extends Action {
 	 * @return true
 	 */
 	static function displayTab( $obj, &$links ) {
-		if ( method_exists( $obj, 'getTitle' ) ) {
-			$title = $obj->getTitle();
-		} else {
-			$title = $obj->mTitle;
-		}
+		$title = $obj->getTitle();
+		$user = $obj->getUser();
+
 		// Make sure that this is not a special page, and
 		// that the user is allowed to edit it
 		// - this function is almost never called on special pages,
@@ -73,7 +71,14 @@ class PFFormEditAction extends Action {
 
 		$content_actions = &$links['views'];
 
-		$user_can_edit = $title->userCan( 'edit' );
+		if ( method_exists( 'MediaWiki\Permissions\PermissionManager', 'userCan' ) ) {
+			// MW 1.33+
+			$permissionManager = MediaWikiServices::getInstance()->getPermissionManager();
+			$user_can_edit = $permissionManager->userCan( 'edit', $user, $title );
+		} else {
+			$user_can_edit = $title->userCan( 'edit', $user );
+		}
+
 		// Create the form edit tab, and apply whatever changes are
 		// specified by the edit-tab global variables.
 		if ( $wgPageFormsRenameEditTabs ) {
@@ -99,11 +104,11 @@ class PFFormEditAction extends Action {
 		}
 
 		$class_name = ( $obj->getRequest()->getVal( 'action' ) == 'formedit' ) ? 'selected' : '';
-		$form_edit_tab = array(
+		$form_edit_tab = [
 			'class' => $class_name,
 			'text' => wfMessage( $form_edit_tab_msg )->text(),
 			'href' => $title->getLocalURL( 'action=formedit' )
-		);
+		];
 
 		// Find the location of the 'edit' tab, and add 'edit
 		// with form' right before it.
@@ -128,13 +133,13 @@ class PFFormEditAction extends Action {
 			$edit_tab_location = - 1;
 		}
 		array_splice( $tab_keys, $edit_tab_location, 0, 'formedit' );
-		array_splice( $tab_values, $edit_tab_location, 0, array( $form_edit_tab ) );
-		$content_actions = array();
+		array_splice( $tab_values, $edit_tab_location, 0, [ $form_edit_tab ] );
+		$content_actions = [];
 		foreach ( $tab_keys as $i => $key ) {
 			$content_actions[$key] = $tab_values[$i];
 		}
 
-		if ( ! $obj->getUser()->isAllowed( 'viewedittab' ) ) {
+		if ( !$obj->getUser()->isAllowed( 'viewedittab' ) ) {
 			// The tab can have either of these two actions.
 			unset( $content_actions['edit'] );
 			unset( $content_actions['viewsource'] );
@@ -149,8 +154,14 @@ class PFFormEditAction extends Action {
 		$targetName = $title->getPrefixedText();
 		$output->setPageTitle( wfMessage( "creating", $targetName )->text() );
 
+		try {
+			$formNames = PFUtils::getAllForms();
+		} catch ( MWException $e ) {
+			$output->addHTML( Html::element( 'div', [ 'class' => 'error' ], $e->getMessage() ) );
+			return;
+		}
+
 		$output->addHTML( Html::element( 'p', null, wfMessage( 'pf-formedit-selectform' )->text() ) );
-		$formNames = PFUtils::getAllForms();
 		$pagesPerForm = self::getNumPagesPerForm();
 		$totalPages = 0;
 		foreach ( $pagesPerForm as $formName => $numPages ) {
@@ -158,91 +169,87 @@ class PFFormEditAction extends Action {
 		}
 		// We define "popular forms" as those that are used to
 		// edit more than 1% of the wiki's form-editable pages.
-		$popularForms = array();
+		$popularForms = [];
 		foreach ( $pagesPerForm as $formName => $numPages ) {
 			if ( $numPages > $totalPages / 100 ) {
 				$popularForms[] = $formName;
 			}
 		}
-		$otherForms = array();
+		$otherForms = [];
 		foreach ( $formNames as $i => $formName ) {
 			if ( !in_array( $formName, $popularForms ) ) {
 				$otherForms[] = $formName;
 			}
 		}
 
-		$fe = SpecialPageFactory::getPage( 'FormEdit' );
+		$fe = PFUtils::getSpecialPage( 'FormEdit' );
 
 		if ( count( $popularForms ) > 0 ) {
 			if ( count( $otherForms ) > 0 ) {
 				$output->addHTML( Html::element(
 					'p',
-					array(),
+					[],
 					wfMessage( 'pf-formedit-mainforms' )->text()
 				) );
 			}
 			$text = self::printLinksToFormArray( $popularForms, $targetName, $fe );
-			$output->addHTML( Html::rawElement( 'div', array( 'class' => 'infoMessage mainForms' ), $text ) );
+			$output->addHTML( Html::rawElement( 'div', [ 'class' => 'infoMessage mainForms' ], $text ) );
 		}
 
 		if ( count( $otherForms ) > 0 ) {
 			if ( count( $popularForms ) > 0 ) {
 				$output->addHTML( Html::element(
 					'p',
-					array(),
+					[],
 					wfMessage( 'pf-formedit-otherforms' )->text()
 				) );
 			}
 			$text = self::printLinksToFormArray( $otherForms, $targetName, $fe );
-			$output->addHTML( Html::rawElement( 'div', array( 'class' => 'infoMessage otherForms' ), $text ) );
+			$output->addHTML( Html::rawElement( 'div', [ 'class' => 'infoMessage otherForms' ], $text ) );
 		}
 
-		// We need to call linkKnown(), not link(), so that PF's
-		// edit=>formedit hook won't be called on this link.
-		if ( function_exists( 'MediaWiki\MediaWikiServices::getLinkRenderer' ) ) {
-			$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
-		} else {
-			$linkRenderer = null;
-		}
-		$noFormLink = PFUtils::makeLink( $linkRenderer, $title, wfMessage( 'pf-formedit-donotuseform' )->escaped(), array(), array( 'action' => 'edit', 'redlink' => true ) );
+		$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
+		$linkParams = [ 'action' => 'edit', 'redlink' => true ];
+		$noFormLink = $linkRenderer->makeKnownLink( $title, wfMessage( 'pf-formedit-donotuseform' )->escaped(), [], $linkParams );
 		$output->addHTML( Html::rawElement( 'p', null, $noFormLink ) );
 	}
 
 	/**
-	 * Finds the number of pages on the wiki that use each form, by getting all the
-	 * categories that have a #default_form call pointing to a particular form, and
-	 * adding up the number of pages in each such category.
+	 * Find the number of pages on the wiki that use each form, by getting
+	 * all the categories that have a #default_form call pointing to a
+	 * particular form, and adding up the number of pages in each such
+	 * category.
 	 * This approach doesn't count #default_form calls for namespaces or
-	 * individual pages, but that doesn't seem like a big deal, because, when
-	 * creating a page in a namespace that has a form, this interface probably won't
-	 * get called anyway; and #default_form calls for individual pages are
-	 * (hopefully) pretty rare.
+	 * individual pages, but that doesn't seem like a big deal, because,
+	 * when creating a page in a namespace that has a form, this interface
+	 * probably won't get called anyway; and #default_form calls for
+	 * individual pages are (hopefully) pretty rare.
 	 * @return int[]
 	 */
 	static function getNumPagesPerForm() {
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		$res = $dbr->select(
-			array( 'category', 'page', 'page_props' ),
-			array( 'pp_value', 'SUM(cat_pages) AS total_pages' ),
-			array(
+			[ 'category', 'page', 'page_props' ],
+			[ 'pp_value', 'SUM(cat_pages) AS total_pages' ],
+			[
 				// Keep backward compatibility with
 				// the page property name for
 				// Semantic Forms.
-				'pp_propname' => array( 'PFDefaultForm', 'SFDefaultForm' )
-			),
+				'pp_propname' => [ 'PFDefaultForm', 'SFDefaultForm' ]
+			],
 			__METHOD__,
-			array(
+			[
 				'GROUP BY' => 'pp_value',
 				'ORDER BY' => 'total_pages DESC',
 				'LIMIT' => 100
-			),
-			array(
-				'page' => array( 'JOIN', 'cat_title = page_title' ),
-				'page_props' => array( 'JOIN', 'page_id = pp_page' )
-			)
+			],
+			[
+				'page' => [ 'JOIN', 'cat_title = page_title' ],
+				'page_props' => [ 'JOIN', 'page_id = pp_page' ]
+			]
 		);
 
-		$pagesPerForm = array();
+		$pagesPerForm = [];
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$formName = $row['pp_value'];
 			$pagesPerForm[$formName] = $row['total_pages'];
@@ -259,11 +266,11 @@ class PFFormEditAction extends Action {
 
 			// Special handling for forms whose name contains a slash.
 			if ( strpos( $formName, '/' ) !== false ) {
-				$url = $fe->getPageTitle()->getLocalURL( array( 'form' => $formName, 'target' => $targetName ) );
+				$url = $fe->getPageTitle()->getLocalURL( [ 'form' => $formName, 'target' => $targetName ] );
 			} else {
 				$url = $fe->getPageTitle( "$formName/$targetName" )->getLocalURL();
 			}
-			$text .= Html::element( 'a', array( 'href' => $url ), $formName );
+			$text .= Html::element( 'a', [ 'href' => $url ], $formName );
 		}
 		return $text;
 	}
@@ -289,7 +296,12 @@ class PFFormEditAction extends Action {
 
 		if ( count( $form_names ) > 1 ) {
 			$warning_text = "\t" . '<div class="warningbox">' . wfMessage( 'pf_formedit_morethanoneform' )->text() . "</div>\n";
-			$output->addWikiText( $warning_text );
+			if ( method_exists( $output, 'addWikiTextAsInterface' ) ) {
+				// MW 1.32+
+				$output->addWikiTextAsInterface( $warning_text );
+			} else {
+				$output->addWikiText( $warning_text );
+			}
 		}
 
 		$form_name = $form_names[0];

@@ -39,8 +39,9 @@ use MediaWiki\MediaWikiServices;
  * choice, using 'autocomplete on category' or 'autocomplete on namespace'
  * (you can only use one). To autcomplete on all pages in the main (blank)
  * namespace, specify "autocomplete on namespace=main".
- * 'reload' is an optional value to be used along with 'popup', causes the page
- * to reload with 'action=purge' after the form is submitted successfully.
+ * 'reload' is an optional parameter that can be used alongside either
+ * 'popup' or 'returnto'; it causes the page that the user ends up on after
+ * submitting the form to get reloaded with 'action=purge'.
  *
  * Example: to create an input to add or edit a page with a form called
  * 'User' within a namespace also called 'User', and to have the form
@@ -71,8 +72,9 @@ use MediaWiki\MediaWikiServices;
  * (or, in the case of 'post button', to be sent as hidden inputs).
  * 'target' is an optional value, setting the name of the page to be
  * edited by the form.
- * 'reload' is an optional value to be used along with 'popup', causes the page
- * to reload with 'action=purge' after the form is submitted successfully.
+ * 'reload' is an optional parameter that can be used alongside either
+ * 'popup' or 'returnto'; it causes the page that the user ends up on after
+ * submitting the form to get reloaded with 'action=purge'.
  *
  * Example: to create a link to add data with a form called
  * 'User' within a namespace also called 'User', and to have the form
@@ -135,15 +137,17 @@ use MediaWiki\MediaWikiServices;
  * '#autoedit' is called as:
  *
  * {{#autoedit:form=|target=|link text=|link type=|tooltip=|query string=
- * |reload}}
+ * |minor|reload}}
  *
  * This function creates a link or button that, when clicked on,
  * automatically modifies the specified page according to the values in the
  * 'query string' variable.
  *
  * The parameters of #autoedit are called in the same format as those
- * of #formlink. The one addition, 'reload', causes the page to reload
- * after the user clicks the button or link.
+ * of #formlink. T The two additions are:
+ * 'minor' - sets this to be a "minor edit"
+ * 'reload' - causes the page to reload after the user clicks the button
+ * or link.
  *
  * @author Yaron Koren
  * @author Sergey Chernyshev
@@ -160,7 +164,7 @@ class PFParserFunctions {
 	// only gets added to the page once
 	private static $num_autocompletion_inputs = 0;
 
-	public static function renderDefaultForm( &$parser ) {
+	public static function renderDefaultForm( Parser $parser ) {
 		$curTitle = $parser->getTitle();
 
 		$params = func_get_args();
@@ -187,25 +191,25 @@ class PFParserFunctions {
 		// It's not a category - display nothing.
 	}
 
-	public static function renderFormLink( &$parser ) {
+	public static function renderFormLink( Parser $parser ) {
 		$params = func_get_args();
 		array_shift( $params ); // We don't need the parser.
 		$str = self::createFormLink( $parser, $params, 'formlink' );
-		return array( $str, 'noparse' => true, 'isHTML' => true );
+		return [ $str, 'noparse' => true, 'isHTML' => true ];
 	}
 
-	public static function renderFormRedLink( &$parser ) {
+	public static function renderFormRedLink( Parser $parser ) {
 		$params = func_get_args();
 		array_shift( $params ); // We don't need the parser.
 		$str = self::createFormLink( $parser, $params, 'formredlink' );
-		return array( $str, 'noparse' => true, 'isHTML' => true );
+		return [ $str, 'noparse' => true, 'isHTML' => true ];
 	}
 
-	public static function renderQueryFormLink( &$parser ) {
+	public static function renderQueryFormLink( Parser $parser ) {
 		$params = func_get_args();
 		array_shift( $params ); // We don't need the parser.
 		$str = self::createFormLink( $parser, $params, 'queryformlink' );
-		return array( $str, 'noparse' => true, 'isHTML' => true );
+		return [ $str, 'noparse' => true, 'isHTML' => true ];
 	}
 
 	private static function convertQueryString( $queryString, $inQueryArr ) {
@@ -220,18 +224,20 @@ class PFParserFunctions {
 		return PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
 	}
 
-	public static function renderFormInput( &$parser ) {
+	public static function renderFormInput( Parser $parser ) {
 		$params = func_get_args();
 		array_shift( $params ); // don't need the parser
 
 		// Set defaults.
 		$inFormName = $inValue = $inButtonStr = '';
-		$inQueryArr = array();
+		$inQueryArr = [];
 		$inAutocompletionSource = '';
 		$inSize = 25;
 		$classStr = "pfFormInput";
+		$inNamespaceSelector = null;
 		$inPlaceholder = null;
 		$inAutofocus = true;
+		$hasPopup = $hasReturnTo = false;
 
 		// Assign params.
 		foreach ( $params as $i => $param ) {
@@ -244,7 +250,7 @@ class PFParserFunctions {
 				// We call recursivePreprocess() and not
 				// recursiveTagParse() so that URL values will
 				// not be turned into links.
-				$value = trim( $parser->recursivePreprocess( $elements[1] ) );
+				$value = trim( $parser->recursivePreprocess( html_entity_decode( $elements[1], ENT_QUOTES ) ) );
 			} else {
 				$paramName = trim( $param );
 				$value = null;
@@ -266,23 +272,44 @@ class PFParserFunctions {
 			} elseif ( $paramName == 'autocomplete on namespace' ) {
 				$inAutocompletionSource = $value;
 				$autocompletionType = 'namespace';
+			} elseif ( $paramName == 'namespace selector' ) {
+				$inNamespaceSelector = explode( ',', $value );
 			} elseif ( $paramName == 'placeholder' ) {
 				$inPlaceholder = $value;
 			} elseif ( $paramName == 'popup' ) {
 				self::loadScriptsForPopupForm( $parser );
 				$classStr .= ' popupforminput';
+				$hasPopup = true;
 			} elseif ( $paramName == 'reload' ) {
 				$classStr .= ' reload';
+				$inQueryArr['reload'] = '1';
 			} elseif ( $paramName == 'no autofocus' ) {
 				$inAutofocus = false;
 			} else {
 				$value = urlencode( $value );
 				parse_str( "$paramName=$value", $arr );
 				$inQueryArr = PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
+				if ( $paramName == 'returnto' ) {
+					$hasReturnTo = true;
+				}
 			}
 		}
 
-		$formInputAttrs = array( 'size' => $inSize );
+		if ( $hasPopup && $hasReturnTo ) {
+			return '<div class="error">Error: \'popup\' and \'returnto\' cannot be set in the same function.</div>';
+		}
+
+		$formInputAttrs = [ 'size' => $inSize ];
+
+		$formContents = '';
+
+		if ( $inNamespaceSelector !== null ) {
+			$dropdownText = '';
+			foreach ( $inNamespaceSelector as $nsName ) {
+				$dropdownText .= Html::element( 'option', null, trim( $nsName ) );
+			}
+			$formContents .= Html::rawElement( 'select', [ 'name' => 'namespace' ], $dropdownText ) . ' : ';
+		}
 
 		if ( $inPlaceholder != null ) {
 			$formInputAttrs['placeholder'] = $inPlaceholder;
@@ -291,7 +318,7 @@ class PFParserFunctions {
 			$formInputAttrs['autofocus'] = 'autofocus';
 		}
 
-		// Now apply the necessary settings and Javascript, depending
+		// Now apply the necessary settings and JavaScript, depending
 		// on whether or not there's autocompletion (and whether the
 		// autocompletion is local or remote).
 		$input_num = 1;
@@ -318,12 +345,12 @@ class PFParserFunctions {
 		// and it will get encoded again by Html::input() - prevent
 		// double-encoding.
 		$inValue = html_entity_decode( $inValue );
-		$formContents = Html::input( 'page_name', $inValue, 'text', $formInputAttrs );
+		$formContents .= Html::input( 'page_name', $inValue, 'text', $formInputAttrs );
 
 		// If the form start URL looks like "index.php?title=Special:FormStart"
 		// (i.e., it's in the default URL style), add in the title as a
 		// hidden value
-		$fs = SpecialPageFactory::getPage( 'FormStart' );
+		$fs = PFUtils::getSpecialPage( 'FormStart' );
 		$fsURL = $fs->getPageTitle()->getLocalURL();
 		if ( ( $pos = strpos( $fsURL, "title=" ) ) > - 1 ) {
 			$formContents .= Html::hidden( "title", urldecode( substr( $fsURL, $pos + 6 ) ) );
@@ -339,7 +366,11 @@ class PFParserFunctions {
 			$inFormName = str_replace( '\,', ',', $inFormName );
 			$formContents .= Html::hidden( "form", $inFormName );
 		} else {
-			$formContents .= PFUtils::formDropdownHTML( $listOfForms );
+			try {
+				$formContents .= PFUtils::formDropdownHTML( $listOfForms );
+			} catch ( MWException $e ) {
+				return Html::element( 'div', [ 'class' => 'error' ], $e->getMessage() );
+			}
 		}
 
 		// Recreate the passed-in query string as a set of hidden
@@ -358,27 +389,27 @@ class PFParserFunctions {
 
 		$buttonStr = ( $inButtonStr != '' ) ? $inButtonStr : wfMessage( 'pf_formstart_createoredit' )->escaped();
 		$formContents .= "&nbsp;" . Html::input( null, $buttonStr, 'submit',
-			array(
+			[
 				'id' => "input_button_$input_num",
 				'class' => 'forminput_button'
-			)
+			]
 		);
 
-		$str = "\t" . Html::rawElement( 'form', array(
+		$str = "\t" . Html::rawElement( 'form', [
 				'name' => 'createbox',
 				'action' => $fsURL,
 				'method' => 'get',
 				'class' => $classStr
-			), '<p>' . $formContents . '</p>'
+			], '<p>' . $formContents . '</p>'
 		) . "\n";
 
-		if ( ! empty( $inAutocompletionSource ) ) {
+		if ( !empty( $inAutocompletionSource ) ) {
 			$str .= "\t\t\t" .
 				Html::element( 'div',
-					array(
+					[
 						'class' => 'page_name_auto_complete',
 						'id' => "div_$input_num",
-					),
+					],
 					// It has to be <div></div>, not
 					// <div />, to work properly - stick
 					// in a space as the content.
@@ -386,28 +417,32 @@ class PFParserFunctions {
 				) . "\n";
 		}
 
-		return array( $str, 'noparse' => true, 'isHTML' => true );
+		Hooks::run( 'PageForms::FormInputEnd', [ $params, &$formContents ] );
+
+		return [ $str, 'noparse' => true, 'isHTML' => true ];
 	}
 
 	/**
 	 * {{#arraymap:value|delimiter|var|formula|new_delimiter}}
-	 * @param Parser &$parser
+	 * @param Parser $parser
 	 * @param PPFrame $frame
 	 * @param array $args
 	 * @return string
 	 */
-	public static function renderArrayMap( &$parser, $frame, $args ) {
+	public static function renderArrayMap( Parser $parser, $frame, $args ) {
 		// Set variables.
 		$value = isset( $args[0] ) ? trim( $frame->expand( $args[0] ) ) : '';
 		$delimiter = isset( $args[1] ) ? trim( $frame->expand( $args[1] ) ) : ',';
 		$var = isset( $args[2] ) ? trim( $frame->expand( $args[2], PPFrame::NO_ARGS | PPFrame::NO_TEMPLATES ) ) : 'x';
 		$formula = isset( $args[3] ) ? $args[3] : 'x';
 		$new_delimiter = isset( $args[4] ) ? trim( $frame->expand( $args[4] ) ) : ', ';
+		$conjunction = isset( $args[5] ) ? trim( $frame->expand( $args[5] ) ) : $new_delimiter;
 		# Unstrip some
 		$delimiter = $parser->mStripState->unstripNoWiki( $delimiter );
 		# Let '\n' represent newlines, and '\s' represent spaces.
-		$delimiter = str_replace( array( '\n', '\s' ), array( "\n", ' ' ), $delimiter );
-		$new_delimiter = str_replace( array( '\n', '\s' ), array( "\n", ' ' ), $new_delimiter );
+		$delimiter = str_replace( [ '\n', '\s' ], [ "\n", ' ' ], $delimiter );
+		$new_delimiter = str_replace( [ '\n', '\s' ], [ "\n", ' ' ], $new_delimiter );
+		$conjunction = str_replace( [ '\n', '\s' ], [ "\n", ' ' ], $conjunction );
 
 		if ( $delimiter == '' ) {
 			$values_array = preg_split( '/(.)/u', $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE );
@@ -415,7 +450,7 @@ class PFParserFunctions {
 			$values_array = explode( $delimiter, $value );
 		}
 
-		$results_array = array();
+		$results_array = [];
 		// Add results to the results array only if the old value was
 		// non-null, and the new, mapped value is non-null as well.
 		foreach ( $values_array as $old_value ) {
@@ -432,17 +467,32 @@ class PFParserFunctions {
 			}
 			$results_array[] = $result_value;
 		}
-		return implode( $new_delimiter, $results_array );
+		if ( $conjunction != $new_delimiter ) {
+			$conjunction = " " . trim( $conjunction ) . " ";
+		}
+
+		$result_text = "";
+		$num_values = count( $results_array );
+		for ( $i = 0; $i < $num_values; $i++ ) {
+			if ( $i == 0 ) {
+				$result_text .= $results_array[$i];
+			} elseif ( $i == $num_values - 1 ) {
+				$result_text .= $conjunction . $results_array[$i];
+			} else {
+				$result_text .= $new_delimiter . $results_array[$i];
+			}
+		}
+		return $result_text;
 	}
 
 	/**
 	 * {{#arraymaptemplate:value|template|delimiter|new_delimiter}}
-	 * @param Parser &$parser
+	 * @param Parser $parser
 	 * @param PPFrame $frame
 	 * @param array $args
 	 * @return string
 	 */
-	public static function renderArrayMapTemplate( &$parser, $frame, $args ) {
+	public static function renderArrayMapTemplate( Parser $parser, $frame, $args ) {
 		// Set variables.
 		$value = isset( $args[0] ) ? trim( $frame->expand( $args[0] ) ) : '';
 		$template = isset( $args[1] ) ? trim( $frame->expand( $args[1] ) ) : '';
@@ -460,7 +510,7 @@ class PFParserFunctions {
 			$values_array = explode( $delimiter, $value );
 		}
 
-		$results_array = array();
+		$results_array = [];
 		foreach ( $values_array as $old_value ) {
 			$old_value = trim( $old_value );
 			if ( $old_value == '' ) {
@@ -479,7 +529,7 @@ class PFParserFunctions {
 		return implode( $new_delimiter, $results_array );
 	}
 
-	public static function renderAutoEdit( &$parser ) {
+	public static function renderAutoEdit( Parser $parser ) {
 		global $wgPageFormsAutoeditNamespaces;
 
 		$parser->getOutput()->addModules( 'ext.pageforms.autoedit' );
@@ -490,9 +540,10 @@ class PFParserFunctions {
 		$linkString = null;
 		$linkType = 'span';
 		$summary = null;
+		$minorEdit = false;
 		$classString = 'autoedit-trigger';
 		$inTooltip = null;
-		$inQueryArr = array();
+		$inQueryArr = [];
 		$editTime = null;
 
 		// Parse parameters.
@@ -518,6 +569,9 @@ class PFParserFunctions {
 				case 'summary':
 					$summary = $parser->recursiveTagParse( $value );
 					break;
+				case 'minor':
+					$minorEdit = true;
+					break;
 				case 'query string' :
 					$inQueryArr = self::convertQueryString( $value, $inQueryArr );
 					break;
@@ -525,7 +579,7 @@ class PFParserFunctions {
 				case 'ok text':
 				case 'error text':
 					// do not parse ok text or error text yet. Will be parsed on api call
-					$arr = array( $key => $value );
+					$arr = [ $key => $value ];
 					$inQueryArr = PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
 					break;
 				case 'tooltip':
@@ -535,7 +589,7 @@ class PFParserFunctions {
 				case 'target':
 				case 'title':
 					$value = $parser->recursiveTagParse( $value );
-					$arr = array( $key => $value );
+					$arr = [ $key => $value ];
 					$inQueryArr = PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
 
 					$targetTitle = Title::newFromText( $value );
@@ -543,21 +597,20 @@ class PFParserFunctions {
 					if ( $targetTitle !== null ) {
 						$allowedNamespaces = array_merge(
 							$wgPageFormsAutoeditNamespaces,
-							array( NS_CATEGORY )
+							[ NS_CATEGORY ]
 						);
 						if ( !in_array( $targetTitle->getNamespace(), $allowedNamespaces ) ) {
-							return '<div class="error">Error: Invalid namespace for "'
-								. $targetTitle->getNsText() . '" detected; see Page Forms\' documentation for help on'
-								. 'configuring #autoedit namespaces using <code>$wgPageFormsAutoeditNamespaces</code>.</div>';
+							$errorMsg = wfMessage( 'pf-autoedit-invalidnamespace', $targetTitle->getNsText() )->parse();
+							return Html::element( 'div', [ 'class' => 'error' ], $errorMsg );
 						}
-						$targetArticle = new Article( $targetTitle );
-						$targetArticle->clear();
-						$editTime = $targetArticle->getTimestamp();
+						$targetWikiPage = WikiPage::factory( $targetTitle );
+						$targetWikiPage->clear();
+						$editTime = $targetWikiPage->getTimestamp();
 					}
 
 				default:
 					$value = $parser->recursiveTagParse( $value );
-					$arr = array( $key => $value );
+					$arr = [ $key => $value ];
 					$inQueryArr = PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
 			}
 		}
@@ -579,19 +632,19 @@ class PFParserFunctions {
 		}
 
 		if ( $linkType == 'button' ) {
-			$attrs = array( 'type' => 'submit', 'class' => $classString );
+			$attrs = [ 'type' => 'submit', 'class' => $classString ];
 			if ( $inTooltip != null ) {
 				$attrs['title'] = $inTooltip;
 			}
 			$linkElement = Html::rawElement( 'button', $attrs, $linkString );
 		} elseif ( $linkType == 'link' ) {
-			$attrs = array( 'class' => $classString, 'href' => "#" );
+			$attrs = [ 'class' => $classString, 'href' => "#" ];
 			if ( $inTooltip != null ) {
 				$attrs['title'] = $inTooltip;
 			}
 			$linkElement = Html::rawElement( 'a', $attrs, $linkString );
 		} else {
-			$linkElement = Html::rawElement( 'span', array( 'class' => $classString ), $linkString );
+			$linkElement = Html::rawElement( 'span', [ 'class' => $classString ], $linkString );
 		}
 
 		if ( $summary == null ) {
@@ -600,32 +653,37 @@ class PFParserFunctions {
 
 		$formcontent .= Html::hidden( 'wpSummary', $summary );
 
+		if ( $minorEdit ) {
+			$formcontent .= Html::hidden( 'wpMinoredit', true );
+		}
+
 		if ( $editTime !== null ) {
 			$formcontent .= Html::hidden( 'wpEdittime', $editTime );
 		}
 
-		$form = Html::rawElement( 'form', array( 'class' => 'autoedit-data' ), $formcontent );
+		$form = Html::rawElement( 'form', [ 'class' => 'autoedit-data' ], $formcontent );
 
-		$output = Html::rawElement( 'div', array( 'class' => 'autoedit' ),
+		$output = Html::rawElement( 'div', [ 'class' => 'autoedit' ],
 				$linkElement .
-				Html::rawElement( 'span', array( 'class' => "autoedit-result" ), null ) .
+				Html::rawElement( 'span', [ 'class' => "autoedit-result" ], null ) .
 				$form
 		);
 
 		// Return output HTML.
-		return $parser->insertStripItem( $output, $parser->mStripState );
+		return $parser->insertStripItem( $output );
 	}
 
-	private static function createFormLink( &$parser, $params, $parserFunctionName ) {
+	private static function createFormLink( Parser $parser, $params, $parserFunctionName ) {
 		// Set defaults.
 		$inFormName = $inLinkStr = $inExistingPageLinkStr = $inLinkType =
 			$inTooltip = $inTargetName = '';
+		$hasPopup = $hasReturnTo = false;
 		if ( $parserFunctionName == 'queryformlink' ) {
 			$inLinkStr = wfMessage( 'runquery' )->parse();
 		}
 		$inCreatePage = false;
 		$classStr = '';
-		$inQueryArr = array();
+		$inQueryArr = [];
 		$targetWindow = '_self';
 
 		// assign params
@@ -664,8 +722,10 @@ class PFParserFunctions {
 			} elseif ( $param_name == null && $value == 'popup' ) {
 				self::loadScriptsForPopupForm( $parser );
 				$classStr = 'popupformlink';
+				$hasPopup = true;
 			} elseif ( $param_name == null && $value == 'reload' ) {
 				$classStr .= ' reload';
+				$inQueryArr['reload'] = '1';
 			} elseif ( $param_name == null && $value == 'new window' ) {
 				$targetWindow = '_blank';
 			} elseif ( $param_name == null && $value == 'create page' ) {
@@ -674,7 +734,14 @@ class PFParserFunctions {
 				$value = urlencode( $value );
 				parse_str( "$param_name=$value", $arr );
 				$inQueryArr = PFUtils::array_merge_recursive_distinct( $inQueryArr, $arr );
+				if ( $param_name == 'returnto' ) {
+					$hasReturnTo = true;
+				}
 			}
+		}
+
+		if ( $hasPopup && $hasReturnTo ) {
+			return '<div class="error">Error: \'popup\' and \'returnto\' cannot be set in the same function.</div>';
 		}
 
 		// Not the most graceful way to do this, but it is the
@@ -697,15 +764,11 @@ class PFParserFunctions {
 		}
 
 		if ( $parserFunctionName == 'formredlink' && $targetPageExists ) {
-			if ( function_exists( 'MediaWiki\MediaWikiServices::getLinkRenderer' ) ) {
-				$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
-			} else {
-				$linkRenderer = null;
-			}
+			$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
 			if ( $inExistingPageLinkStr == '' ) {
-				return PFUtils::makeLink( $linkRenderer, $targetTitle );
+				return $linkRenderer->makeKnownLink( $targetTitle );
 			} else {
-				return PFUtils::makeLink( $linkRenderer, $targetTitle, $inExistingPageLinkStr );
+				return $linkRenderer->makeKnownLink( $targetTitle, $inExistingPageLinkStr );
 			}
 		}
 
@@ -718,27 +781,27 @@ class PFParserFunctions {
 		}
 
 		if ( $parserFunctionName == 'queryformlink' ) {
-			$formSpecialPage = SpecialPageFactory::getPage( 'RunQuery' );
+			$formSpecialPage = PFUtils::getSpecialPage( 'RunQuery' );
 		} else {
-			$formSpecialPage = SpecialPageFactory::getPage( 'FormEdit' );
+			$formSpecialPage = PFUtils::getSpecialPage( 'FormEdit' );
 		}
 		$formSpecialPageTitle = $formSpecialPage->getPageTitle();
 
 		if ( $inFormName == '' ) {
-			$query = array( 'target' => $inTargetName );
+			$query = [ 'target' => $inTargetName ];
 			$link_url = $formSpecialPageTitle->getLocalURL( $query );
 		} elseif ( strpos( $inFormName, '/' ) == true ) {
-			$query = array( 'form' => $inFormName, 'target' => $inTargetName );
+			$query = [ 'form' => $inFormName, 'target' => $inTargetName ];
 			$link_url = $formSpecialPageTitle->getLocalURL( $query );
 		} else {
 			$link_url = $formSpecialPageTitle->getLocalURL() . "/$inFormName";
-			if ( ! empty( $inTargetName ) ) {
+			if ( !empty( $inTargetName ) ) {
 				$link_url .= "/$inTargetName";
 			}
 			$link_url = str_replace( ' ', '_', $link_url );
 		}
 		$hidden_inputs = "";
-		if ( ! empty( $inQueryArr ) ) {
+		if ( !empty( $inQueryArr ) ) {
 			// Special handling for the buttons - query string
 			// has to be turned into hidden inputs.
 			if ( $inLinkType == 'button' || $inLinkType == 'post button' ) {
@@ -756,23 +819,23 @@ class PFParserFunctions {
 			}
 		}
 		if ( $inLinkType == 'button' || $inLinkType == 'post button' ) {
-			$buttonAttrs = array(
+			$buttonAttrs = [
 				'type' => 'submit',
 				'value' => $inLinkStr,
 				'title' => $inTooltip
-			);
+			];
 			$buttonHTML = Html::rawElement( 'button', $buttonAttrs, $inLinkStr );
-			$formAttrs = array(
+			$formAttrs = [
 				'action' => $link_url,
 				'method' => ( $inLinkType == 'button' ) ? 'get' : 'post',
 				'class' => $classStr,
 				'target' => $targetWindow
-			);
+			];
 			$str = Html::rawElement( 'form', $formAttrs, $buttonHTML . $hidden_inputs );
 		} else {
 			// If a target page has been specified but it doesn't
 			// exist, make it a red link.
-			if ( ! empty( $inTargetName ) ) {
+			if ( !empty( $inTargetName ) ) {
 				if ( !$targetPageExists ) {
 					$classStr .= " new";
 				}
@@ -782,13 +845,13 @@ class PFParserFunctions {
 					$inLinkStr = $inTargetName;
 				}
 			}
-			$str = Html::rawElement( 'a', array( 'href' => $link_url, 'class' => $classStr, 'title' => $inTooltip, 'target' => $targetWindow ), $inLinkStr );
+			$str = Html::rawElement( 'a', [ 'href' => $link_url, 'class' => $classStr, 'title' => $inTooltip, 'target' => $targetWindow ], $inLinkStr );
 		}
 
 		return $str;
 	}
 
-	private static function loadScriptsForPopupForm( &$parser ) {
+	private static function loadScriptsForPopupForm( Parser $parser ) {
 		$parser->getOutput()->addModules( 'ext.pageforms.popupformedit' );
 		return true;
 	}

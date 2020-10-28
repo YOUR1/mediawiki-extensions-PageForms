@@ -1,16 +1,17 @@
 {
 	"@metadata": {
 		"authors": [
+			"Alirezaaa",
+			"Armin1392",
 			"Ebraminio",
+			"FarsiNevis",
 			"Huji",
+			"Mcuteangel",
 			"Mjbmr",
 			"Momeni",
 			"Omidh",
-			"Tofighi",
-			"Alirezaaa",
-			"Armin1392",
-			"Mcuteangel",
-			"Reza1615"
+			"Reza1615",
+			"Tofighi"
 		]
 	},
 	"pageforms-desc": "فرم‌هایی برای افزودن و ویرایش اطلاعات معنایی",
@@ -46,6 +47,7 @@
 	"pf_createtemplate_addfield": "افزودن ورودی",
 	"pf_createtemplate_deletefield": "حذف",
 	"forms": "فرم‌ها",
+	"pf-calendar-updateevent": "روزآمدسازی رویداد",
 	"pf_forms_docu": "فرم‌های زیر در این ویکی وجود دارند.",
 	"pf_forminputs_mandatory": "الزامی",
 	"pf_forminputs_restricted": "فقط مدیران می‌توانند این ورودی را ویرایش کنند",
@@ -141,7 +143,6 @@
 	"pf_formedit_edittitle": "ویرایش $1: $2",
 	"pf_formedit_morethanoneform": "'''هشدار:''' بیش از یک فرم پیش‌فرض برای این صفحه تعریف شده‌است.",
 	"pf_formedit_formwarning": "اخطار: این صفحه [[$1|هم‌اکنون وجود دارد]]، ولی به‌وسیله این فرم ساخته نشده‌است.",
-	"pf_formedit_mismatchedbrackets": "هشدار: این صفحه شامل براکت‌های پیچ‌دار یا چهارگوشی است که بسته نشده‌اند، بنابراین صفحه به درستی توسط فرم کنتزل نخواهد شد. لطفاً <a href=\"$1\"> خطا را در متن منبع </a> قبل از پردازش، رفع کنید.",
 	"pf_formedit_remove": "حذف این مثال",
 	"pf_formedit_addanotherabove": "افزودن نمونه دیگری بالای این یکی",
 	"pf_formedit_addanother": "افزدون دیگری",
@@ -178,6 +179,7 @@
 	"pf_bad_url_error": "باید قالب URL درستی داشته باشد و با 'http' شروع شود",
 	"pf_bad_email_error": "آدرس ایمیل باید قالب صحیحی داشته باشد",
 	"pf_bad_number_error": "باید یک عدد معتبر باشد",
+	"pf_bad_integer_error": "باید یک عدد صحیح معتبر باشد",
 	"pf_bad_date_error": "باید یک تاریخ معتبر باشد",
 	"uploadwindow": "پنجره بارگذاری",
 	"pf_deletionlog": "سیاههٔ حذف",
@@ -186,6 +188,7 @@
 	"pf-pageschemas-pagenameformula": "فرمول نام صفحه:",
 	"pf-pageschemas-createtitle": "عنوان فرم برای صفحات تازه:",
 	"pf-pageschemas-edittitle": "عنوان فرم برای صفحات موجود:",
+	"pf-pageschemas-forminput": "از ورودی",
 	"pf-pageschemas-inputtype": "نوع ورودی (ترک جای خالی برای تنظیم به پیش‌فرض):",
 	"pf-pageschemas-otherparams": "نام‌های پارامتر و مقادیر آن‌ها به عنوان کلید=جفت مقدار که با کاما جدا شده(اگر یک مقدار شامل یک کاما،جایگزین آن با \"\\,\" شود) وارد کنید. برای مثال: $1",
 	"pf_property_isproperty": "این یک ویژگی از نوع $1 است.",
@@ -212,7 +215,7 @@
 	"pf-datepicker-prev": "قبلی",
 	"pf-datepicker-next": "بعدی",
 	"pf-datepicker-today": "امروز",
-	"pf-datepicker-dateformat": "دسته فرمت تاریخ. برای اطلاعات بیشتر [https://www.mediawiki.org/w/index.php?title=Extension:Semantic_Forms_Inputs&fromsection=Date_picker#Parameters online documentation] را مشاهده کنید.",
+	"pf-datepicker-dateformat": "دسته فرمت تاریخ. برای اطلاعات بیشتر [https://www.mediawiki.org/wiki/Extension:Page_Forms/Input_types/Datepicker#Parameters online documentation] را مشاهده کنید.",
 	"pf-datepicker-weekstart": "اولین روز هفته (۰ - یکشنبه، ۱ - دوشنبه،...).",
 	"pf-datepicker-firstdate": "اول تاریخی که می‌تواند انتخاب شود (در فرمت ‌دی‌دی/ام‌ام/وای‌وای‌وای‌وای).",
 	"pf-datepicker-lastdate": "آخرین تاریخی که می‌تواند انتخاب شود (در فرمت دی‌دی/ام‌ام/وای‌وای‌وای‌وای).",

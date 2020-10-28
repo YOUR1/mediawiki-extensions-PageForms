@@ -76,7 +76,7 @@ class PFTimePickerInput extends PFFormInput {
 		}
 
 		// build JS code from attributes array
-		$jsattribs = array(
+		$jsattribs = [
 			'minTime'   => $minTime,
 			'maxTime'   => $maxTime,
 			'interval'  => $interval,
@@ -84,7 +84,7 @@ class PFTimePickerInput extends PFFormInput {
 			'currValue' => $this->mCurrentValue,
 			'disabled'  => $this->mIsDisabled,
 			'userClasses' => $userClasses
-		);
+		];
 
 		if ( array_key_exists( 'part of dtp', $this->mOtherArgs ) ) {
 			$jsattribs['partOfDTP'] = $this->mOtherArgs['part of dtp'];
@@ -114,8 +114,8 @@ class PFTimePickerInput extends PFFormInput {
 		$html = PFDatePickerInput::genericTextHTML( $this->mCurrentValue, $this->mInputName, $this->mIsDisabled, $this->mOtherArgs, 'input_' . $this->mInputNumber );
 
 		// wrap in span (e.g. used for mandatory inputs)
-		if ( ! array_key_exists( 'part of dtp', $this->mOtherArgs ) ) {
-			$html = '<span class="inputSpan' . ( array_key_exists( 'mandatory', $this->mOtherArgs ) ? ' mandatoryFieldSpan' : '' ) . '">' .$html . '</span>';
+		if ( !array_key_exists( 'part of dtp', $this->mOtherArgs ) ) {
+			$html = '<span class="inputSpan' . ( array_key_exists( 'mandatory', $this->mOtherArgs ) ? ' mandatoryFieldSpan' : '' ) . '">' . $html . '</span>';
 		}
 
 		return $html;
@@ -127,7 +127,7 @@ class PFTimePickerInput extends PFFormInput {
 	 * @return string[]
 	 */
 	public static function getOtherPropTypesHandled() {
-		return array( '_str', '_dat' );
+		return [ '_str', '_dat' ];
 	}
 
 	/**
@@ -138,21 +138,21 @@ class PFTimePickerInput extends PFFormInput {
 	 */
 	public static function getParameters() {
 		$params = parent::getParameters();
-		$params['mintime'] = array(
+		$params['mintime'] = [
 			'name' => 'mintime',
 			'type' => 'string',
 			'description' => wfMessage( 'semanticformsinputs-timepicker-mintime' )->text(),
-		);
-		$params['maxtime'] = array(
+		];
+		$params['maxtime'] = [
 			'name' => 'maxtime',
 			'type' => 'string',
 			'description' => wfMessage( 'semanticformsinputs-timepicker-maxtime' )->text(),
-		);
-		$params['interval'] = array(
+		];
+		$params['interval'] = [
 			'name' => 'interval',
 			'type' => 'int',
 			'description' => wfMessage( 'semanticformsinputs-timepicker-interval' )->text(),
-		);
+		];
 
 		return $params;
 	}

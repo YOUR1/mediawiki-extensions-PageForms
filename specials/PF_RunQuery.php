@@ -27,7 +27,7 @@ class PFRunQuery extends IncludableSpecialPage {
 	}
 
 	function printPage( $form_name, $embedded = false ) {
-		global $wgPageFormsFormPrinter, $wgParser, $wgPageFormsRunQueryFormAtTop;
+		global $wgPageFormsFormPrinter, $wgPageFormsRunQueryFormAtTop;
 
 		$out = $this->getOutput();
 		$req = $this->getRequest();
@@ -38,10 +38,10 @@ class PFRunQuery extends IncludableSpecialPage {
 
 		if ( !$form_title || !$form_title->exists() ) {
 			if ( $form_name === '' ) {
-				$text = Html::element( 'p', array( 'class' => 'error' ), wfMessage( 'pf_runquery_badurl' )->text() ) . "\n";
+				$text = Html::element( 'p', [ 'class' => 'error' ], $this->msg( 'pf_runquery_badurl' )->text() ) . "\n";
 			} else {
-				$text = Html::rawElement( 'p', array( 'class' => 'error' ),
-					wfMessage( 'pf_formstart_badform', PFUtils::linkText( PF_NS_FORM, $form_name ) )->parse() ) . "\n";
+				$text = Html::rawElement( 'p', [ 'class' => 'error' ],
+					$this->msg( 'pf_formstart_badform', PFUtils::linkText( PF_NS_FORM, $form_name ) )->parse() ) . "\n";
 			}
 			$out->addHTML( $text );
 			return;
@@ -85,17 +85,17 @@ class PFRunQuery extends IncludableSpecialPage {
 		if ( $form_submitted ) {
 			// @TODO - fix RunQuery's parsing so that this check
 			// isn't needed.
-			if ( $wgParser->getOutput() == null ) {
-				$headItems = array();
+			if ( PFUtils::getParser()->getOutput() == null ) {
+				$headItems = [];
 			} else {
-				$headItems = $wgParser->getOutput()->getHeadItems();
+				$headItems = PFUtils::getParser()->getOutput()->getHeadItems();
 			}
 			foreach ( $headItems as $key => $item ) {
 				$out->addHeadItem( $key, "\t\t" . $item . "\n" );
 			}
 
-			$wgParser->mOptions = ParserOptions::newFromUser( $user );
-			$resultsText = $wgParser->parse( $data_text, $this->getPageTitle(), $wgParser->mOptions, true, false )->getText();
+			PFUtils::getParser()->mOptions = ParserOptions::newFromUser( $user );
+			$resultsText = PFUtils::getParser()->parse( $data_text, $this->getPageTitle(), PFUtils::getParser()->mOptions, true, false )->getText();
 		}
 
 		// Get the full text of the form.
@@ -108,7 +108,7 @@ class PFRunQuery extends IncludableSpecialPage {
 			// the query form is at the top or bottom) is displayed
 			// if the form has already been submitted.
 			if ( $form_submitted ) {
-				$additionalQueryHeader = "\n" . Html::element( 'h2', null, wfMessage( 'pf_runquery_additionalquery' )->text() ) . "\n";
+				$additionalQueryHeader = "\n" . Html::element( 'h2', null, $this->msg( 'pf_runquery_additionalquery' )->text() ) . "\n";
 				$dividerText = "\n<hr style=\"margin: 15px 0;\" />\n";
 			}
 
@@ -124,22 +124,25 @@ class PFRunQuery extends IncludableSpecialPage {
 				$realTitle = $this->getPageTitle( $form_name );
 			}
 
-			// Preserve all query string values in the results page.
-			$queryStringValues = array();
-			foreach ( $req->getValues() as $key => $value ) {
-				if ( $key != 'title' ) {
-					$queryStringValues[$key] = $value;
-				}
+			// Preserve all query string values in the results
+			// page - including "title", in case this wiki has the
+			// default URL structure.
+			$queryStringValues = $req->getValues();
+			if ( !array_key_exists( 'pfRunQueryFormName', $queryStringValues ) ) {
+				$queryStringValues['pfRunQueryFormName'] = $form_name;
 			}
-			$action = htmlspecialchars( $realTitle->getLocalURL( $queryStringValues ) );
+			$action = htmlspecialchars( $realTitle->getLocalURL() );
 
 			$fullFormText .= <<<END
 	<form id="pfForm" name="createbox" action="$action" method="get" class="createbox">
 
 END;
-			$fullFormText .= Html::hidden( 'pfRunQueryFormName', $form_name );
-			// Set 'title' as hidden field, in case there's no URL niceness.
-			$fullFormText .= Html::hidden( 'title', PFUtils::titleURLString( $realTitle ) );
+			foreach ( $queryStringValues as $key => $value ) {
+				if ( is_array( $value ) ) {
+					$value = wfArrayToCgi( $value );
+				}
+				$fullFormText .= Html::hidden( $key, $value ) . "\n";
+			}
 			$fullFormText .= $form_text;
 		}
 
@@ -149,14 +152,14 @@ END;
 		if ( $req->getVal( 'additionalquery' ) == 'false' ) {
 			$text .= $resultsText;
 		} elseif ( $wgPageFormsRunQueryFormAtTop ) {
-			$text .= Html::openElement( 'div', array( 'class' => 'pf-runquery-formcontent' ) );
+			$text .= Html::openElement( 'div', [ 'class' => 'pf-runquery-formcontent' ] );
 			$text .= $fullFormText;
 			$text .= $dividerText;
 			$text .= Html::closeElement( 'div' );
 			$text .= $resultsText;
 		} else {
 			$text .= $resultsText;
-			$text .= Html::openElement( 'div', array( 'class' => 'pf-runquery-formcontent' ) );
+			$text .= Html::openElement( 'div', [ 'class' => 'pf-runquery-formcontent' ] );
 			$text .= $additionalQueryHeader;
 			$text .= $fullFormText;
 			$text .= Html::closeElement( 'div' );
@@ -171,16 +174,11 @@ END;
 
 		// Now write everything to the screen.
 		$out->addHTML( $text );
-		PFUtils::addFormRLModules( $embedded ? $wgParser : null );
+		PFUtils::addFormRLModules( $embedded ? PFUtils::getParser() : null );
 		if ( !$embedded ) {
-			$po = $wgParser->getOutput();
+			$po = PFUtils::getParser()->getOutput();
 			if ( $po ) {
-				// addParserOutputMetadata was introduced in 1.24 when addParserOutputNoText was deprecated
-				if ( method_exists( $out, 'addParserOutputMetadata' ) ) {
-					$out->addParserOutputMetadata( $po );
-				} else {
-					$out->addParserOutputNoText( $po );
-				}
+				$out->addParserOutputMetadata( $po );
 			}
 		}
 
@@ -191,7 +189,7 @@ END;
 			if ( $form_page_title != null ) {
 				$out->setPageTitle( $form_page_title );
 			} else {
-				$s = wfMessage( 'pf_runquery_title', $form_title->getText() )->text();
+				$s = $this->msg( 'pf_runquery_title', $form_title->getText() )->text();
 				$out->setPageTitle( $s );
 			}
 		}

@@ -1,8 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"McDutchie",
-			"Karmwiki"
+			"Karmwiki",
+			"McDutchie"
 		]
 	},
 	"pageforms-desc": "Formularios pro adder e modificar datos semantic",
@@ -117,7 +117,6 @@
 	"pf_formedit_edittitle": "Modificar $1: $2",
 	"pf_formedit_morethanoneform": "Attention: Plus de un formulario predefinite es definite pro iste pagina.",
 	"pf_formedit_formwarning": "Attention: Iste pagina [[$1|jam existe]], ma non usa iste formulario.",
-	"pf_formedit_mismatchedbrackets": "Attention: Iste pagina contine parentheses crispe o quadrate que non es claudite, de sorta que le pagina non essera maneate correctemente per le formulario. Per favor <a href=\"$1\">repara le error in le texto fonte</a> ante de continuar.",
 	"pf_formedit_remove": "Remover iste instantia",
 	"pf_formedit_addanother": "Adder un altere",
 	"pf_formedit_none": "Nulle",
@@ -144,6 +143,7 @@
 	"pf_bad_url_error": "le adresse URL debe esser in formato correcte, comenciante con 'http'",
 	"pf_bad_email_error": "le adresse de e-mail debe esser in formato correcte",
 	"pf_bad_number_error": "debe esser un numero valide",
+	"pf_bad_integer_error": "debe esser un numero integre",
 	"pf_bad_date_error": "debe esser un data valide",
 	"uploadwindow": "Fenestra de incargamento",
 	"pf_deletionlog": "Registro de deletiones",
@@ -175,7 +175,7 @@
 	"pf-datepicker-prev": "Precedente",
 	"pf-datepicker-next": "Sequente",
 	"pf-datepicker-today": "Hodie",
-	"pf-datepicker-dateformat": "Le specification del formato del data. Vide le [https://www.mediawiki.org/w/index.php?title=Extension:Semantic_Forms_Inputs&fromsection=Date_picker#Parameters documentation in linea] pro plus information.",
+	"pf-datepicker-dateformat": "Le specification del formato del data. Vide le [https://www.mediawiki.org/wiki/Extension:Page_Forms/Input_types/Datepicker#Parameters documentation in linea] pro plus information.",
 	"pf-datepicker-weekstart": "Le prime die del septimana (0 - dominica, 1 - lunedi, ...).",
 	"pf-datepicker-firstdate": "Le prime data que pote esser seligite (in formato aaaa/mm/dd).",
 	"pf-datepicker-lastdate": "Le ultime data que pote esser seligite (in formato aaaa/mm/dd).",

@@ -34,50 +34,46 @@ class PFAutocompleteAPI extends ApiBase {
 		$basevalue = $params['basevalue'];
 		// $limit = $params['limit'];
 
-		if ( is_null( $baseprop ) && is_null( $base_cargo_table ) && strlen( $substr ) == 0 ) {
-			if ( is_callable( array( $this, 'dieWithError' ) ) ) {
-				$this->dieWithError( array( 'apierror-missingparam', 'substr' ), 'param_substr' );
-			} else {
-				$this->dieUsage( 'The substring must be specified', 'param_substr' );
-			}
+		if ( $baseprop === null && $base_cargo_table === null && strlen( $substr ) == 0 ) {
+			$this->dieWithError( [ 'apierror-missingparam', 'substr' ], 'param_substr' );
 		}
 
 		global $wgPageFormsUseDisplayTitle;
 		$map = false;
-		if ( !is_null( $baseprop ) ) {
-			if ( !is_null( $property ) ) {
-				$data = self::getAllValuesForProperty( $property, null, $baseprop, $basevalue );
+		if ( $baseprop !== null ) {
+			if ( $property !== null ) {
+				$data = $this->getAllValuesForProperty( $property, null, $baseprop, $basevalue );
 			}
-		} elseif ( !is_null( $property ) ) {
-			$data = self::getAllValuesForProperty( $property, $substr );
-		} elseif ( !is_null( $category ) ) {
+		} elseif ( $property !== null ) {
+			$data = $this->getAllValuesForProperty( $property, $substr );
+		} elseif ( $category !== null ) {
 			$data = PFValuesUtils::getAllPagesForCategory( $category, 3, $substr );
 			$map = $wgPageFormsUseDisplayTitle;
 			if ( $map ) {
 				$data = PFValuesUtils::disambiguateLabels( $data );
 			}
-		} elseif ( !is_null( $concept ) ) {
+		} elseif ( $concept !== null ) {
 			$data = PFValuesUtils::getAllPagesForConcept( $concept, $substr );
 			$map = $wgPageFormsUseDisplayTitle;
 			if ( $map ) {
 				$data = PFValuesUtils::disambiguateLabels( $data );
 			}
-		} elseif ( !is_null( $cargo_table ) && !is_null( $cargo_field ) ) {
+		} elseif ( $cargo_table !== null && $cargo_field !== null ) {
 			$data = self::getAllValuesForCargoField( $cargo_table, $cargo_field, $substr, $base_cargo_table, $base_cargo_field, $basevalue );
-		} elseif ( !is_null( $namespace ) ) {
+		} elseif ( $namespace !== null ) {
 			$data = PFValuesUtils::getAllPagesForNamespace( $namespace, $substr );
 			$map = $wgPageFormsUseDisplayTitle;
-		} elseif ( !is_null( $external_url ) ) {
+		} elseif ( $external_url !== null ) {
 			$data = PFValuesUtils::getValuesFromExternalURL( $external_url, $substr );
 		} else {
-			$data = array();
+			$data = [];
 		}
 
 		// If we got back an error message, exit with that message.
 		if ( !is_array( $data ) ) {
-			if ( is_callable( array( $this, 'dieWithError' ) ) ) {
+			if ( is_callable( [ $this, 'dieWithError' ] ) ) {
 				if ( !$data instanceof Message ) {
-					$data = ApiMessage::create( new RawMessage( '$1', array( $data ) ), 'unknownerror' );
+					$data = ApiMessage::create( new RawMessage( '$1', [ $data ] ), 'unknownerror' );
 				}
 				$this->dieWithError( $data );
 			} else {
@@ -86,7 +82,7 @@ class PFAutocompleteAPI extends ApiBase {
 					$code = $data instanceof IApiMessage ? $data->getApiCode() : $data->getKey();
 					$data = $data->inLanguage( 'en' )->useDatabase( false )->text();
 				}
-				$this->dieUsage( $data, $code );
+				$this->dieWithError( $data, $code );
 			}
 		}
 
@@ -101,13 +97,13 @@ class PFAutocompleteAPI extends ApiBase {
 		// Format data as the API requires it - this is not needed
 		// for "values from url", where the data is already formatted
 		// correctly.
-		if ( is_null( $external_url ) ) {
-			$formattedData = array();
+		if ( $external_url === null ) {
+			$formattedData = [];
 			foreach ( $data as $index => $value ) {
 				if ( $map ) {
-					$formattedData[] = array( 'title' => $index, 'displaytitle' => $value );
+					$formattedData[] = [ 'title' => $index, 'displaytitle' => $value ];
 				} else {
-					$formattedData[] = array( 'title' => $value );
+					$formattedData[] = [ 'title' => $value ];
 				}
 			}
 		} else {
@@ -121,14 +117,14 @@ class PFAutocompleteAPI extends ApiBase {
 	}
 
 	protected function getAllowedParams() {
-		return array(
-			'limit' => array(
+		return [
+			'limit' => [
 				ApiBase::PARAM_TYPE => 'limit',
 				ApiBase::PARAM_DFLT => 10,
 				ApiBase::PARAM_MIN => 1,
 				ApiBase::PARAM_MAX => ApiBase::LIMIT_BIG1,
 				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_BIG2
-			),
+			],
 			'substr' => null,
 			'property' => null,
 			'category' => null,
@@ -141,11 +137,11 @@ class PFAutocompleteAPI extends ApiBase {
 			'base_cargo_table' => null,
 			'base_cargo_field' => null,
 			'basevalue' => null,
-		);
+		];
 	}
 
 	protected function getParamDescription() {
-		return array(
+		return [
 			'substr' => 'Search substring',
 			'property' => 'Semantic property for which to search values',
 			'category' => 'Category for which to search values',
@@ -155,7 +151,7 @@ class PFAutocompleteAPI extends ApiBase {
 			'baseprop' => 'A previous property in the form to check against',
 			'basevalue' => 'The value to check for the previous property',
 			// 'limit' => 'Limit how many entries to return',
-		);
+		];
 	}
 
 	protected function getDescription() {
@@ -163,14 +159,14 @@ class PFAutocompleteAPI extends ApiBase {
 	}
 
 	protected function getExamples() {
-		return array(
+		return [
 			'api.php?action=pfautocomplete&substr=te',
 			'api.php?action=pfautocomplete&substr=te&property=Has_author',
 			'api.php?action=pfautocomplete&substr=te&category=Authors',
-		);
+		];
 	}
 
-	private static function getAllValuesForProperty(
+	private function getAllValuesForProperty(
 		$property_name,
 		$substring,
 		$basePropertyName = null,
@@ -180,9 +176,13 @@ class PFAutocompleteAPI extends ApiBase {
 		$wgPageFormsAutocompleteCacheTimeout;
 		global $smwgDefaultStore;
 
-		$values = array();
-		$db = wfGetDB( DB_SLAVE );
-		$sqlOptions = array();
+		if ( $smwgDefaultStore == null ) {
+			$this->dieWithError( 'Semantic MediaWiki must be installed to query on "property"', 'param_property' );
+		}
+
+		$values = [];
+		$db = wfGetDB( DB_REPLICA );
+		$sqlOptions = [];
 		$sqlOptions['LIMIT'] = $wgPageFormsMaxAutocompleteValues;
 
 		if ( method_exists( 'SMW\DataValueFactory', 'newPropertyValueByLabel' ) ) {
@@ -193,14 +193,14 @@ class PFAutocompleteAPI extends ApiBase {
 		}
 		$propertyHasTypePage = ( $property->getPropertyTypeID() == '_wpg' );
 		$property_name = str_replace( ' ', '_', $property_name );
-		$conditions = array( 'p_ids.smw_title' => $property_name );
+		$conditions = [ 'p_ids.smw_title' => $property_name ];
 
 		// Use cache if allowed
 		if ( $wgPageFormsCacheAutocompleteValues ) {
 			$cache = PFFormUtils::getFormCache();
 			// Remove trailing whitespace to avoid unnecessary database selects
 			$cacheKeyString = $property_name . '::' . rtrim( $substring );
-			if ( !is_null( $basePropertyName ) ) {
+			if ( $basePropertyName !== null ) {
 				$cacheKeyString .= ',' . $basePropertyName . ',' . $baseValue;
 			}
 			$cacheKey = wfMemcKey( 'pf-autocomplete', md5( $cacheKeyString ) );
@@ -235,7 +235,7 @@ class PFAutocompleteAPI extends ApiBase {
 			$fromClause = "$propsTable p JOIN $idsTable p_ids ON p.p_id = p_ids.smw_id";
 		}
 
-		if ( !is_null( $basePropertyName ) ) {
+		if ( $basePropertyName !== null ) {
 			if ( method_exists( 'SMW\DataValueFactory', 'newPropertyValueByLabel' ) ) {
 				$baseProperty = SMW\DataValueFactory::getInstance()->newPropertyValueByLabel( $basePropertyName );
 			} else {
@@ -274,7 +274,7 @@ class PFAutocompleteAPI extends ApiBase {
 			}
 		}
 
-		if ( !is_null( $substring ) ) {
+		if ( $substring !== null ) {
 			// "Page" type property valeus are stored differently
 			// in the DB, i.e. underlines instead of spaces.
 			$conditions[] = PFValuesUtils::getSQLConditionForAutocompleteInColumn( $valueField, $substring, $propertyHasTypePage );
@@ -301,7 +301,7 @@ class PFAutocompleteAPI extends ApiBase {
 		global $wgPageFormsMaxAutocompleteValues, $wgPageFormsCacheAutocompleteValues, $wgPageFormsAutocompleteCacheTimeout;
 		global $wgPageFormsAutocompleteOnAllChars;
 
-		$values = array();
+		$values = [];
 		$tablesStr = $cargoTable;
 		$fieldsStr = $cargoField;
 		$joinOnStr = '';
@@ -312,7 +312,7 @@ class PFAutocompleteAPI extends ApiBase {
 			$cache = PFFormUtils::getFormCache();
 			// Remove trailing whitespace to avoid unnecessary database selects
 			$cacheKeyString = $cargoTable . '|' . $cargoField . '|' . rtrim( $substring );
-			if ( !is_null( $baseCargoTable ) ) {
+			if ( $baseCargoTable !== null ) {
 				$cacheKeyString .= '|' . $baseCargoTable . '|' . $baseCargoField . '|' . $baseValue;
 			}
 			$cacheKey = wfMemcKey( 'pf-autocomplete', md5( $cacheKeyString ) );
@@ -324,7 +324,7 @@ class PFAutocompleteAPI extends ApiBase {
 			}
 		}
 
-		if ( !is_null( $baseCargoTable ) && !is_null( $baseCargoField ) ) {
+		if ( $baseCargoTable !== null && $baseCargoField !== null ) {
 			if ( $baseCargoTable != $cargoTable ) {
 				$tablesStr .= ", $baseCargoTable";
 				$joinOnStr = "$cargoTable._pageName = $baseCargoTable._pageName";
@@ -332,16 +332,37 @@ class PFAutocompleteAPI extends ApiBase {
 			$whereStr = "$baseCargoTable.$baseCargoField = \"$baseValue\"";
 		}
 
-		if ( !is_null( $substring ) ) {
+		if ( $substring !== null ) {
 			if ( $whereStr != '' ) {
 				$whereStr .= " AND ";
 			}
 			$fieldIsList = self::cargoFieldIsList( $cargoTable, $cargoField );
-			$operator = ( $fieldIsList ) ? "HOLDS LIKE" : "LIKE";
+
+			if ( $fieldIsList ) {
+				// If it's a list field, we query directly on
+				// the "helper table" for that field. We could
+				// instead use "HOLDS LIKE", but this would
+				// return false positives - other values that
+				// have been listed alongside the values we're
+				// looking for - at least for Cargo >= 2.6.
+				$fieldTableName = $cargoTable . '__' . $cargoField;
+				// Because of the way Cargo querying works, the
+				// field table has to be listed first for only
+				// the right values to show up.
+				$tablesStr = $fieldTableName . ', ' . $tablesStr;
+				if ( $joinOnStr != '' ) {
+					$joinOnStr = ', ' . $joinOnStr;
+				}
+				$joinOnStr = $fieldTableName . '._rowID=' .
+					$cargoTable . '._ID' . $joinOnStr;
+
+				$fieldsStr = $cargoField = '_value';
+			}
+
 			if ( $wgPageFormsAutocompleteOnAllChars ) {
-				$whereStr .= "($cargoField $operator \"%$substring%\")";
+				$whereStr .= "($cargoField LIKE \"%$substring%\")";
 			} else {
-				$whereStr .= "($cargoField $operator \"$substring%\" OR $cargoField $operator \"% $substring%\")";
+				$whereStr .= "($cargoField LIKE \"$substring%\" OR $cargoField LIKE \"% $substring%\")";
 			}
 		}
 
@@ -356,14 +377,22 @@ class PFAutocompleteAPI extends ApiBase {
 			$wgPageFormsMaxAutocompleteValues,
 			$offsetStr = 0
 		);
-		$cargoFieldAlias = str_replace( '_', ' ', $cargoField );
 		$queryResults = $sqlQuery->run();
+
+		if ( $cargoField[0] != '_' ) {
+			$cargoFieldAlias = str_replace( '_', ' ', $cargoField );
+		} else {
+			$cargoFieldAlias = $cargoField;
+		}
 
 		foreach ( $queryResults as $row ) {
 			// @TODO - this check should not be necessary.
-			if ( ( $value = $row[$cargoFieldAlias] ) != '' ) {
-				$values[] = $value;
+			if ( ( $value = $row[$cargoFieldAlias] ) == '' ) {
+				continue;
 			}
+			// Cargo HTML-encodes everything - let's decode double
+			// quotes, at least.
+			$values[] = str_replace( '&quot;', '"', $value );
 		}
 
 		if ( $wgPageFormsCacheAutocompleteValues ) {
@@ -378,7 +407,7 @@ class PFAutocompleteAPI extends ApiBase {
 		// @TODO - this is duplicate work; the schema is retrieved
 		// again when the CargoSQLQuery object is created. There should
 		// be some way of avoiding that duplicate retrieval.
-		$tableSchemas = CargoUtils::getTableSchemas( array( $cargoTable ) );
+		$tableSchemas = CargoUtils::getTableSchemas( [ $cargoTable ] );
 		if ( !array_key_exists( $cargoTable, $tableSchemas ) ) {
 			return false;
 		}

@@ -98,7 +98,7 @@ class PFTemplateField {
 	 */
 	function setSemanticProperty( $semantic_property ) {
 		$this->mSemanticProperty = str_replace( '\\', '', $semantic_property );
-		$this->mPossibleValues = array();
+		$this->mPossibleValues = [];
 		// set field type and possible values, if any
 		$this->setTypeAndPossibleValues();
 	}
@@ -114,9 +114,9 @@ class PFTemplateField {
 		$this->mCargoTable = $tableName;
 		$this->mCargoField = $fieldName;
 
-		if ( is_null( $fieldDescription ) ) {
+		if ( $fieldDescription === null ) {
 			try {
-				$tableSchemas = CargoUtils::getTableSchemas( array( $tableName ) );
+				$tableSchemas = CargoUtils::getTableSchemas( [ $tableName ] );
 			} catch ( MWException $e ) {
 				return;
 			}
@@ -147,19 +147,11 @@ class PFTemplateField {
 			$this->mFieldType = $fieldDescription->mType;
 		}
 		$this->mIsList = $fieldDescription->mIsList;
-		if ( method_exists( $fieldDescription, 'getDelimiter' ) ) {
-			// Cargo 0.11+
-			$this->mDelimiter = $fieldDescription->getDelimiter();
-		} else {
-			$this->mDelimiter = $fieldDescription->mDelimiter;
-		}
+		$this->mDelimiter = $fieldDescription->getDelimiter();
 		$this->mPossibleValues = $fieldDescription->mAllowedValues;
-		if ( property_exists( $fieldDescription, 'mIsMandatory' ) ) {
-			// Cargo 1.7+
-			$this->mIsMandatory = $fieldDescription->mIsMandatory;
-			$this->mIsUnique = $fieldDescription->mIsUnique;
-			$this->mRegex = $fieldDescription->mRegex;
-		}
+		$this->mIsMandatory = $fieldDescription->mIsMandatory;
+		$this->mIsUnique = $fieldDescription->mIsUnique;
+		$this->mRegex = $fieldDescription->mRegex;
 	}
 
 	function getFieldName() {
@@ -194,6 +186,9 @@ class PFTemplateField {
 	}
 
 	function getPossibleValues() {
+		if ( $this->mPossibleValues == null ) {
+			return [];
+		}
 		return $this->mPossibleValues;
 	}
 
@@ -268,9 +263,9 @@ class PFTemplateField {
 			// field call, to be used as the variable.
 			$var = "x"; // default - use this if all the attempts fail
 			if ( strstr( $fieldProperty, $var ) ) {
-				$var_options = array( 'y', 'z', 'xx', 'yy', 'zz', 'aa', 'bb', 'cc' );
+				$var_options = [ 'y', 'z', 'xx', 'yy', 'zz', 'aa', 'bb', 'cc' ];
 				foreach ( $var_options as $option ) {
-					if ( ! strstr( $fieldProperty, $option ) ) {
+					if ( !strstr( $fieldProperty, $option ) ) {
 						$var = $option;
 						break;
 					}
@@ -290,7 +285,7 @@ class PFTemplateField {
 
 		// Not a list.
 		$fieldParam = '{{{' . $this->mFieldName . '|}}}';
-		if ( is_null( $this->mNamespace ) ) {
+		if ( $this->mNamespace === null ) {
 			$fieldString = $fieldParam;
 		} else {
 			$fieldString = $this->mNamespace . ':' . $fieldParam;
@@ -309,7 +304,7 @@ class PFTemplateField {
 				return $fieldString;
 			}
 			return $fieldString;
-		} elseif ( is_null( $this->mNamespace ) ) {
+		} elseif ( $this->mNamespace === null ) {
 			return "[[$fieldProperty::$fieldString]]";
 		} else {
 			// Special handling is needed, for at

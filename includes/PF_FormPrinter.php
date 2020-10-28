@@ -13,6 +13,8 @@
  * @ingroup PF
  */
 
+use MediaWiki\MediaWikiServices;
+
 class PFFormPrinter {
 
 	public $mSemanticTypeHooks;
@@ -24,18 +26,18 @@ class PFFormPrinter {
 	public function __construct() {
 		global $wgPageFormsDisableOutsideServices;
 		// Initialize variables.
-		$this->mSemanticTypeHooks = array();
-		$this->mCargoTypeHooks = array();
-		$this->mInputTypeHooks = array();
-		$this->mInputTypeClasses = array();
-		$this->mDefaultInputForPropType = array();
-		$this->mDefaultInputForPropTypeList = array();
-		$this->mPossibleInputsForPropType = array();
-		$this->mPossibleInputsForPropTypeList = array();
-		$this->mDefaultInputForCargoType = array();
-		$this->mDefaultInputForCargoTypeList = array();
-		$this->mPossibleInputsForCargoType = array();
-		$this->mPossibleInputsForCargoTypeList = array();
+		$this->mSemanticTypeHooks = [];
+		$this->mCargoTypeHooks = [];
+		$this->mInputTypeHooks = [];
+		$this->mInputTypeClasses = [];
+		$this->mDefaultInputForPropType = [];
+		$this->mDefaultInputForPropTypeList = [];
+		$this->mPossibleInputsForPropType = [];
+		$this->mPossibleInputsForPropTypeList = [];
+		$this->mDefaultInputForCargoType = [];
+		$this->mDefaultInputForCargoTypeList = [];
+		$this->mPossibleInputsForCargoType = [];
+		$this->mPossibleInputsForCargoTypeList = [];
 
 		$this->standardInputsIncluded = false;
 
@@ -71,19 +73,19 @@ class PFFormPrinter {
 		// All-purpose setup hook.
 		// Avoid PHP 7.1 warning from passing $this by reference.
 		$formPrinterRef = $this;
-		Hooks::run( 'PageForms::FormPrinterSetup', array( &$formPrinterRef ) );
+		Hooks::run( 'PageForms::FormPrinterSetup', [ &$formPrinterRef ] );
 	}
 
 	public function setSemanticTypeHook( $type, $is_list, $class_name, $default_args ) {
-		$this->mSemanticTypeHooks[$type][$is_list] = array( $class_name, $default_args );
+		$this->mSemanticTypeHooks[$type][$is_list] = [ $class_name, $default_args ];
 	}
 
 	public function setCargoTypeHook( $type, $is_list, $class_name, $default_args ) {
-		$this->mCargoTypeHooks[$type][$is_list] = array( $class_name, $default_args );
+		$this->mCargoTypeHooks[$type][$is_list] = [ $class_name, $default_args ];
 	}
 
 	public function setInputTypeHook( $input_type, $class_name, $default_args ) {
-		$this->mInputTypeHooks[$input_type] = array( $class_name, $default_args );
+		$this->mInputTypeHooks[$input_type] = [ $class_name, $default_args ];
 	}
 
 	/**
@@ -93,63 +95,63 @@ class PFFormPrinter {
 	 * Must be derived from PFFormInput.
 	 */
 	public function registerInputType( $inputTypeClass ) {
-		$inputTypeName = call_user_func( array( $inputTypeClass, 'getName' ) );
+		$inputTypeName = call_user_func( [ $inputTypeClass, 'getName' ] );
 		$this->mInputTypeClasses[$inputTypeName] = $inputTypeClass;
-		$this->setInputTypeHook( $inputTypeName, $inputTypeClass, array() );
+		$this->setInputTypeHook( $inputTypeName, $inputTypeClass, [] );
 
-		$defaultProperties = call_user_func( array( $inputTypeClass, 'getDefaultPropTypes' ) );
+		$defaultProperties = call_user_func( [ $inputTypeClass, 'getDefaultPropTypes' ] );
 		foreach ( $defaultProperties as $propertyType => $additionalValues ) {
 			$this->setSemanticTypeHook( $propertyType, false, $inputTypeClass, $additionalValues );
 			$this->mDefaultInputForPropType[$propertyType] = $inputTypeName;
 		}
-		$defaultPropertyLists = call_user_func( array( $inputTypeClass, 'getDefaultPropTypeLists' ) );
+		$defaultPropertyLists = call_user_func( [ $inputTypeClass, 'getDefaultPropTypeLists' ] );
 		foreach ( $defaultPropertyLists as $propertyType => $additionalValues ) {
 			$this->setSemanticTypeHook( $propertyType, true, $inputTypeClass, $additionalValues );
 			$this->mDefaultInputForPropTypeList[$propertyType] = $inputTypeName;
 		}
 
-		$defaultCargoTypes = call_user_func( array( $inputTypeClass, 'getDefaultCargoTypes' ) );
+		$defaultCargoTypes = call_user_func( [ $inputTypeClass, 'getDefaultCargoTypes' ] );
 		foreach ( $defaultCargoTypes as $fieldType => $additionalValues ) {
 			$this->setCargoTypeHook( $fieldType, false, $inputTypeClass, $additionalValues );
 			$this->mDefaultInputForCargoType[$fieldType] = $inputTypeName;
 		}
-		$defaultCargoTypeLists = call_user_func( array( $inputTypeClass, 'getDefaultCargoTypeLists' ) );
+		$defaultCargoTypeLists = call_user_func( [ $inputTypeClass, 'getDefaultCargoTypeLists' ] );
 		foreach ( $defaultCargoTypeLists as $fieldType => $additionalValues ) {
 			$this->setCargoTypeHook( $fieldType, true, $inputTypeClass, $additionalValues );
 			$this->mDefaultInputForCargoTypeList[$fieldType] = $inputTypeName;
 		}
 
-		$otherProperties = call_user_func( array( $inputTypeClass, 'getOtherPropTypesHandled' ) );
+		$otherProperties = call_user_func( [ $inputTypeClass, 'getOtherPropTypesHandled' ] );
 		foreach ( $otherProperties as $propertyTypeID ) {
 			if ( array_key_exists( $propertyTypeID, $this->mPossibleInputsForPropType ) ) {
 				$this->mPossibleInputsForPropType[$propertyTypeID][] = $inputTypeName;
 			} else {
-				$this->mPossibleInputsForPropType[$propertyTypeID] = array( $inputTypeName );
+				$this->mPossibleInputsForPropType[$propertyTypeID] = [ $inputTypeName ];
 			}
 		}
-		$otherPropertyLists = call_user_func( array( $inputTypeClass, 'getOtherPropTypeListsHandled' ) );
+		$otherPropertyLists = call_user_func( [ $inputTypeClass, 'getOtherPropTypeListsHandled' ] );
 		foreach ( $otherPropertyLists as $propertyTypeID ) {
 			if ( array_key_exists( $propertyTypeID, $this->mPossibleInputsForPropTypeList ) ) {
 				$this->mPossibleInputsForPropTypeList[$propertyTypeID][] = $inputTypeName;
 			} else {
-				$this->mPossibleInputsForPropTypeList[$propertyTypeID] = array( $inputTypeName );
+				$this->mPossibleInputsForPropTypeList[$propertyTypeID] = [ $inputTypeName ];
 			}
 		}
 
-		$otherCargoTypes = call_user_func( array( $inputTypeClass, 'getOtherCargoTypesHandled' ) );
+		$otherCargoTypes = call_user_func( [ $inputTypeClass, 'getOtherCargoTypesHandled' ] );
 		foreach ( $otherCargoTypes as $cargoType ) {
 			if ( array_key_exists( $cargoType, $this->mPossibleInputsForCargoType ) ) {
 				$this->mPossibleInputsForCargoType[$cargoType][] = $inputTypeName;
 			} else {
-				$this->mPossibleInputsForCargoType[$cargoType] = array( $inputTypeName );
+				$this->mPossibleInputsForCargoType[$cargoType] = [ $inputTypeName ];
 			}
 		}
-		$otherCargoTypeLists = call_user_func( array( $inputTypeClass, 'getOtherCargoTypeListsHandled' ) );
+		$otherCargoTypeLists = call_user_func( [ $inputTypeClass, 'getOtherCargoTypeListsHandled' ] );
 		foreach ( $otherCargoTypeLists as $cargoType ) {
 			if ( array_key_exists( $cargoType, $this->mPossibleInputsForCargoTypeList ) ) {
 				$this->mPossibleInputsForCargoTypeList[$cargoType][] = $inputTypeName;
 			} else {
-				$this->mPossibleInputsForCargoTypeList[$cargoType] = array( $inputTypeName );
+				$this->mPossibleInputsForCargoTypeList[$cargoType] = [ $inputTypeName ];
 			}
 		}
 
@@ -214,13 +216,13 @@ class PFFormPrinter {
 			if ( array_key_exists( $propertyType, $this->mPossibleInputsForPropTypeList ) ) {
 				return $this->mPossibleInputsForPropTypeList[$propertyType];
 			} else {
-				return array();
+				return [];
 			}
 		} else {
 			if ( array_key_exists( $propertyType, $this->mPossibleInputsForPropType ) ) {
 				return $this->mPossibleInputsForPropType[$propertyType];
 			} else {
-				return array();
+				return [];
 			}
 		}
 	}
@@ -230,13 +232,13 @@ class PFFormPrinter {
 			if ( array_key_exists( $fieldType, $this->mPossibleInputsForCargoTypeList ) ) {
 				return $this->mPossibleInputsForCargoTypeList[$fieldType];
 			} else {
-				return array();
+				return [];
 			}
 		} else {
 			if ( array_key_exists( $fieldType, $this->mPossibleInputsForCargoType ) ) {
 				return $this->mPossibleInputsForCargoType[$fieldType];
 			} else {
-				return array();
+				return [];
 			}
 		}
 	}
@@ -252,10 +254,10 @@ class PFFormPrinter {
 	 */
 	function showDeletionLog( $out ) {
 		LogEventsList::showLogExtract( $out, 'delete', $this->mPageTitle->getPrefixedText(),
-			'', array( 'lim' => 10,
-				'conds' => array( "log_action != 'revision'" ),
+			'', [ 'lim' => 10,
+				'conds' => [ "log_action != 'revision'" ],
 				'showIfEmpty' => false,
-				'msgKey' => array( 'moveddeleted-notice' ) )
+				'msgKey' => [ 'moveddeleted-notice' ] ]
 		);
 		return true;
 	}
@@ -284,6 +286,8 @@ class PFFormPrinter {
 	}
 
 	static function placeholderFormat( $templateName, $fieldName ) {
+		$templateName = str_replace( '_', ' ', $templateName );
+		$fieldName = str_replace( '_', ' ', $fieldName );
 		return $templateName . '___' . $fieldName;
 	}
 
@@ -296,11 +300,11 @@ class PFFormPrinter {
 		// multiple template form's HTML into the main form's HTML.
 		// So, the HTML will be stored in $text.
 		$text = "\t" . '<div class="multipleTemplateWrapper">' . "\n";
-		$attrs = array( 'class' => 'multipleTemplateList' );
-		if ( !is_null( $tif->getMinInstancesAllowed() ) ) {
+		$attrs = [ 'class' => 'multipleTemplateList' ];
+		if ( $tif->getMinInstancesAllowed() !== null ) {
 			$attrs['minimumInstances'] = $tif->getMinInstancesAllowed();
 		}
-		if ( !is_null( $tif->getMaxInstancesAllowed() ) ) {
+		if ( $tif->getMaxInstancesAllowed() !== null ) {
 			$attrs['maximumInstances'] = $tif->getMaxInstancesAllowed();
 		}
 		if ( $tif->getDisplayedFieldsWhenMinimized() != null ) {
@@ -321,8 +325,8 @@ class PFFormPrinter {
 		if ( $form_is_disabled ) {
 			$addAboveButton = $removeButton = '';
 		} else {
-			$addAboveButton = Html::element( 'a', array( 'class' => "addAboveButton", 'title' => wfMessage( 'pf_formedit_addanotherabove' )->text() ) );
-			$removeButton = Html::element( 'a', array( 'class' => "removeButton", 'title' => wfMessage( 'pf_formedit_remove' )->text() ) );
+			$addAboveButton = Html::element( 'a', [ 'class' => "addAboveButton", 'title' => wfMessage( 'pf_formedit_addanotherabove' )->text() ] );
+			$removeButton = Html::element( 'a', [ 'class' => "removeButton", 'title' => wfMessage( 'pf_formedit_remove' )->text() ] );
 		}
 
 		$text = <<<END
@@ -348,6 +352,10 @@ END;
 	 * @return string
 	 */
 	function multipleTemplateInstanceHTML( $template_in_form, $form_is_disabled, &$section ) {
+		global $wgPageFormsCalendarHTML;
+
+		$wgPageFormsCalendarHTML[$template_in_form->getTemplateName()] = str_replace( '[num]', "[cf]", $section );
+
 		// Add the character "a" onto the instance number of this input
 		// in the form, to differentiate the inputs the form starts out
 		// with from any inputs added by the Javascript.
@@ -366,12 +374,12 @@ END;
 		);
 
 		$text = "\t\t" . Html::rawElement( 'div',
-				array(
+				[
 				// The "multipleTemplate" class is there for
 				// backwards-compatibility with any custom CSS on people's
 				// wikis before PF 2.0.9.
 				'class' => "multipleTemplateInstance multipleTemplate"
-			),
+			],
 			$this->multipleTemplateInstanceTableHTML( $form_is_disabled, $section )
 		) . "\n";
 
@@ -390,17 +398,17 @@ END;
 		global $wgPageFormsTabIndex;
 
 		$text = "\t\t" . Html::rawElement( 'div',
-			array(
+			[
 				'class' => "multipleTemplateStarter",
 				'style' => "display: none",
-			),
+			],
 			$this->multipleTemplateInstanceTableHTML( $form_is_disabled, $section )
 		) . "\n";
 
-		$attributes = array(
+		$attributes = [
 			'tabindex' => $wgPageFormsTabIndex,
 			'class' => 'multipleTemplateAdder',
-		);
+		];
 		if ( $form_is_disabled ) {
 			$attributes['disabled'] = true;
 		}
@@ -446,7 +454,7 @@ END;
 				$labelText = $fieldName . ': ';
 			}
 			$label = Html::element( 'label',
-				array( 'for' => "input_$wgPageFormsFieldNum" ),
+				[ 'for' => "input_$wgPageFormsFieldNum" ],
 				$labelText );
 
 			// If a 'tooltip' parameter was set, add a tooltip
@@ -456,12 +464,12 @@ END;
 
 				$wgOut->addModules( 'ext.pageforms.balloon' );
 				$tooltipText = $formField->getFieldArg( 'tooltip' );
-				$label .= ' ' . Html::element( 'button', array(
+				$label .= ' ' . Html::element( 'button', [
 					'data-balloon-length' => 'medium',
 					'data-balloon' => $tooltipText,
 					'disabled' => true,
 					'style' => "height: 13px; width: 13px; background: url($wgScriptPath/resources/src/mediawiki/images/question.png); border: none;"
-					), '' );
+					], '' );
 			}
 
 			$labelCell = Html::rawElement( 'th', null, $label );
@@ -471,7 +479,7 @@ END;
 			$html .= Html::rawElement( 'tr', null, $labelCell . $inputCell ) . "\n";
 		}
 
-		$html = Html::rawElement( 'table', array( 'class' => 'formtable' ), $html );
+		$html = Html::rawElement( 'table', [ 'class' => 'formtable' ], $html );
 
 		return $html;
 	}
@@ -482,12 +490,12 @@ END;
 
 		$wgOut->addModules( 'ext.pageforms.jsgrid' );
 
-		$gridParams = array();
+		$gridParams = [];
 		foreach ( $tif->getFields() as $formField ) {
 			$templateField = $formField->template_field;
 
 			$inputType = $formField->getInputType();
-			$gridParamValues = array( 'name' => $templateField->getFieldName() );
+			$gridParamValues = [ 'name' => $templateField->getFieldName() ];
 			if ( $formField->getLabel() !== null ) {
 				$gridParamValues['title'] = $formField->getLabel();
 			}
@@ -499,9 +507,9 @@ END;
 				$gridParamValues['type'] = 'date';
 			} elseif ( ( $possibleValues = $formField->getPossibleValues() ) != null ) {
 				array_unshift( $possibleValues, '' );
-				$completePossibleValues = array();
+				$completePossibleValues = [];
 				foreach ( $possibleValues as $value ) {
-					$completePossibleValues[] = array( 'Name' => $value, 'Id' => $value );
+					$completePossibleValues[] = [ 'Name' => $value, 'Id' => $value ];
 				}
 				$gridParamValues['type'] = 'select';
 				$gridParamValues['items'] = $completePossibleValues;
@@ -515,16 +523,16 @@ END;
 
 		$templateName = $tif->getTemplateName();
 		$templateDivID = str_replace( ' ', '', $templateName ) . "Grid";
-		$templateDivAttrs = array(
+		$templateDivAttrs = [
 			'class' => 'pfJSGrid',
 			'id' => $templateDivID,
 			'data-template-name' => $templateName
-		);
+		];
 		if ( $tif->getHeight() != null ) {
 			$templateDivAttrs['height'] = $tif->getHeight();
 		}
 
-		$loadingImage = Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ) );
+		$loadingImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ] );
 		$text = Html::rawElement( 'div', $templateDivAttrs, $loadingImage );
 
 		$wgPageFormsGridParams[$templateName] = $gridParams;
@@ -605,7 +613,7 @@ END;
 		// parsed twice.
 		if ( array_key_exists( 'is_list', $value ) ) {
 			unset( $value['is_list'] );
-			return implode( "$delimiter ", $value );
+			return htmlentities( implode( "$delimiter ", $value ) );
 		}
 
 		// if it has 1 or 2 elements, assume it's a checkbox; if it has
@@ -655,7 +663,7 @@ END;
 				if ( $month == '' ) {
 					return $year;
 				} elseif ( $day == '' ) {
-					if ( ! $wgAmericanDates ) {
+					if ( !$wgAmericanDates ) {
 						// The month is a number - we
 						// need it to be a string, so
 						// that the date will be parsed
@@ -673,16 +681,16 @@ END;
 					}
 					// If there's a day, include whatever
 					// time information we have.
-					if ( ! is_null( $hour ) ) {
+					if ( $hour !== null ) {
 						$new_value .= " " . str_pad( intval( substr( $hour, 0, 2 ) ), 2, '0', STR_PAD_LEFT ) . ":" . str_pad( intval( substr( $minute, 0, 2 ) ), 2, '0', STR_PAD_LEFT );
 					}
-					if ( ! is_null( $second ) ) {
+					if ( $second !== null ) {
 						$new_value .= ":" . str_pad( intval( substr( $second, 0, 2 ) ), 2, '0', STR_PAD_LEFT );
 					}
-					if ( ! is_null( $ampm24h ) ) {
+					if ( $ampm24h !== null ) {
 						$new_value .= " $ampm24h";
 					}
-					if ( ! is_null( $timezone ) ) {
+					if ( $timezone !== null ) {
 						$new_value .= " $timezone";
 					}
 					return $new_value;
@@ -695,12 +703,13 @@ END;
 	static function displayLoadingImage() {
 		global $wgPageFormsScriptPath;
 
-		$loadingBGImage = Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loadingbg.png" ) );
-		$text = '<div style="position: fixed; left: 50%; top: 50%;">' . $loadingBGImage . '</div>';
-		$loadingImage = Html::element( 'img', array( 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ) );
+		$text = '<div id="loadingMask"></div>';
+		$loadingBGImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loadingbg.png" ] );
+		$text .= '<div style="position: fixed; left: 50%; top: 50%;">' . $loadingBGImage . '</div>';
+		$loadingImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ] );
 		$text .= '<div style="position: fixed; left: 50%; top: 50%; padding: 48px;">' . $loadingImage . '</div>';
 
-		return Html::rawElement( 'span', array( 'class' => 'loadingImage' ), $text );
+		return Html::rawElement( 'span', [ 'class' => 'loadingImage' ], $text );
 	}
 
 	/**
@@ -721,7 +730,10 @@ END;
 	 * @param string|null $page_name_formula
 	 * @param bool $is_query
 	 * @param bool $is_embedded
+	 * @param bool $is_autocreate true when called by #formredlink with "create page"
 	 * @return array
+	 * @throws FatalError
+	 * @throws MWException
 	 */
 	function formHTML(
 		$form_def,
@@ -732,11 +744,13 @@ END;
 		$page_name = null,
 		$page_name_formula = null,
 		$is_query = false,
-		$is_embedded = false
+		$is_embedded = false,
+		$is_autocreate = false
 	) {
-		global $wgRequest, $wgUser, $wgParser;
+		global $wgRequest, $wgUser;
 		global $wgPageFormsTabIndex; // used to represent the current tab index in the form
 		global $wgPageFormsFieldNum; // used for setting various HTML IDs
+		global $wgPageFormsShowExpandAllLink;
 
 		// Initialize some variables.
 		$wiki_page = new PFWikiPage();
@@ -762,7 +776,7 @@ END;
 		// minimize the html traffic and would allow us to do a concurrent
 		// update check. For now, we pass it through a hidden text field.
 
-		if ( ! $partial_form_submitted ) {
+		if ( !$partial_form_submitted ) {
 			$original_page_content = $existing_page_content;
 		} else {
 			$original_page_content = null;
@@ -799,27 +813,32 @@ END;
 		global $wgOut;
 		// Show previous set of deletions for this page, if it's been
 		// deleted before.
-		if ( ! $form_submitted &&
+		if ( !$form_submitted &&
 			( $this->mPageTitle && !$this->mPageTitle->exists() &&
-			is_null( $page_name_formula ) )
+			$page_name_formula === null )
 		) {
 			$this->showDeletionLog( $wgOut );
 		}
-		// Unfortunately, we can't just call userCan() here because,
-		// since MW 1.16, it has a bug in which it ignores a setting of
+		// Unfortunately, we can't just call userCan() or its
+		// equivalent here because it seems to ignore the setting
 		// "$wgEmailConfirmToEdit = true;". Instead, we'll just get the
 		// permission errors from the start, and use those to determine
 		// whether the page is editable.
 		if ( !$is_query ) {
-			// $userCanEditPage = ( $wgUser->isAllowed( 'edit' ) && $this->mPageTitle->userCan( 'edit' ) );
-			$permissionErrors = $this->mPageTitle->getUserPermissionsErrors( 'edit', $wgUser );
+			if ( class_exists( 'MediaWiki\Permissions\PermissionManager' ) ) {
+				// MW 1.33+
+				$permissionErrors = MediaWikiServices::getInstance()->getPermissionManager()
+					->getPermissionErrors( 'edit', $wgUser, $this->mPageTitle );
+			} else {
+				$permissionErrors = $this->mPageTitle->getUserPermissionsErrors( 'edit', $wgUser );
+			}
 			// The handling of $wgReadOnly and $wgReadOnlyFile
 			// has to be done separately.
 			if ( wfReadOnly() ) {
-				$permissionErrors = array( array( 'readonlytext', array( wfReadOnlyReason() ) ) );
+				$permissionErrors = [ [ 'readonlytext', [ wfReadOnlyReason() ] ] ];
 			}
 			$userCanEditPage = count( $permissionErrors ) == 0;
-			Hooks::run( 'PageForms::UserCanEditPage', array( $this->mPageTitle, &$userCanEditPage ) );
+			Hooks::run( 'PageForms::UserCanEditPage', [ $this->mPageTitle, &$userCanEditPage ] );
 		}
 
 		// Start off with a loading spinner - this will be removed by
@@ -829,42 +848,56 @@ END;
 			$form_is_disabled = false;
 			// Show "Your IP address will be recorded" warning if
 			// user is anonymous, and it's not a query.
-			if ( $wgUser->isAnon() && ! $is_query ) {
+			if ( $wgUser->isAnon() && !$is_query ) {
 				// Based on code in MediaWiki's EditPage.php.
 				$anonEditWarning = wfMessage( 'anoneditwarning',
 					// Log-in link
 					'{{fullurl:Special:UserLogin|returnto={{FULLPAGENAMEE}}}}',
 					// Sign-up link
 					'{{fullurl:Special:UserLogin/signup|returnto={{FULLPAGENAMEE}}}}' )->parse();
-				$form_text .= Html::rawElement( 'div', array( 'id' => 'mw-anon-edit-warning', 'class' => 'warningbox' ), $anonEditWarning );
+				$form_text .= Html::rawElement( 'div', [ 'id' => 'mw-anon-edit-warning', 'class' => 'warningbox' ], $anonEditWarning );
 			}
 		} else {
 			$form_is_disabled = true;
 			if ( $wgOut->getTitle() != null ) {
 				$wgOut->setPageTitle( wfMessage( 'badaccess' )->text() );
-				$wgOut->addWikiText( $wgOut->formatPermissionsErrorMessage( $permissionErrors, 'edit' ) );
+				if ( method_exists( $wgOut, 'addWikiTextAsInterface' ) ) {
+					// MW 1.32
+					$wgOut->addWikiTextAsInterface( $wgOut->formatPermissionsErrorMessage( $permissionErrors, 'edit' ) );
+				} else {
+					$wgOut->addWikiText( $wgOut->formatPermissionsErrorMessage( $permissionErrors, 'edit' ) );
+				}
 				$wgOut->addHTML( "\n<hr />\n" );
 			}
 		}
 
-		// $oldParser = $wgParser;
+		if ( $wgPageFormsShowExpandAllLink ) {
+			$form_text .= Html::rawElement( 'p', [ 'id' => 'pf-expand-all' ],
+				// @TODO - add an i18n message for this.
+				Html::element( 'a', [ 'href' => '#' ], 'Expand all collapsed parts of the form' ) ) . "\n";
+		}
 
-		// $wgParser = unserialize( serialize( $oldParser ) ); // deep clone of parser
-		if ( !$wgParser->Options() ) {
-			$wgParser->Options( ParserOptions::newFromUser( $wgUser ) );
+		$parser = PFUtils::getParser()->getFreshParser();
+		if ( !$parser->getOptions() ) {
+			if ( method_exists( $parser, 'setOptions' ) ) {
+				// MW 1.35+
+				$parser->setOptions( ParserOptions::newFromUser( $wgUser ) );
+			} else {
+				$parser->Options( ParserOptions::newFromUser( $wgUser ) );
+			}
 		}
 		if ( !$is_embedded ) {
-			$wgParser->Title( $this->mPageTitle );
+			$parser->setTitle( $this->mPageTitle );
 		}
 		// This is needed in order to make sure $parser->mLinkHolders
 		// is set.
-		$wgParser->clearState();
+		$parser->clearState();
 
-		$form_def = PFFormUtils::getFormDefinition( $wgParser, $form_def, $form_id );
+		$form_def = PFFormUtils::getFormDefinition( $parser, $form_def, $form_id );
 
 		// Turn form definition file into an array of sections, one for
 		// each template definition (plus the first section).
-		$form_def_sections = array();
+		$form_def_sections = [];
 		$start_position = 0;
 		$section_start = 0;
 		$free_text_was_included = false;
@@ -895,7 +928,7 @@ END;
 		$template = null;
 		$tif = null;
 		// This array will keep track of all the replaced @<name>@ strings
-		$placeholderFields = array();
+		$placeholderFields = [];
 
 		for ( $section_num = 0; $section_num < count( $form_def_sections ); $section_num++ ) {
 			$start_position = 0;
@@ -907,17 +940,29 @@ END;
 				$brackets_end_loc = strpos( $section, "}}}", $brackets_loc );
 				$bracketed_string = substr( $section, $brackets_loc + 3, $brackets_end_loc - ( $brackets_loc + 3 ) );
 				$tag_components = PFUtils::getFormTagComponents( $bracketed_string );
+				if ( count( $tag_components ) == 0 ) {
+					continue;
+				}
 				$tag_title = trim( $tag_components[0] );
 				// =====================================================
 				// for template processing
 				// =====================================================
 				if ( $tag_title == 'for template' ) {
+					foreach ( $tag_components as $tag_component ) {
+						// Angled brackets could cause a security leak (and should not be necessary).
+						if ( strpos( $tag_component, '<' ) !== false || strpos( $tag_component, '>' ) !== false ) {
+							throw new MWException(
+								'<div class="error">Error in form definition! The following field tag contains forbidden characters:</div>' .
+								"\n<pre>" . htmlspecialchars( $section ) . "</pre>"
+							);
+						}
+					}
 					if ( $tif ) {
 						$previous_template_name = $tif->getTemplateName();
 					} else {
 						$previous_template_name = '';
 					}
-					$template_name = str_replace( '_', ' ', $wgParser->recursiveTagParse( $tag_components[1] ) );
+					$template_name = str_replace( '_', ' ', $parser->recursiveTagParse( $tag_components[1] ) );
 					$is_new_template = ( $template_name != $previous_template_name );
 					if ( $is_new_template ) {
 						$template = PFTemplate::newFromName( $template_name );
@@ -964,7 +1009,10 @@ END;
 					// page or a form submit, because even if
 					// the source is a page, values can still
 					// come from a query string.
-					$tif->setFieldValuesFromSubmit();
+					// (Unless it's called from #formredlink.)
+					if ( !$is_autocreate ) {
+						$tif->setFieldValuesFromSubmit();
+					}
 
 					$tif->checkIfAllInstancesPrinted( $form_submitted, $source_is_page );
 
@@ -976,6 +1024,9 @@ END;
 				// end template processing
 				// =====================================================
 				} elseif ( $tag_title == 'end template' ) {
+					if ( count( $tag_components ) > 1 ) {
+						throw new MWException( '<div class="error">Error in form definition: \'end template\' tag cannot contain any additional parameters.</div>' );
+					}
 					if ( $source_is_page ) {
 						// Add any unhandled template fields
 						// in the page as hidden variables.
@@ -993,8 +1044,15 @@ END;
 					// means we're handling the free text field.
 					// Make the template a dummy variable.
 					if ( $tif == null ) {
-						$template = new PFTemplate( null, array() );
-						$tif = new PFTemplateInForm();
+						$template = new PFTemplate( null, [] );
+						// Get free text from the query string, if it was set.
+						if ( $wgRequest->getCheck( 'free_text' ) ) {
+							$standard_input = $wgRequest->getArray( 'standard_input', [] );
+							$standard_input['#freetext#'] = $wgRequest->getVal( 'free_text' );
+							$wgRequest->setVal( 'standard_input', $standard_input );
+						}
+						$tif = PFTemplateInForm::create( 'standard_input', null, null, null, [] );
+						$tif->setFieldValuesFromSubmit();
 					}
 					// We get the field name both here
 					// and in the PFFormField constructor,
@@ -1002,12 +1060,12 @@ END;
 					// to deal with the #freetext# hack,
 					// among others.
 					$field_name = trim( $tag_components[1] );
-					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled );
+					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled, $wgUser );
 					// For special displays, add in the
 					// form fields, so we know the data
 					// structure.
 					if ( ( $tif->getDisplay() == 'table' && ( !$tif->allowsMultiple() || $tif->getInstanceNum() == 0 ) ) ||
-						( $tif->getDisplay() == 'spreadsheet' && $tif->allowsMultiple() && $tif->getInstanceNum() == 0 ) ) {
+						( $tif->getDisplay() == 'spreadsheet' && $tif->allowsMultiple() && $tif->getInstanceNum() == 0 ) || ( $tif->getDisplay() == 'calendar' && $tif->allowsMultiple() && $tif->getInstanceNum() == 0 ) ) {
 						$tif->addField( $form_field );
 					}
 					$cur_value = $form_field->getCurrentValue( $tif->getValuesFromSubmit(), $form_submitted, $source_is_page, $tif->allInstancesPrinted() );
@@ -1054,7 +1112,7 @@ END;
 						} else {
 							$wgPageFormsTabIndex++;
 							$wgPageFormsFieldNum++;
-							if ( $cur_value === '' || is_null( $cur_value ) ) {
+							if ( $cur_value === '' || $cur_value === null ) {
 								$default_value = '!free_text!';
 							} else {
 								$default_value = $cur_value;
@@ -1064,7 +1122,7 @@ END;
 							$new_text = $freeTextInput->getHtmlText();
 							if ( $form_field->hasFieldArg( 'edittools' ) ) {
 								// borrowed from EditPage::showEditTools()
-								$edittools_text = $wgParser->recursiveTagParse( wfMessage( 'edittools', array( 'content' ) )->text() );
+								$edittools_text = $parser->recursiveTagParse( wfMessage( 'edittools', [ 'content' ] )->text() );
 
 								$new_text .= <<<END
 		<div class="mw-editTools">
@@ -1126,7 +1184,7 @@ END;
 							$generated_page_name = str_replace( '_', ' ', $generated_page_name );
 						}
 
-						if ( !empty( $cur_value ) &&
+						if ( $cur_value !== '' &&
 							( $form_field->hasFieldArg( 'mapping template' ) ||
 							$form_field->hasFieldArg( 'mapping property' ) ||
 							( $form_field->hasFieldArg( 'mapping cargo table' ) &&
@@ -1150,13 +1208,14 @@ END;
 						// @TODO - should it be $cur_value for both cases? Or should the
 						// hook perhaps modify both variables?
 						if ( $form_submitted ) {
-							Hooks::run( 'PageForms::CreateFormField', array( &$form_field, &$cur_value_in_template, true ) );
+							Hooks::run( 'PageForms::CreateFormField', [ &$form_field, &$cur_value_in_template, true ] );
 						} else {
-							Hooks::run( 'PageForms::CreateFormField', array( &$form_field, &$cur_value, false ) );
+							$this->createFormFieldTranslateTag( $template, $tif, $form_field, $cur_value );
+							Hooks::run( 'PageForms::CreateFormField', [ &$form_field, &$cur_value, false ] );
 						}
 						// if this is not part of a 'multiple' template, increment the
 						// global tab index (used for correct tabbing)
-						if ( ! $form_field->hasFieldArg( 'part_of_multiple' ) ) {
+						if ( !$form_field->hasFieldArg( 'part_of_multiple' ) ) {
 							$wgPageFormsTabIndex++;
 						}
 						// increment the global field number regardless
@@ -1186,7 +1245,7 @@ END;
 							// to the default value
 							( $cur_value === '' || $cur_value == 'current user' )
 						) {
-							$cur_value_in_template = $wgUser->getName();
+							$cur_value_in_template = $wgUser->isRegistered() ? $wgUser->getName() : '';
 							$cur_value = $cur_value_in_template;
 						}
 
@@ -1237,7 +1296,7 @@ END;
 					// handle all the possible values
 					$input_name = $tag_components[1];
 					$input_label = null;
-					$attr = array();
+					$attr = [];
 
 					// if it's a query, ignore all standard inputs except run query
 					if ( ( $is_query && $input_name != 'run query' ) || ( !$is_query && $input_name == 'run query' ) ) {
@@ -1259,7 +1318,7 @@ END;
 						} elseif ( count( $sub_components ) == 2 ) {
 							switch ( $sub_components[0] ) {
 							case 'label':
-								$input_label = $wgParser->recursiveTagParse( $sub_components[1] );
+								$input_label = $parser->recursiveTagParse( $sub_components[1] );
 								break;
 							case 'class':
 								$attr['class'] = $sub_components[1];
@@ -1301,7 +1360,7 @@ END;
 					$wgPageFormsTabIndex++;
 
 					$section_name = trim( $tag_components[1] );
-					$page_section_in_form = PFPageSection::newFromFormTag( $tag_components );
+					$page_section_in_form = PFPageSection::newFromFormTag( $tag_components, $wgUser );
 					$section_text = null;
 
 					// Split the existing page contents into the textareas in the form.
@@ -1333,23 +1392,40 @@ END;
 						}
 						$section_end_loc = -1;
 
-						// get the position of the next template or section defined in the form
-						$next_section_start_loc = strpos( $section, '{{{', $brackets_end_loc );
-						if ( $next_section_start_loc == false ) {
-							$section_end_loc = strpos( $existing_page_content, '{{', $section_start_loc );
-						} else {
-							$next_section_end_loc = strpos( $section, '}}}', $next_section_start_loc );
-							$bracketed_string_next_section = substr( $section, $next_section_start_loc + 3, $next_section_end_loc - ( $next_section_start_loc + 3 ) );
-							$tag_components_next_section = PFUtils::getFormTagComponents( $bracketed_string_next_section );
-							$tag_title_next_section = trim( $tag_components_next_section[0] );
-							if ( $tag_title_next_section == 'section' ) {
-								if ( preg_match( '/(^={1,6}[ ]*?' . $tag_components_next_section[1] . '[ ]*?={1,6}\s*?$)/m', $existing_page_content, $matches, PREG_OFFSET_CAPTURE ) ) {
-									$section_end_loc = $matches[0][1];
+						// get the position of the next template or section defined in the form which is not empty and hidden if empty
+						$previous_brackets_end_loc = $brackets_end_loc;
+						$next_section_found = false;
+						// loop until the next section is found
+						while ( !$next_section_found ) {
+							$next_bracket_start_loc = strpos( $section, '{{{', $previous_brackets_end_loc );
+							if ( $next_bracket_start_loc == false ) {
+								$section_end_loc = strpos( $existing_page_content, '{{', $section_start_loc );
+								$next_section_found = true;
+							} else {
+								$next_bracket_end_loc = strpos( $section, '}}}', $next_bracket_start_loc );
+								$bracketed_string_next_section = substr( $section, $next_bracket_start_loc + 3, $next_bracket_end_loc - ( $next_bracket_start_loc + 3 ) );
+								$tag_components_next_section = PFUtils::getFormTagComponents( $bracketed_string_next_section );
+								$page_next_section_in_form = PFPageSection::newFromFormTag( $tag_components_next_section, $wgUser );
+								$tag_title_next_section = trim( $tag_components_next_section[0] );
+								if ( $tag_title_next_section == 'section' ) {
+									// There is no pattern match for the next section if the section is empty and its hideIfEmpty attribute is set
+									if ( preg_match( '/(^={1,6}[ ]*?' . preg_quote( $tag_components_next_section[1], '/' ) . '[ ]*?={1,6}\s*?$)/m', $existing_page_content, $matches, PREG_OFFSET_CAPTURE ) ) {
+										$section_end_loc = $matches[0][1];
+										$next_section_found = true;
+									// Check for the next section if no pattern match
+									} elseif ( $page_next_section_in_form->isHideIfEmpty() ) {
+										$previous_brackets_end_loc = $next_bracket_end_loc;
+									} else {
+										// If none of the above conditions is satisfied, exit the loop.
+										break;
+									}
+								} else {
+									$next_section_found = true;
 								}
 							}
 						}
 
-						if ( $section_end_loc === -1 || $section_end_loc == null ) {
+						if ( $section_end_loc === -1 || $section_end_loc === null ) {
 							$section_text = substr( $existing_page_content, $section_start_loc );
 							$existing_page_content = substr( $existing_page_content, 0, $section_start_loc );
 						} else {
@@ -1359,19 +1435,23 @@ END;
 					}
 
 					// If input is from the form.
-					if ( ( ! $source_is_page ) && $wgRequest ) {
+					if ( ( !$source_is_page ) && $wgRequest ) {
 						$text_per_section = $wgRequest->getArray( '_section' );
-						$section_text = $text_per_section[trim( $section_name )];
 
+						if ( is_array( $text_per_section ) && array_key_exists( $section_name, $text_per_section ) ) {
+							$section_text = $text_per_section[$section_name];
+						} else {
+							$section_text = '';
+						}
 						// $section_options will allow to pass additional options in the future without breaking backword compatibility
-						$section_options = array( 'hideIfEmpty' => $page_section_in_form->isHideIfEmpty() );
+						$section_options = [ 'hideIfEmpty' => $page_section_in_form->isHideIfEmpty() ];
 						$wiki_page->addSection( $section_name, $page_section_in_form->getSectionLevel(), $section_text, $section_options );
 					}
 
 					$section_text = trim( $section_text );
 
 					// Set input name for query string.
-					$input_name = '_section' . '[' . trim( $section_name ) . ']';
+					$input_name = '_section' . '[' . $section_name . ']';
 					$other_args = $page_section_in_form->getSectionArgs();
 					$other_args['isSection'] = true;
 					if ( $page_section_in_form->isMandatory() ) {
@@ -1429,7 +1509,9 @@ END;
 							$wgPageFormsRunQueryFormAtTop = true;
 						}
 					}
-					$section = substr_replace( $section, '', $brackets_loc, $brackets_end_loc + 3 - $brackets_loc );
+					// Replace the {{{info}}} tag with a hidden span, instead of a blank, to avoid a
+					// potential security issue.
+					$section = substr_replace( $section, '<span style="visibility: hidden;"></span>', $brackets_loc, $brackets_end_loc + 3 - $brackets_loc );
 				// =====================================================
 				// default outer level processing
 				// =====================================================
@@ -1480,6 +1562,73 @@ END;
 						// to be specially inserted.
 						$multipleTemplateHTML .= "</fieldset>\n";
 					}
+				} elseif ( $tif->getDisplay() == 'calendar' ) {
+					if ( $tif->allInstancesPrinted() ) {
+						global $wgOut, $wgPageFormsCalendarParams, $wgPageFormsCalendarValues;
+						global $wgPageFormsScriptPath;
+						$text = '';
+						$params = [];
+						foreach ( $tif->getFields() as $formField ) {
+							$templateField = $formField->template_field;
+							$inputType = $formField->getInputType();
+							$values = [ 'name' => $templateField->getFieldName() ];
+							if ( $formField->getLabel() !== null ) {
+								$values['title'] = $formField->getLabel();
+							}
+							if ( $inputType == 'textarea' ) {
+								$values['type'] = 'textarea';
+							} elseif ( $inputType == 'datetime' ) {
+								$values['type'] = 'datetime';
+							} elseif ( $inputType == 'checkbox' ) {
+								$values['type'] = 'checkbox';
+							} elseif ( $inputType == 'checkboxes' ) {
+								$values['type'] = 'checkboxes';
+							} elseif ( $inputType == 'listbox' ) {
+								$values['type'] = 'listbox';
+							} elseif ( $inputType == 'date' ) {
+								$values['type'] = 'date';
+							} elseif ( $inputType == 'rating' ) {
+								$values['type'] = 'rating';
+							} elseif ( $inputType == 'radiobutton' ) {
+								$values['type'] = 'radiobutton';
+							} elseif ( $inputType == 'tokens' ) {
+								$values['type'] = 'tokens';
+							} elseif ( ( $possibleValues = $formField->getPossibleValues() ) != null ) {
+								array_unshift( $possibleValues, '' );
+								$completePossibleValues = [];
+								foreach ( $possibleValues as $value ) {
+									$completePossibleValues[] = [ 'Name' => $value, 'Id' => $value ];
+								}
+								$values['type'] = 'select';
+								$values['items'] = $completePossibleValues;
+								$values['valueField'] = 'Id';
+								$values['textField'] = 'Name';
+							} else {
+								$values['type'] = 'text';
+							}
+							$params[] = $values;
+						}
+						$templateName = $tif->getTemplateName();
+						$templateDivID = str_replace( ' ', '_', $templateName ) . "FullCalendar";
+						$templateDivAttrs = [
+							'class' => 'pfFullCalendarJS',
+							'id' => $templateDivID,
+							'template-name' => $templateName,
+							'title-field' => $tif->getEventTitleField(),
+							'event-date-field' => $tif->getEventDateField(),
+							'event-start-date-field' => $tif->getEventStartDateField(),
+							'event-end-date-field' => $tif->getEventEndDateField()
+						];
+						$loadingImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ] );
+						$text = "<div id='fullCalendarLoading1' style='display: none;'>" . $loadingImage . "</div>";
+						$text .= Html::rawElement( 'div', $templateDivAttrs, $text );
+						$wgPageFormsCalendarParams[$templateName] = $params;
+						$wgPageFormsCalendarValues[$templateName] = $tif->getGridValues();
+						$fullForm = $this->multipleTemplateInstanceHTML( $tif, $form_is_disabled, $section );
+						$multipleTemplateHTML .= $text;
+						$multipleTemplateHTML .= "</fieldset>\n";
+						PFFormUtils::setGlobalVarsForSpreadsheet();
+					}
 				} else {
 					if ( $tif->getDisplay() == 'table' ) {
 						$section = $this->tableHTML( $tif, $tif->getInstanceNum() );
@@ -1487,7 +1636,7 @@ END;
 					if ( $tif->getInstanceNum() == 0 ) {
 						$multipleTemplateHTML .= $this->multipleTemplateStartHTML( $tif );
 					}
-					if ( ! $tif->allInstancesPrinted() ) {
+					if ( !$tif->allInstancesPrinted() ) {
 						$multipleTemplateHTML .= $this->multipleTemplateInstanceHTML( $tif, $form_is_disabled, $section );
 					} else {
 						$multipleTemplateHTML .= $this->multipleTemplateEndHTML( $tif, $form_is_disabled, $section );
@@ -1516,7 +1665,7 @@ END;
 					$multipleTemplateHTML .= self::makePlaceholderInFormHTML( $placeholder );
 					$form_text = str_replace( self::makePlaceholderInFormHTML( $placeholder ), $multipleTemplateHTML, $form_text );
 				}
-				if ( ! $tif->allInstancesPrinted() ) {
+				if ( !$tif->allInstancesPrinted() ) {
 					// This will cause the section to be
 					// re-parsed on the next go.
 					$section_num--;
@@ -1542,7 +1691,7 @@ END;
 
 		// If it wasn't included in the form definition, add the
 		// 'free text' input as a hidden field at the bottom.
-		if ( ! $free_text_was_included ) {
+		if ( !$free_text_was_included ) {
 			$form_text .= Html::hidden( 'pf_free_text', '!free_text!' );
 		}
 		// Get free text, and add to page data, as well as retroactively
@@ -1556,8 +1705,8 @@ END;
 				$free_text = $original_page_content;
 			} else {
 				$free_text = null;
-				$existing_page_content = preg_replace( array( '/�\{/m', '/\}�/m' ),
-					array( '{{', '}}' ),
+				$existing_page_content = preg_replace( [ '/�\{/m', '/\}�/m' ],
+					[ '{{', '}}' ],
 					$existing_page_content );
 				$existing_page_content = str_replace( '{{{insertionpoint}}}', '', $existing_page_content );
 			}
@@ -1567,10 +1716,10 @@ END;
 			// whatever in the page hasn't already been inserted
 			// into the form.
 			$free_text = trim( $existing_page_content );
-		// or get it from a form submission
-		} elseif ( $wgRequest->getCheck( 'pf_free_text' ) ) {
+		// ...or get it from the form submission, if it's not called from #formredlink
+		} elseif ( !$is_autocreate && $wgRequest->getCheck( 'pf_free_text' ) ) {
 			$free_text = $wgRequest->getVal( 'pf_free_text' );
-			if ( ! $free_text_was_included ) {
+			if ( !$free_text_was_included ) {
 				$wiki_page->addFreeTextSection();
 			}
 		} elseif ( $preloaded_free_text != null ) {
@@ -1588,7 +1737,7 @@ END;
 		$page_text = '';
 
 		Hooks::run( 'PageForms::BeforeFreeTextSubst',
-			array( &$free_text, $existing_page_content, &$page_text ) );
+			[ &$free_text, $existing_page_content, &$page_text ] );
 
 		// Now that we have the free text, we can create the full page
 		// text.
@@ -1603,7 +1752,7 @@ END;
 
 		// Add a warning in, if we're editing an existing page and that
 		// page appears to not have been created with this form.
-		if ( !$is_query && is_null( $page_name_formula ) &&
+		if ( !$is_query && $page_name_formula === null &&
 			$this->mPageTitle->exists() && $existing_page_content !== ''
 			&& !$source_page_matches_this_form ) {
 			$form_text = "\t" . '<div class="warningbox">' .
@@ -1622,8 +1771,11 @@ END;
 
 		if ( !$is_query ) {
 			$form_text .= Html::hidden( 'wpStarttime', wfTimestampNow() );
-			$article = new Article( $this->mPageTitle, 0 );
-			$form_text .= Html::hidden( 'wpEdittime', $article->getTimestamp() );
+			// This variable is called $mwWikiPage and not
+			// something simpler, to avoid confusion with the
+			// variable $wiki_page, which is of type PFWikiPage.
+			$mwWikiPage = WikiPage::factory( $this->mPageTitle );
+			$form_text .= Html::hidden( 'wpEdittime', $mwWikiPage->getTimestamp() );
 			$form_text .= Html::hidden( 'wpEditToken', $wgUser->getEditToken() );
 			if ( defined( 'EditPage::UNICODE_CHECK' ) ) {
 				// MW 1.30+
@@ -1632,8 +1784,8 @@ END;
 		}
 
 		$form_text .= "\t</form>\n";
-		$wgParser->replaceLinkHolders( $form_text );
-		Hooks::run( 'PageForms::RenderingEnd', array( &$form_text ) );
+		$parser->replaceLinkHolders( $form_text );
+		Hooks::run( 'PageForms::RenderingEnd', [ &$form_text ] );
 
 		// Send the autocomplete values to the browser, along with the
 		// mappings of which values should apply to which fields.
@@ -1644,14 +1796,12 @@ END;
 		}
 
 		if ( !$is_embedded ) {
-			$form_page_title = $wgParser->recursiveTagParse( str_replace( "{{!}}", "|", $form_page_title ) );
+			$form_page_title = $parser->recursiveTagParse( str_replace( "{{!}}", "|", $form_page_title ) );
 		} else {
 			$form_page_title = null;
 		}
 
-		// $wgParser = $oldParser;
-
-		return array( $form_text, $page_text, $form_page_title, $generated_page_name );
+		return [ $form_text, $page_text, $form_page_title, $generated_page_name ];
 	}
 
 	/**
@@ -1701,7 +1851,7 @@ END;
 				$other_args = $form_field->getArgumentsForInputCall();
 				// Set default size for list inputs.
 				if ( $form_field->isList() ) {
-					if ( ! array_key_exists( 'size', $other_args ) ) {
+					if ( !array_key_exists( 'size', $other_args ) ) {
 						$other_args['size'] = 100;
 					}
 				}
@@ -1721,6 +1871,64 @@ END;
 			$text = $form_input->getHtmlText();
 		}
 
+		$this->addTranslatableInput( $form_field, $cur_value, $text );
 		return $text;
 	}
+
+	function isTranslateEnabled() {
+		return class_exists( 'SpecialTranslate' );
+	}
+
+	/**
+	 * for translatable fields, this function add an hidden input containing the translate tags
+	 *
+	 * @param unknown $form_field
+	 * @param unknown $cur_value
+	 * @param unknown &$text
+	 */
+	private function addTranslatableInput( $form_field, $cur_value, &$text ) {
+		if ( !$this->isTranslateEnabled() || !$form_field->hasFieldArg( 'translatable' ) || !$form_field->getFieldArg( 'translatable' ) ) {
+			return;
+		}
+
+		if ( $form_field->hasFieldArg( 'translate_number_tag' ) ) {
+			$inputName = $form_field->getInputName();
+			$pattern = '/\[([^\\]\\]]+)\]$/';
+			if ( preg_match( $pattern, $inputName, $matches ) ) {
+				$inputName = preg_replace( $pattern, '[${1}_translate_number_tag]', $inputName );
+			} else {
+				$inputName .= '_translate_number_tag';
+			}
+			$translateTag = $form_field->getFieldArg( 'translate_number_tag' );
+			$text .= "<input type='hidden' name='$inputName' value='$translateTag'/>";
+		}
+	}
+
+	private function createFormFieldTranslateTag( &$template, &$tif, &$form_field, &$cur_value ) {
+		if ( !$this->isTranslateEnabled() || !$form_field->hasFieldArg( 'translatable' ) || !$form_field->getFieldArg( 'translatable' ) ) {
+			return;
+		}
+
+		// If translatable, add translatable tags when saving, or remove them for displaying form.
+		if ( preg_match( '#^<translate>(.*)</translate>$#', $cur_value, $matches ) ) {
+			$cur_value = $matches[1];
+		} elseif ( substr( $cur_value, 0, strlen( '<translate>' ) ) == '<translate>'
+				&& substr( $cur_value, -1 * strlen( '</translate>' ) ) == '</translate>' ) {
+			// For unknown reasons, the pregmatch regex does not work every time !! :(
+			$cur_value = substr( $cur_value, strlen( '<translate>' ), -1 * strlen( '</translate>' ) );
+		}
+
+		if ( substr( $cur_value, 0, 6 ) == '<!--T:' ) {
+			// hide the tag <!-- T:X --> in another input
+			// if field does not use VisualEditor?
+
+			if ( preg_match( "/<!-- *T:([a-zA-Z0-9]+) *-->( |\n)/", $cur_value, $matches ) ) {
+				// Remove the tag from this input.
+				$cur_value = str_replace( $matches[0], '', $cur_value );
+				// Add a field arg, to add a hidden input in form with the tag.
+				$form_field->setFieldArg( 'translate_number_tag', $matches[0] );
+			}
+		}
+	}
+
 }

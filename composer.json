@@ -20,7 +20,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.0",
+		"php": ">=5.5.9",
 		"composer/installers": "1.*,>=1.0.1"
 	},
 	"suggest": {
@@ -37,19 +37,20 @@
 		}
 	},
 	"require-dev": {
-		"jakub-onderka/php-parallel-lint": "1.0.0",
-		"jakub-onderka/php-console-highlighter": "0.3.2",
-		"mediawiki/mediawiki-codesniffer": "19.2.0",
-		"mediawiki/minus-x": "0.3.1"
+		"mediawiki/mediawiki-codesniffer": "31.0.0",
+		"mediawiki/minus-x": "1.1.0",
+		"php-parallel-lint/php-console-highlighter": "0.5.0",
+		"php-parallel-lint/php-parallel-lint": "1.2.0"
 	},
 	"scripts": {
 		"test": [
 			"parallel-lint . --exclude vendor --exclude node_modules",
 			"minus-x check .",
-			"phpcs -p -s"
+			"phpcs -p -s ."
 		],
 		"fix": [
 			"minus-x fix .",
+			"phpcbf .",
 			"phpcbf"
 		]
 	}

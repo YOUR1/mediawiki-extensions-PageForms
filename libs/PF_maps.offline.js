@@ -10,6 +10,8 @@ function setupMapFormInput( inputDiv, mapService ) {
 	/**
 	 * Round off a number to five decimal places - that's the most
 	 * we need for coordinates, one would think.
+	 *
+	 * @param num
 	 */
 	function pfRoundOffDecimal( num ) {
 		return Math.round( num * 100000 ) / 100000;
@@ -109,7 +111,7 @@ function setupMapFormInput( inputDiv, mapService ) {
 		mapCanvas = inputDiv.find('.pfMapCanvas').get(0);
 		mapOptions = {
 			zoom: 1,
-			center: [0, 0]
+			center: [ 0, 0 ]
 		};
 		var layerOptions = {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -136,7 +138,20 @@ function setupMapFormInput( inputDiv, mapService ) {
 	} else { // if ( mapService == "OpenLayers" ) {
 		var mapCanvasID = inputDiv.find( '.pfMapCanvas' ).attr( 'id' );
 		map = new OpenLayers.Map( mapCanvasID );
-		map.addLayer( new OpenLayers.Layer.OSM() );
+		// We do this more complex initialization, rather than just
+		// calling OpenLayers.Layer.OSM(), so that the tiles will be
+		// loaded via either HTTP or HTTPS, depending on what we are
+		// using.
+		map.addLayer( new OpenLayers.Layer.OSM(
+			"OpenStreetMap",
+			// Official OSM tileset as protocol-independent URLs
+			[
+				'//a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+				'//b.tile.openstreetmap.org/${z}/${x}/${y}.png',
+				'//c.tile.openstreetmap.org/${z}/${x}/${y}.png'
+			],
+			null
+		) );
 		map.zoomTo( 0 );
 		markers = new OpenLayers.Layer.Markers( "Markers" );
 		map.addLayer( markers );
@@ -275,7 +290,7 @@ function setupMapFormInput( inputDiv, mapService ) {
 				} else if ( mapService === "Leaflet" ) {
 					var lPoint = L.latLng( lat, lon );
 					leafletSetMarker( lPoint );
-					map.fitBounds([[bottom, left], [top, right]]);
+					map.fitBounds([ [ bottom, left ], [ top, right ] ]);
 				}
 			});
 		}
@@ -303,12 +318,35 @@ function setupMapFormInput( inputDiv, mapService ) {
 
 jQuery(document).ready( function() {
 	jQuery(".pfGoogleMapsInput").each( function() {
+		// Ignore the hidden "starter" div in multiple-instance templates.
+		if ( $(this).closest(".multipleTemplateStarter").length > 0 ) {
+			return;
+		}
 		setupMapFormInput( jQuery(this), "Google Maps" );
 	});
 	jQuery(".pfLeafletInput").each( function() {
+		if ( $(this).closest(".multipleTemplateStarter").length > 0 ) {
+			return;
+		}
 		setupMapFormInput( jQuery(this), "Leaflet" );
 	});
 	jQuery(".pfOpenLayersInput").each( function() {
+		if ( $(this).closest(".multipleTemplateStarter").length > 0 ) {
+			return;
+		}
+		setupMapFormInput( jQuery(this), "OpenLayers" );
+	});
+});
+
+// Activate maps in a new instance of a multiple-instance template.
+mw.hook('pf.addTemplateInstance').add(function( $newInstance ) {
+	$newInstance.find(".pfGoogleMapsInput").each( function() {
+		setupMapFormInput( jQuery(this), "Google Maps" );
+	});
+	$newInstance.find(".pfLeafletInput").each( function() {
+		setupMapFormInput( jQuery(this), "Leaflet" );
+	});
+	$newInstance.find(".pfOpenLayersInput").each( function() {
 		setupMapFormInput( jQuery(this), "OpenLayers" );
 	});
 });

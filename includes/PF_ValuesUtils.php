@@ -21,16 +21,16 @@ class PFValuesUtils {
 	public static function getSMWPropertyValues( $store, $subject, $propID, $requestOptions = null ) {
 		// If SMW is not installed, exit out.
 		if ( !class_exists( 'SMWDIWikiPage' ) ) {
-			return array();
+			return [];
 		}
-		if ( is_null( $subject ) ) {
+		if ( $subject === null ) {
 			$page = null;
 		} else {
 			$page = SMWDIWikiPage::newFromTitle( $subject );
 		}
 		$property = SMWDIProperty::newFromUserLabel( $propID );
 		$res = $store->getPropertyValues( $page, $property, $requestOptions );
-		$values = array();
+		$values = [];
 		foreach ( $res as $value ) {
 			if ( $value instanceof SMWDIUri ) {
 				$values[] = $value->getURI();
@@ -57,8 +57,8 @@ class PFValuesUtils {
 	 * @return array
 	 */
 	public static function getCategoriesForPage( $title ) {
-		$categories = array();
-		$db = wfGetDB( DB_SLAVE );
+		$categories = [];
+		$db = wfGetDB( DB_REPLICA );
 		$titlekey = $title->getArticleID();
 		if ( $titlekey == 0 ) {
 			// Something's wrong - exit
@@ -85,8 +85,8 @@ class PFValuesUtils {
 	 * @return array
 	 */
 	public static function getAllCategories() {
-		$categories = array();
-		$db = wfGetDB( DB_SLAVE );
+		$categories = [];
+		$db = wfGetDB( DB_REPLICA );
 		$res = $db->select(
 			'category',
 			'cat_title',
@@ -116,7 +116,7 @@ class PFValuesUtils {
 
 		$store = PFUtils::getSMWStore();
 		if ( $store == null ) {
-			return array();
+			return [];
 		}
 		$requestoptions = new SMWRequestOptions();
 		$requestoptions->limit = $wgPageFormsMaxAutocompleteValues;
@@ -155,11 +155,11 @@ class PFValuesUtils {
 		try {
 			$sqlQuery = CargoSQLQuery::newFromValues( $tableName, $fieldName, $whereStr, $joinOnStr = null, $fieldName, $havingStr = null, $fieldName, $limitStr, $offsetStr = 0 );
 		} catch ( Exception $e ) {
-			return array();
+			return [];
 		}
 
 		$queryResults = $sqlQuery->run();
-		$values = array();
+		$values = [];
 		// Field names starting with a '_' are special fields -
 		// all other fields will have had their underscores
 		// replaced with spaces in $queryResults.
@@ -169,7 +169,9 @@ class PFValuesUtils {
 			$fieldAlias = str_replace( '_', ' ', $fieldName );
 		}
 		foreach ( $queryResults as $row ) {
-			$values[] = $row[$fieldAlias];
+			// Cargo HTML-encodes everything - let's decode double
+			// quotes, at least.
+			$values[] = str_replace( '&quot;', '"', $row[$fieldAlias] );
 		}
 		return $values;
 	}
@@ -190,18 +192,18 @@ class PFValuesUtils {
 		}
 		global $wgPageFormsMaxAutocompleteValues, $wgPageFormsUseDisplayTitle;
 
-		$db = wfGetDB( DB_SLAVE );
+		$db = wfGetDB( DB_REPLICA );
 		$top_category = str_replace( ' ', '_', $top_category );
-		$categories = array( $top_category );
-		$checkcategories = array( $top_category );
-		$pages = array();
-		$sortkeys = array();
+		$categories = [ $top_category ];
+		$checkcategories = [ $top_category ];
+		$pages = [];
+		$sortkeys = [];
 		for ( $level = $num_levels; $level > 0; $level-- ) {
-			$newcategories = array();
+			$newcategories = [];
 			foreach ( $checkcategories as $category ) {
-				$tables = array( 'categorylinks', 'page' );
-				$columns = array( 'page_title', 'page_namespace' );
-				$conditions = array();
+				$tables = [ 'categorylinks', 'page' ];
+				$columns = [ 'page_title', 'page_namespace' ];
+				$conditions = [];
 				$conditions[] = 'cl_from = page_id';
 				$conditions['cl_to'] = $category;
 				if ( $wgPageFormsUseDisplayTitle ) {
@@ -209,20 +211,20 @@ class PFValuesUtils {
 					$tables['pp_defaultsort'] = 'page_props';
 					$columns['pp_displaytitle_value'] = 'pp_displaytitle.pp_value';
 					$columns['pp_defaultsort_value'] = 'pp_defaultsort.pp_value';
-					$join = array(
-						'pp_displaytitle' => array(
-							'LEFT JOIN', array(
+					$join = [
+						'pp_displaytitle' => [
+							'LEFT JOIN', [
 								'pp_displaytitle.pp_page = page_id',
-								'pp_displaytitle.pp_propname = "displaytitle"'
-							)
-						),
-						'pp_defaultsort' => array(
-							'LEFT JOIN', array(
+								'pp_displaytitle.pp_propname = \'displaytitle\''
+							]
+						],
+						'pp_defaultsort' => [
+							'LEFT JOIN', [
 								'pp_defaultsort.pp_page = page_id',
-								'pp_defaultsort.pp_propname = "defaultsort"'
-							)
-						)
-					);
+								'pp_defaultsort.pp_propname = \'defaultsort\''
+							]
+						]
+					];
 					if ( $substring != null ) {
 						$conditions[] = '(pp_displaytitle.pp_value IS NULL AND (' .
 							self::getSQLConditionForAutocompleteInColumn( 'page_title', $substring ) .
@@ -231,7 +233,7 @@ class PFValuesUtils {
 							' OR page_namespace = ' . NS_CATEGORY;
 					}
 				} else {
-					$join = array();
+					$join = [];
 					if ( $substring != null ) {
 						$conditions[] = self::getSQLConditionForAutocompleteInColumn( 'page_title', $substring ) . ' OR page_namespace = ' . NS_CATEGORY;
 					}
@@ -241,10 +243,10 @@ class PFValuesUtils {
 					$columns,
 					$conditions,
 					__METHOD__,
-					$options = array(
+					$options = [
 						'ORDER BY' => 'cl_type, cl_sortkey',
 						'LIMIT' => $wgPageFormsMaxAutocompleteValues
-					),
+					],
 					$join );
 				if ( $res ) {
 					while ( $res && $row = $db->fetchRow( $res ) ) {
@@ -259,23 +261,23 @@ class PFValuesUtils {
 							}
 						} else {
 							$cur_title = Title::makeTitleSafe( $page_namespace, $page_name );
-							if ( is_null( $cur_title ) ) {
+							if ( $cur_title === null ) {
 								// This can happen if it's
 								// a "phantom" page, in a
 								// namespace that no longer exists.
 								continue;
 							}
 							$cur_value = PFUtils::titleString( $cur_title );
-							if ( ! in_array( $cur_value, $pages ) ) {
+							if ( !in_array( $cur_value, $pages ) ) {
 								if ( array_key_exists( 'pp_displaytitle_value', $row ) &&
-									!is_null( $row[ 'pp_displaytitle_value' ] ) &&
+									( $row[ 'pp_displaytitle_value' ] ) !== null &&
 									trim( str_replace( '&#160;', '', strip_tags( $row[ 'pp_displaytitle_value' ] ) ) ) !== '' ) {
 									$pages[ $cur_value . '@' ] = htmlspecialchars_decode( $row[ 'pp_displaytitle_value'] );
 								} else {
 									$pages[ $cur_value . '@' ] = $cur_value;
 								}
 								if ( array_key_exists( 'pp_defaultsort_value', $row ) &&
-									!is_null( $row[ 'pp_defaultsort_value' ] ) ) {
+									( $row[ 'pp_defaultsort_value' ] ) !== null ) {
 									$sortkeys[ $cur_value ] = $row[ 'pp_defaultsort_value'];
 								} else {
 									$sortkeys[ $cur_value ] = $cur_value;
@@ -291,7 +293,7 @@ class PFValuesUtils {
 			} else {
 				$categories = array_merge( $categories, $newcategories );
 			}
-			$checkcategories = array_diff( $newcategories, array() );
+			$checkcategories = array_diff( $newcategories, [] );
 		}
 		return self::fixedMultiSort( $sortkeys, $pages );
 	}
@@ -310,7 +312,7 @@ class PFValuesUtils {
 	 */
 	static function fixedMultiSort( $sortkeys, $pages ) {
 		array_multisort( $sortkeys, $pages );
-		$newPages = array();
+		$newPages = [];
 		foreach ( $pages as $key => $value ) {
 			$fixedKey = rtrim( $key, '@' );
 			$newPages[$fixedKey] = $value;
@@ -323,12 +325,12 @@ class PFValuesUtils {
 
 		$store = PFUtils::getSMWStore();
 		if ( $store == null ) {
-			return array();
+			return [];
 		}
 
 		$conceptTitle = Title::makeTitleSafe( SMW_NS_CONCEPT, $conceptName );
 
-		if ( !is_null( $substring ) ) {
+		if ( $substring !== null ) {
 			$substring = strtolower( $substring );
 		}
 
@@ -345,14 +347,14 @@ class PFValuesUtils {
 		$query = new SMWQuery( $desc );
 		$query->setLimit( $wgPageFormsMaxAutocompleteValues );
 		$query_result = $store->getQueryResult( $query );
-		$pages = array();
-		$sortkeys = array();
-		$titles = array();
+		$pages = [];
+		$sortkeys = [];
+		$titles = [];
 		while ( $res = $query_result->getNext() ) {
 			$page = $res[0]->getNextText( SMW_OUTPUT_WIKI );
 			if ( $wgPageFormsUseDisplayTitle && class_exists( 'PageProps' ) ) {
 				$title = Title::newFromText( $page );
-				if ( !is_null( $title ) ) {
+				if ( $title !== null ) {
 					$titles[] = $title;
 				}
 			} else {
@@ -363,28 +365,32 @@ class PFValuesUtils {
 
 		if ( $wgPageFormsUseDisplayTitle && class_exists( 'PageProps' ) ) {
 			$properties = PageProps::getInstance()->getProperties( $titles,
-				array( 'displaytitle', 'defaultsort' ) );
+				[ 'displaytitle', 'defaultsort' ] );
 			foreach ( $titles as $title ) {
 				if ( array_key_exists( $title->getArticleID(), $properties ) ) {
 					$titleprops = $properties[$title->getArticleID()];
-					if ( array_key_exists( 'displaytitle', $titleprops ) &&
-						trim( str_replace( '&#160;', '', strip_tags( $titleprops['displaytitle'] ) ) ) !== '' ) {
-						$pages[$title->getPrefixedText()] = htmlspecialchars_decode( $titleprops['displaytitle'] );
-					} else {
-						$pages[$title->getPrefixedText()] = $title->getPrefixedText();
-					}
-					if ( array_key_exists( 'defaultsort', $titleprops ) ) {
-						$sortkeys[$title->getPrefixedText()] = $titleprops['defaultsort'];
-					} else {
-						$sortkeys[$title->getPrefixedText()] = $title->getPrefixedText();
-					}
+				} else {
+					$titleprops = [];
+				}
+
+				$titleText = $title->getPrefixedText();
+				if ( array_key_exists( 'displaytitle', $titleprops ) &&
+					trim( str_replace( '&#160;', '', strip_tags( $titleprops['displaytitle'] ) ) ) !== '' ) {
+					$pages[$titleText] = htmlspecialchars_decode( $titleprops['displaytitle'] );
+				} else {
+					$pages[$titleText] = $titleText;
+				}
+				if ( array_key_exists( 'defaultsort', $titleprops ) ) {
+					$sortkeys[$titleText] = $titleprops['defaultsort'];
+				} else {
+					$sortkeys[$titleText] = $titleText;
 				}
 			}
 		}
 
-		if ( !is_null( $substring ) ) {
-			$filtered_pages = array();
-			$filtered_sortkeys = array();
+		if ( $substring !== null ) {
+			$filtered_pages = [];
+			$filtered_sortkeys = [];
 			foreach ( $pages as $index => $pageName ) {
 				// Filter on the substring manually. It would
 				// be better to do this filtering in the
@@ -419,19 +425,19 @@ class PFValuesUtils {
 	}
 
 	public static function getAllPagesForNamespace( $namespaceStr, $substring = null ) {
-		global $wgContLang, $wgLanguageCode, $wgPageFormsUseDisplayTitle;
+		global $wgLanguageCode, $wgPageFormsUseDisplayTitle;
 
 		$namespaceNames = explode( ',', $namespaceStr );
 
-		$allNamespaces = $wgContLang->getNamespaces();
+		$allNamespaces = PFUtils::getContLang()->getNamespaces();
 
 		if ( $wgLanguageCode != 'en' ) {
 			$englishLang = Language::factory( 'en' );
 			$allEnglishNamespaces = $englishLang->getNamespaces();
 		}
 
-		$queriedNamespaces = array();
-		$namespaceConditions = array();
+		$queriedNamespaces = [];
+		$namespaceConditions = [];
 
 		foreach ( $namespaceNames as $namespace_name ) {
 
@@ -452,7 +458,7 @@ class PFValuesUtils {
 
 			// If that didn't find anything, and we're in a language
 			// other than English, check English as well.
-			if ( is_null( $matchingNamespaceCode ) && $wgLanguageCode != 'en' ) {
+			if ( $matchingNamespaceCode === null && $wgLanguageCode != 'en' ) {
 				foreach ( $allEnglishNamespaces as $curNSCode => $curNSName ) {
 					if ( $curNSName == $namespace_name ) {
 						$matchingNamespaceCode = $curNSCode;
@@ -460,7 +466,7 @@ class PFValuesUtils {
 				}
 			}
 
-			if ( is_null( $matchingNamespaceCode ) ) {
+			if ( $matchingNamespaceCode === null ) {
 				throw new MWException( wfMessage( 'pf-missingnamespace', wfEscapeWikiText( $namespace_name ) ) );
 			}
 
@@ -468,11 +474,11 @@ class PFValuesUtils {
 			$namespaceConditions[] = "page_namespace = $matchingNamespaceCode";
 		}
 
-		$db = wfGetDB( DB_SLAVE );
-		$conditions = array();
+		$db = wfGetDB( DB_REPLICA );
+		$conditions = [];
 		$conditions[] = implode( ' OR ', $namespaceConditions );
-		$tables = array( 'page' );
-		$columns = array( 'page_title' );
+		$tables = [ 'page' ];
+		$columns = [ 'page_title' ];
 		if ( count( $namespaceNames ) > 1 ) {
 			$columns[] = 'page_namespace';
 		}
@@ -481,40 +487,40 @@ class PFValuesUtils {
 			$tables['pp_defaultsort'] = 'page_props';
 			$columns['pp_displaytitle_value'] = 'pp_displaytitle.pp_value';
 			$columns['pp_defaultsort_value'] = 'pp_defaultsort.pp_value';
-			$join = array(
-				'pp_displaytitle' => array(
-					'LEFT JOIN', array(
+			$join = [
+				'pp_displaytitle' => [
+					'LEFT JOIN', [
 						'pp_displaytitle.pp_page = page_id',
-						'pp_displaytitle.pp_propname = "displaytitle"'
-					)
-				),
-				'pp_defaultsort' => array(
-					'LEFT JOIN', array(
+						'pp_displaytitle.pp_propname = \'displaytitle\''
+					]
+				],
+				'pp_defaultsort' => [
+					'LEFT JOIN', [
 						'pp_defaultsort.pp_page = page_id',
-						'pp_defaultsort.pp_propname = "defaultsort"'
-					)
-				)
-			);
+						'pp_defaultsort.pp_propname = \'defaultsort\''
+					]
+				]
+			];
 			if ( $substring != null ) {
 				$substringCondition = '(pp_displaytitle.pp_value IS NULL AND (' .
 					self::getSQLConditionForAutocompleteInColumn( 'page_title', $substring ) .
 					')) OR ' .
-					self::getSQLConditionForAutocompleteInColumn( 'pp_displaytitle.pp_value', $substring );
+					self::getSQLConditionForAutocompleteInColumn( 'pp_displaytitle.pp_value', $substring, false );
 				if ( !in_array( NS_CATEGORY, $queriedNamespaces ) ) {
 					$substringCondition .= ' OR page_namespace = ' . NS_CATEGORY;
 				}
 				$conditions[] = $substringCondition;
 			}
 		} else {
-			$join = array();
+			$join = [];
 			if ( $substring != null ) {
 				$conditions[] = self::getSQLConditionForAutocompleteInColumn( 'page_title', $substring );
 			}
 		}
-		$res = $db->select( $tables, $columns, $conditions, __METHOD__, $options = array(), $join );
+		$res = $db->select( $tables, $columns, $conditions, __METHOD__, $options = [], $join );
 
-		$pages = array();
-		$sortkeys = array();
+		$pages = [];
+		$sortkeys = [];
 		while ( $row = $db->fetchRow( $res ) ) {
 			// If there's more than one namespace, include the
 			// namespace prefix in the results - otherwise, don't.
@@ -525,14 +531,14 @@ class PFValuesUtils {
 				$title = str_replace( '_', ' ', $row['page_title'] );
 			}
 			if ( array_key_exists( 'pp_displaytitle_value', $row ) &&
-				!is_null( $row[ 'pp_displaytitle_value' ] ) &&
+				( $row[ 'pp_displaytitle_value' ] ) !== null &&
 				trim( str_replace( '&#160;', '', strip_tags( $row[ 'pp_displaytitle_value' ] ) ) ) !== '' ) {
-				$pages[ $title ] = htmlspecialchars_decode( $row[ 'pp_displaytitle_value'] );
+				$pages[ $title ] = htmlspecialchars_decode( $row[ 'pp_displaytitle_value'], ENT_QUOTES );
 			} else {
 				$pages[ $title ] = $title;
 			}
 			if ( array_key_exists( 'pp_defaultsort_value', $row ) &&
-				!is_null( $row[ 'pp_defaultsort_value' ] ) ) {
+				( $row[ 'pp_defaultsort_value' ] ) !== null ) {
 				$sortkeys[ $title ] = $row[ 'pp_defaultsort_value'];
 			} else {
 				$sortkeys[ $title ] = $title;
@@ -554,7 +560,7 @@ class PFValuesUtils {
 	 */
 	public static function getAutocompleteValues( $source_name, $source_type ) {
 		if ( $source_name === null ) {
-			return array();
+			return [];
 		}
 
 		// The query depends on whether this is a Cargo field, SMW
@@ -576,6 +582,118 @@ class PFValuesUtils {
 			$names_array = self::getAllPagesForNamespace( $source_name );
 		}
 		return $names_array;
+	}
+
+	public static function getAutocompletionTypeAndSource( &$field_args ) {
+		global $wgCapitalLinks;
+
+		if ( array_key_exists( 'values from property', $field_args ) ) {
+			$autocompletionSource = $field_args['values from property'];
+			$autocompleteFieldType = 'property';
+		} elseif ( array_key_exists( 'values from category', $field_args ) ) {
+			$autocompleteFieldType = 'category';
+			$autocompletionSource = $field_args['values from category'];
+		} elseif ( array_key_exists( 'values from concept', $field_args ) ) {
+			$autocompleteFieldType = 'concept';
+			$autocompletionSource = $field_args['values from concept'];
+		} elseif ( array_key_exists( 'values from namespace', $field_args ) ) {
+			$autocompleteFieldType = 'namespace';
+			$autocompletionSource = $field_args['values from namespace'];
+		} elseif ( array_key_exists( 'values from url', $field_args ) ) {
+			$autocompleteFieldType = 'external_url';
+			$autocompletionSource = $field_args['values from url'];
+		} elseif ( array_key_exists( 'values', $field_args ) ) {
+			global $wgPageFormsFieldNum;
+			$autocompleteFieldType = 'values';
+			$autocompletionSource = "values-$wgPageFormsFieldNum";
+		} elseif ( array_key_exists( 'autocomplete field type', $field_args ) ) {
+			$autocompleteFieldType = $field_args['autocomplete field type'];
+			$autocompletionSource = $field_args['autocompletion source'];
+		} elseif ( array_key_exists( 'full_cargo_field', $field_args ) ) {
+			$autocompletionSource = $field_args['full_cargo_field'];
+			$autocompleteFieldType = 'cargo field';
+		} elseif ( array_key_exists( 'cargo field', $field_args ) ) {
+			$fieldName = $field_args['cargo field'];
+			$tableName = $field_args['cargo table'];
+			$autocompletionSource = "$tableName|$fieldName";
+			$autocompleteFieldType = 'cargo field';
+		} elseif ( array_key_exists( 'semantic_property', $field_args ) ) {
+			$autocompletionSource = $field_args['semantic_property'];
+			$autocompleteFieldType = 'property';
+		} else {
+			$autocompleteFieldType = null;
+			$autocompletionSource = null;
+		}
+
+		if ( $wgCapitalLinks && $autocompleteFieldType != 'external_url' && $autocompleteFieldType != 'cargo field' ) {
+			$autocompletionSource = PFUtils::getContLang()->ucfirst( $autocompletionSource );
+		}
+
+		return [ $autocompleteFieldType, $autocompletionSource ];
+	}
+
+	public static function getRemoteDataTypeAndPossiblySetAutocompleteValues( $autocompleteFieldType, $autocompletionSource, $field_args, $autocompleteSettings ) {
+		global $wgPageFormsMaxLocalAutocompleteValues, $wgPageFormsAutocompleteValues;
+
+		if ( $autocompleteFieldType == 'external_url' ) {
+			// Autocompletion from URL is always done remotely.
+			return $autocompleteFieldType;
+		}
+		if ( $autocompletionSource == '' ) {
+			// No autocompletion.
+			return null;
+		}
+		// @TODO - that empty() check shouldn't be necessary.
+		if ( array_key_exists( 'possible_values', $field_args ) &&
+		!empty( $field_args['possible_values'] ) ) {
+			$autocompleteValues = $field_args['possible_values'];
+		} elseif ( $autocompleteFieldType == 'values' ) {
+			$autocompleteValues = explode( ',', $field_args['values'] );
+		} else {
+			$autocompleteValues = self::getAutocompleteValues( $autocompletionSource, $autocompleteFieldType );
+		}
+
+		if ( count( $autocompleteValues ) > $wgPageFormsMaxLocalAutocompleteValues &&
+			$autocompleteFieldType != 'values' &&
+			!array_key_exists( 'values dependent on', $field_args ) &&
+			!array_key_exists( 'mapping template', $field_args ) &&
+			!array_key_exists( 'mapping property', $field_args ) &&
+			!( array_key_exists( 'mapping cargo table', $field_args ) &&
+			array_key_exists( 'mapping cargo field', $field_args ) )
+		) {
+			return $autocompleteFieldType;
+		} else {
+			$wgPageFormsAutocompleteValues[$autocompleteSettings] = $autocompleteValues;
+			return null;
+		}
+	}
+
+	/**
+	 * Get all autocomplete-related values, plus delimiter value
+	 * (it's needed also for the 'uploadable' link, if there is one).
+	 *
+	 * @param array $field_args
+	 * @param bool $is_list
+	 * @return string[]
+	 */
+	public static function setAutocompleteValues( $field_args, $is_list ) {
+		list( $autocompleteFieldType, $autocompletionSource ) =
+			self::getAutocompletionTypeAndSource( $field_args );
+		$autocompleteSettings = $autocompletionSource;
+		if ( $is_list ) {
+			$autocompleteSettings .= ',list';
+			if ( array_key_exists( 'delimiter', $field_args ) ) {
+				$delimiter = $field_args['delimiter'];
+				$autocompleteSettings .= ',' . $delimiter;
+			} else {
+				$delimiter = ',';
+			}
+		} else {
+			$delimiter = null;
+		}
+
+		$remoteDataType = self::getRemoteDataTypeAndPossiblySetAutocompleteValues( $autocompleteFieldType, $autocompletionSource, $field_args, $autocompleteSettings );
+		return [ $autocompleteSettings, $remoteDataType, $delimiter ];
 	}
 
 	/**
@@ -600,7 +718,7 @@ class PFValuesUtils {
 		if ( empty( $wgPageFormsAutocompletionURLs ) ) {
 			return wfMessage( 'pf-nocompletionurls' );
 		}
-		if ( ! array_key_exists( $external_url_alias, $wgPageFormsAutocompletionURLs ) ) {
+		if ( !array_key_exists( $external_url_alias, $wgPageFormsAutocompletionURLs ) ) {
 			return wfMessage( 'pf-invalidexturl' );
 		}
 		$url = $wgPageFormsAutocompletionURLs[$external_url_alias];
@@ -616,7 +734,7 @@ class PFValuesUtils {
 		if ( empty( $data ) ) {
 			return wfMessage( 'pf-externalpagebadjson' );
 		}
-		$return_values = array();
+		$return_values = [];
 		foreach ( $data->pfautocomplete as $val ) {
 			$return_values[] = (array)$val;
 		}
@@ -634,7 +752,7 @@ class PFValuesUtils {
 	public static function getSQLConditionForAutocompleteInColumn( $column, $substring, $replaceSpaces = true ) {
 		global $wgDBtype, $wgPageFormsAutocompleteOnAllChars;
 
-		$db = wfGetDB( DB_SLAVE );
+		$db = wfGetDB( DB_REPLICA );
 
 		// CONVERT() is also supported in PostgreSQL, but it doesn't
 		// seem to work the same way.
@@ -650,11 +768,11 @@ class PFValuesUtils {
 		}
 
 		if ( $wgPageFormsAutocompleteOnAllChars ) {
-			return $column_value . $db->buildLike( $substring, $db->anyString() );
+			return $column_value . $db->buildLike( $db->anyString(), $substring, $db->anyString() );
 		} else {
 			$spaceRepresentation = $replaceSpaces ? '_' : ' ';
 			return $column_value . $db->buildLike( $substring, $db->anyString() ) .
-				' OR ' .$column_value .
+				' OR ' . $column_value .
 				$db->buildLike( $db->anyString(), $spaceRepresentation . $substring, $db->anyString() );
 		}
 	}
@@ -666,7 +784,7 @@ class PFValuesUtils {
 	 * @return array
 	 */
 	public static function getAllPagesForQuery( $rawQuery ) {
-		$rawQueryArray = array( $rawQuery );
+		$rawQueryArray = [ $rawQuery ];
 		SMWQueryProcessor::processFunctionParams( $rawQueryArray, $queryString, $processedParams, $printouts );
 		SMWQueryProcessor::addThisPrintout( $printouts, $processedParams );
 		$processedParams = SMWQueryProcessor::getProcessedParams( $processedParams, $printouts );
@@ -675,7 +793,7 @@ class PFValuesUtils {
 			SMWQueryProcessor::SPECIAL_PAGE, '', $printouts );
 		$res = PFUtils::getSMWStore()->getQueryResult( $queryObj );
 		$rows = $res->getResults();
-		$pages = array();
+		$pages = [];
 		foreach ( $rows as $row ) {
 			$pages[] = $row->getDbKey();
 		}
@@ -697,7 +815,7 @@ class PFValuesUtils {
 		if ( count( $labels ) == count( array_unique( $labels ) ) ) {
 			return $labels;
 		}
-		$fixed_labels = array();
+		$fixed_labels = [];
 		foreach ( $labels as $value => $label ) {
 			$fixed_labels[$value] = $labels[$value];
 		}

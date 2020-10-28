@@ -47,13 +47,13 @@ class PFForm {
 		$this->mAssociatedCategory = $associatedCategory;
 	}
 
-	function createMarkup( $standardInputs = array(), $freeTextLabel = null ) {
+	function createMarkup( $standardInputs = [], $freeTextLabel = null ) {
 		$title = Title::makeTitle( PF_NS_FORM, $this->mFormName );
-		$fs = SpecialPageFactory::getPage( 'FormStart' );
+		$fs = PFUtils::getSpecialPage( 'FormStart' );
 		$form_start_url = PFUtils::titleURLString( $fs->getPageTitle() ) . "/" . $title->getPartialURL();
 		$form_description = wfMessage( 'pf_form_docu', $this->mFormName, $form_start_url )->inContentLanguage()->text();
 		$form_input = "{{#forminput:form=" . str_replace( ',', '\,', $this->mFormName );
-		if ( !is_null( $this->mAssociatedCategory ) ) {
+		if ( $this->mAssociatedCategory !== null ) {
 			$form_input .= "|autocomplete on category=" . $this->mAssociatedCategory;
 		}
 		$form_input .= "}}\n";
@@ -93,7 +93,7 @@ END;
 			}
 		}
 
-		if ( is_null( $freeTextLabel ) ) {
+		if ( $freeTextLabel === null ) {
 			$freeTextLabel = wfMessage( 'pf_form_freetextlabel' )->inContentLanguage()->text();
 		}
 
