@@ -443,11 +443,7 @@ END;
 			}
 
 			if ( $formField->isHidden() ) {
-				$attribs = [];
-				if ( $form_field->hasFieldArg( 'class' ) ) {
-					$attribs['class'] = $form_field->getFieldArg( 'class' );
-				}
-				$html .= Html::hidden( $formField->getInputName(), $curValue, $attribs );
+				$html .= Html::hidden( $formField->getInputName(), $curValue );
 				continue;
 			}
 
@@ -492,7 +488,7 @@ END;
 		global $wgOut, $wgPageFormsGridValues, $wgPageFormsGridParams;
 		global $wgPageFormsScriptPath;
 
-		$wgOut->addModules( 'ext.pageforms.spreadsheet' );
+		$wgOut->addModules( 'ext.pageforms.jsgrid' );
 
 		$gridParams = [];
 		foreach ( $tif->getFields() as $formField ) {
@@ -503,20 +499,12 @@ END;
 			if ( $formField->getLabel() !== null ) {
 				$gridParamValues['title'] = $formField->getLabel();
 			}
-			if ( !empty( $allowedValues = $formField->getPossibleValues() ) ) {
-				$gridParamValues['values'] = $allowedValues;
-				if ( $formField->isList() ) {
-					$gridParamValues['list'] = true;
-					$gridParamValues['delimiter'] = $formField->getFieldArg( 'delimiter' );
-				}
-			} elseif ( $inputType == 'textarea' ) {
+			if ( $inputType == 'textarea' ) {
 				$gridParamValues['type'] = 'textarea';
 			} elseif ( $inputType == 'checkbox' ) {
 				$gridParamValues['type'] = 'checkbox';
 			} elseif ( $inputType == 'date' ) {
 				$gridParamValues['type'] = 'date';
-			} elseif ( $inputType == 'datetime' ) {
-				$gridParamValues['type'] = 'datetime';
 			} elseif ( ( $possibleValues = $formField->getPossibleValues() ) != null ) {
 				array_unshift( $possibleValues, '' );
 				$completePossibleValues = [];
@@ -536,7 +524,7 @@ END;
 		$templateName = $tif->getTemplateName();
 		$templateDivID = str_replace( ' ', '', $templateName ) . "Grid";
 		$templateDivAttrs = [
-			'class' => 'pfSpreadsheet',
+			'class' => 'pfJSGrid',
 			'id' => $templateDivID,
 			'data-template-name' => $templateName
 		];
@@ -545,8 +533,7 @@ END;
 		}
 
 		$loadingImage = Html::element( 'img', [ 'src' => "$wgPageFormsScriptPath/skins/loading.gif" ] );
-		$loadingImageDiv = '<div class="loadingImage">' . $loadingImage . '</div>';
-		$text = Html::rawElement( 'div', $templateDivAttrs, $loadingImageDiv );
+		$text = Html::rawElement( 'div', $templateDivAttrs, $loadingImage );
 
 		$wgPageFormsGridParams[$templateName] = $gridParams;
 		$wgPageFormsGridValues[$templateName] = $tif->getGridValues();
@@ -626,7 +613,7 @@ END;
 		// parsed twice.
 		if ( array_key_exists( 'is_list', $value ) ) {
 			unset( $value['is_list'] );
-			return str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], implode( "$delimiter ", $value ) );
+			return htmlentities( implode( "$delimiter ", $value ) );
 		}
 
 		// if it has 1 or 2 elements, assume it's a checkbox; if it has
@@ -1067,13 +1054,19 @@ END;
 						$tif = PFTemplateInForm::create( 'standard_input', null, null, null, [] );
 						$tif->setFieldValuesFromSubmit();
 					}
+
+					// YvdB 28-10-2020:
+					// This variable needs to be set in the newFromFormFieldTag so we know what values are set during
+					// the actual printing of the form.
+					$isEditing = $source_is_page && ( $tif->getFullTextInPage() != '' ) && ( !$form_is_partial || !$form_submitted );
+
 					// We get the field name both here
 					// and in the PFFormField constructor,
 					// because PFFormField isn't equipped
 					// to deal with the #freetext# hack,
 					// among others.
 					$field_name = trim( $tag_components[1] );
-					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled, $wgUser );
+					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled, $wgUser, $isEditing );
 					// For special displays, add in the
 					// form fields, so we know the data
 					// structure.
@@ -1249,34 +1242,17 @@ END;
 									( $input_type == '' && $form_field->getTemplateField()->getPropertyType() == '_dat' ) ) {
 								$cur_value_in_template = self::getStringForCurrentTime( $input_type == 'datetime', $form_field->hasFieldArg( 'include timezone' ) );
 							}
+						}
 						// If the field is a text field, and its default value was set
 						// to 'current user', and it has no current value, set $cur_value
 						// to be the current user.
-						} elseif ( $form_field->getDefaultValue() == 'current user' &&
+						if ( $form_field->getDefaultValue() == 'current user' &&
 							// if the date is hidden, cur_value will already be set
 							// to the default value
 							( $cur_value === '' || $cur_value == 'current user' )
 						) {
-							if ( method_exists( $wgUser, 'isRegistered' ) ) {
-								// MW 1.34+
-								$cur_value_in_template = $wgUser->isRegistered() ? $wgUser->getName() : '';
-							} else {
-								$cur_value_in_template = $wgUser->getName();
-							}
+							$cur_value_in_template = $wgUser->isRegistered() ? $wgUser->getName() : '';
 							$cur_value = $cur_value_in_template;
-						// UUID is the only default value (so far) that can also be set
-						// by the JavaScript, for multiple-instance templates - for the
-						// other default values, there's no real need to have a
-						// different value for each instance.
-						} elseif ( $form_field->getDefaultValue() == 'uuid' &&
-							( $cur_value == '' || $cur_value == 'uuid' )
-						) {
-							if ( $tif->allowsMultiple() ) {
-								// Will be set by the JS.
-								$form_field->setFieldArg( 'class', 'new-uuid' );
-							} else {
-								$cur_value = $cur_value_in_template = self::generateUUID();
-							}
 						}
 
 						// If all instances have been
@@ -1849,11 +1825,7 @@ END;
 		$class_name = null;
 
 		if ( $form_field->isHidden() ) {
-			$attribs = [];
-			if ( $form_field->hasFieldArg( 'class' ) ) {
-				$attribs['class'] = $form_field->getFieldArg( 'class' );
-			}
-			$text = Html::hidden( $form_field->getInputName(), $cur_value, $attribs );
+			$text = Html::hidden( $form_field->getInputName(), $cur_value );
 		} elseif ( $form_field->getInputType() !== '' &&
 				array_key_exists( $form_field->getInputType(), $this->mInputTypeHooks ) &&
 				$this->mInputTypeHooks[$form_field->getInputType()] != null ) {
@@ -1963,25 +1935,6 @@ END;
 				$form_field->setFieldArg( 'translate_number_tag', $matches[0] );
 			}
 		}
-	}
-
-	private static function generateUUID() {
-		// Copied from https://www.php.net/manual/en/function.uniqid.php#94959
-		return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			// 32 bits for "time_low"
-			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-			// 16 bits for "time_mid"
-			mt_rand( 0, 0xffff ),
-			// 16 bits for "time_hi_and_version",
-			// four most significant bits holds version number 4
-			mt_rand( 0, 0x0fff ) | 0x4000,
-			// 16 bits, 8 bits for "clk_seq_hi_res",
-			// 8 bits for "clk_seq_low",
-			// two most significant bits holds zero and one for variant DCE1.1
-			mt_rand( 0, 0x3fff ) | 0x8000,
-			// 48 bits for "node"
-			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
-		);
 	}
 
 }
