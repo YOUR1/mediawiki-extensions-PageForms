@@ -43,6 +43,31 @@ class PFFormField {
 	private $mIsDisabled;
 
 	/**
+	 * @var string
+	 */
+	private $valuesSourceType;
+
+	/**
+	 * @var mixed|string|null
+	 */
+	private $valuesSource;
+
+	/**
+	 * @var false|mixed
+	 */
+	private $editing;
+
+	/**
+	 * @var PFTemplateInForm
+	 */
+	private $tif;
+
+	/**
+	 * @var string
+	 */
+	private $field_name;
+
+	/**
 	 * @param PFTemplateField $template_field
 	 *
 	 * @return self
@@ -169,7 +194,8 @@ class PFFormField {
 		$template,
 		$template_in_form,
 		$form_is_disabled,
-		User $user
+		User $user,
+		$isEditing = false
 	) {
 		$parser = PFUtils::getParser();
 
@@ -178,6 +204,10 @@ class PFFormField {
 
 		$field_name = trim( $tag_components[1] );
 		$template_name = $template_in_form->getTemplateName();
+
+		$f->editing = $isEditing;
+		$f->tif = $template_in_form;
+		$f->field_name = $field_name;
 
 		// See if this field matches one of the fields defined for this
 		// template - if it does, use all available information about
@@ -342,6 +372,8 @@ class PFFormField {
 				global $wgPageFormsUseDisplayTitle;
 				$f->mUseDisplayTitle = $wgPageFormsUseDisplayTitle;
 			}
+			$f->valuesSourceType = $valuesSourceType;
+			$f->valuesSource = $valuesSource;
 		}
 
 		if ( !array_key_exists( 'delimiter', $f->mFieldArgs ) ) {
@@ -379,7 +411,10 @@ class PFFormField {
 
 		$mappingType = null;
 		if ( $f->mPossibleValues !== null ) {
-			if ( array_key_exists( 'mapping template', $f->mFieldArgs ) ) {
+			if ( array_key_exists( 'force autocomplete', $f->mFieldArgs ) ) {
+				$f->mPossibleValues = $f->getCurrentValues($template_in_form, $field_name, $isEditing );
+				$mappingType = '';
+			} elseif ( array_key_exists( 'mapping template', $f->mFieldArgs ) ) {
 				$mappingType = 'template';
 			} elseif ( array_key_exists( 'mapping property', $f->mFieldArgs ) ) {
 				$mappingType = 'property';
@@ -407,6 +442,7 @@ class PFFormField {
 
 			$f->setMappedValues( $mappingType );
 		}
+
 
 		if ( $template_in_form->allowsMultiple() ) {
 			$f->mFieldArgs['part_of_multiple'] = true;
@@ -1007,4 +1043,55 @@ class PFFormField {
 
 		return $other_args;
 	}
+
+	/**
+	 * Retrieves the (known) set values for this field
+	 *
+	 * @note YvdBogert: Used to map the display titles int ovalues
+	 *
+	 * @param PFTemplateInForm $templateInForm
+	 * @param string $fieldName
+	 * @param boolean $isEditing
+	 *
+	 * @return array Mapped collection of titles and displaytitles
+	 */
+	public function getCurrentValues( PFTemplateInForm $templateInForm, $fieldName, $isEditing = true ) {
+		// Switch values source based on type of form action (submit, or editing) since they may be different
+		if ( $isEditing ) {
+			// if the user is currently editing the page through the form, we retrieve the values that are actually used on the page
+			$valuesInPage = $templateInForm->getValuesFromPage();
+		} else {
+			// if the user has concluded editing, we retrieve the values that are sent in the submit (post)
+			$valuesInPage = $templateInForm->getValuesFromSubmit();
+		}
+
+		$valuesInPage = ( isset ( $valuesInPage[ $fieldName ] ) ) ? $valuesInPage[ $fieldName ] : false;
+
+		if ( !$valuesInPage ) {
+			return [];
+		}
+
+		if ( is_string ( $valuesInPage ) ) {
+			$valuesInPage = explode( $this->mFieldArgs['delimiter'], $valuesInPage );
+		}
+
+		// Return nothing if no values are found
+		if ( count ( $valuesInPage ) == 0 ) {
+			return [];
+		}
+
+		// Do an additional check to see if there are weird values in the value list.
+		// For example $values[is_list] was passed.. that's not needed!
+		foreach ( $valuesInPage as $k => $value ) {
+			if ( !is_int( $k ) ) {
+				unset($valuesInPage[$k]);
+				continue;
+			}
+			$valuesInPage[$k] = trim( $value );
+		}
+
+		return PFValuesUtils::getLabelsFromDisplayTitle( $valuesInPage, !$isEditing );
+	}
+
+
 }

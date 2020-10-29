@@ -1054,13 +1054,17 @@ END;
 						$tif = PFTemplateInForm::create( 'standard_input', null, null, null, [] );
 						$tif->setFieldValuesFromSubmit();
 					}
+					// YvdB 28-10-2020:
+					// This variable needs to be set in the newFromFormFieldTag so we know what values are set during
+					// the actual printing of the form.
+					$isEditing = $source_is_page && ( $tif->getFullTextInPage() != '' ) && ( !$form_is_partial || !$form_submitted );
 					// We get the field name both here
 					// and in the PFFormField constructor,
 					// because PFFormField isn't equipped
 					// to deal with the #freetext# hack,
 					// among others.
 					$field_name = trim( $tag_components[1] );
-					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled, $wgUser );
+					$form_field = PFFormField::newFromFormFieldTag( $tag_components, $template, $tif, $form_is_disabled, $wgUser, $isEditing );
 					// For special displays, add in the
 					// form fields, so we know the data
 					// structure.

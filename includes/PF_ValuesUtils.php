@@ -639,16 +639,21 @@ class PFValuesUtils {
 			// Autocompletion from URL is always done remotely.
 			return $autocompleteFieldType;
 		}
+
 		if ( $autocompletionSource == '' ) {
 			// No autocompletion.
 			return null;
 		}
+
+		// YvdB: Set values based on the known values
+		// to prevent SQL queries
+		if ( isset( $field_args['force autocomplete'] ) ) {
+			$autocompleteValues = $field_args[ 'possible_values' ];
 		// @TODO - that empty() check shouldn't be necessary.
-		if ( array_key_exists( 'possible_values', $field_args ) &&
-		!empty( $field_args['possible_values'] ) ) {
+		} else if ( array_key_exists( 'possible_values', $field_args ) && !empty( $field_args['possible_values'] ) ) {
 			$autocompleteValues = $field_args['possible_values'];
 		} elseif ( $autocompleteFieldType == 'values' ) {
-			$autocompleteValues = explode( ',', $field_args['values'] );
+			$autocompleteValues = explode( ',', $field_args[ 'values' ] );
 		} else {
 			$autocompleteValues = self::getAutocompleteValues( $autocompletionSource, $autocompleteFieldType );
 		}
@@ -693,6 +698,13 @@ class PFValuesUtils {
 		}
 
 		$remoteDataType = self::getRemoteDataTypeAndPossiblySetAutocompleteValues( $autocompleteFieldType, $autocompletionSource, $field_args, $autocompleteSettings );
+
+		// @YvdBogert:
+		// If the mapping property was set, force the remoteDataType to category
+		// so remote autocompletion will be triggered
+		if ( $remoteDataType === null && isset ( $field_args['force autocomplete'] )) {
+			$remoteDataType = $autocompleteFieldType;
+		}
 		return [ $autocompleteSettings, $remoteDataType, $delimiter ];
 	}
 
@@ -838,5 +850,62 @@ class PFValuesUtils {
 		}
 		return $labels;
 	}
+
+
+	/**
+	 * @note YvdB: Used in PF_FormField by "mapping display title"
+	 * @param array $values
+	 *
+	 * @return array
+	 */
+	public static function getLabelsFromDisplayTitle( array $values, $doReverseLookup = false ) {
+		$labels = [];
+		foreach ( $values as $value ) {
+			if ( $doReverseLookup ) {
+				preg_match('((.*)\((.*)\))', $value, $realTitleMatches);
+				if ( count ( $realTitleMatches ) === 3 && isset ( $realTitleMatches[ 2 ] ) ) {
+					$value = $realTitleMatches[ 2 ];
+				}
+			}
+			$displayTitle = self::getDisplayTitle( $value );
+			$labels[ $value ] = ( $displayTitle ) ? $displayTitle . " ($value)" : $value;
+		}
+		return self::disambiguateLabels( $labels );
+	}
+
+	/**
+	 * Returns the display title of the given title
+	 * @note YvdB: Same as DisplayTitleHooks::getDisplayTitle
+	 *
+	 * @param Title|string $title
+	 *
+	 * @return bool|string
+	 */
+	private static function getDisplayTitle( $title ) {
+
+		if ( is_string( $title ) ) {
+			$title = Title::newFromText( $title );
+		}
+
+		if ( $title === null || !$title->exists() ) {
+			return false;
+		}
+
+		$titlesPrefixedText = $title->getPrefixedText();
+		$title = Title::newFromText( $titlesPrefixedText );
+		if ( $title instanceof Title ) {
+			$values = PageProps::getInstance()->getProperties( $title, 'displaytitle' );
+			$id = $title->getArticleID();
+			if ( array_key_exists( $id, $values ) ) {
+				$value = $values[$id];
+				if ( trim( str_replace( '&#160;', '', strip_tags( $value ) ) ) !== '' &&
+					$value !== $titlesPrefixedText ) {
+					return $value;
+				}
+			}
+		}
+		return $titlesPrefixedText;
+	}
+
 
 }

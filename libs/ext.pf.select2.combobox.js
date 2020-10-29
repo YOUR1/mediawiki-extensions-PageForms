@@ -241,11 +241,12 @@
 			processResults: function (data) { // parse the results into the format expected by Select2.
 				if (data.pfautocomplete !== undefined) {
 					data.pfautocomplete.forEach( function(item) {
-						item.id = item.title;
 						if (item.displaytitle !== undefined) {
-							item.text = item.displaytitle;
+							item.text = item.displaytitle + " ("+ item.title +")";
+							item.id = item.displaytitle + " ("+ item.title +")";
 						} else {
 							item.text = item.title;
+							item.id = item.title;
 						}
 					});
 					return {results: data.pfautocomplete};
