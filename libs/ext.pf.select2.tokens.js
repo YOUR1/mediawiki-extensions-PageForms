@@ -312,8 +312,14 @@
 				if (data.pfautocomplete !== undefined) {
 					data.pfautocomplete.forEach( function(item) {
 						if (item.displaytitle !== undefined) {
-							item.text = item.displaytitle + " ("+ item.title +")";
-							item.id = item.displaytitle + " ("+ item.title +")";
+							var currentDisplayTitle = item.displaytitle;
+							if ( currentDisplayTitle.indexOf("(") === -1
+								&& currentDisplayTitle.indexOf(")") == -1
+							) {
+								currentDisplayTitle += " ("+ item.title +")";
+							}
+							item.id = currentDisplayTitle;
+							item.text = currentDisplayTitle;
 						} else {
 							item.text = item.title;
 							item.id = item.title;
