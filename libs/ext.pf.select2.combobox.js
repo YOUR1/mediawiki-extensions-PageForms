@@ -41,7 +41,6 @@
 	combobox_proto.setOptions = function() {
 		var input_id = this.id;
 		var opts = {};
-		opts.language = {};
 		input_id = "#" + input_id;
 		var input_tagname = $(input_id).prop( "tagName" );
 		var autocomplete_opts = this.getAutocompleteOpts();
@@ -49,9 +48,7 @@
 		if ( autocomplete_opts.autocompletedatatype !== undefined ) {
 			opts.ajax = this.getAjaxOpts();
 			opts.minimumInputLength = 1;
-			opts.language.inputTooShort = function() {
-				return mw.msg( "pf-select2-input-too-short", opts.minimumInputLength );
-			};
+			opts.formatInputTooShort = mw.msg( "pf-select2-input-too-short", opts.minimumInputLength );
 		} else if ( input_tagname === "SELECT" ) {
 			opts.data = this.getData( autocomplete_opts.autocompletesettings );
 		}
@@ -74,17 +71,17 @@
 		}
 		opts.templateResult = function( result ) {
 			var term = $( input_id ).data("select2").dropdown.$search.val();
-			if ( term === undefined ) {
+			if( term === undefined ) {
 				term = "";
 			}
-			return pf.select2.base.prototype.textHighlight( result.id, term );
+			var text = result.id;
+			var highlightedText = pf.select2.base.prototype.textHighlight( text, term );
+			var markup = highlightedText;
+
+			return markup;
 		}
-		opts.language.searching = function() {
-			return mw.msg( "pf-select2-searching" );
-		};
-		opts.language.noMatches = function() {
-			return mw.msg( "pf-select2-no-matches" );
-		};
+		opts.formatSearching = mw.msg( "pf-select2-searching" );
+		opts.formatNoMatches = mw.msg( "pf-select2-no-matches" );
 		opts.placeholder = $(input_id).attr( "placeholder" );
 		if( opts.placeholder === undefined ) {
 			opts.placeholder = "";
@@ -155,12 +152,12 @@
 			} else {
 				var wgPageFormsAutocompleteValues = mw.config.get( 'wgPageFormsAutocompleteValues' );
 				data = wgPageFormsAutocompleteValues[autocompletesettings];
+				// We need to insert an empty string at the starting
+				// of this array so that when select2 gets the data
+				// it doesn't duplicate the first option in the dropdown
+				data.unshift("");
+				//Convert data into the format accepted by Select2
 				if (data !== undefined && data !== null ) {
-					// Insert an empty string at the start of the array,
-					// so that when Select2 gets the data it doesn't
-					// duplicate the first option in the dropdown
-					data.unshift("");
-					// Convert data into the format accepted by Select2
 					for (var key in data) {
 						values.push({
 							id: data[key], text: data[key]
@@ -244,11 +241,18 @@
 			processResults: function (data) { // parse the results into the format expected by Select2.
 				if (data.pfautocomplete !== undefined) {
 					data.pfautocomplete.forEach( function(item) {
-						item.id = item.title;
 						if (item.displaytitle !== undefined) {
-							item.text = item.displaytitle;
+							var currentDisplayTitle = item.displaytitle;
+							if ( currentDisplayTitle.indexOf("(") === -1
+								&& currentDisplayTitle.indexOf(")") == -1
+							) {
+								currentDisplayTitle += " ("+ item.title +")";
+							}
+							item.id = currentDisplayTitle;
+							item.text = currentDisplayTitle;
 						} else {
 							item.text = item.title;
+							item.id = item.title;
 						}
 					});
 					return {results: data.pfautocomplete};

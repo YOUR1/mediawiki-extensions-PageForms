@@ -1054,12 +1054,10 @@ END;
 						$tif = PFTemplateInForm::create( 'standard_input', null, null, null, [] );
 						$tif->setFieldValuesFromSubmit();
 					}
-
 					// YvdB 28-10-2020:
 					// This variable needs to be set in the newFromFormFieldTag so we know what values are set during
 					// the actual printing of the form.
 					$isEditing = $source_is_page && ( $tif->getFullTextInPage() != '' ) && ( !$form_is_partial || !$form_submitted );
-
 					// We get the field name both here
 					// and in the PFFormField constructor,
 					// because PFFormField isn't equipped

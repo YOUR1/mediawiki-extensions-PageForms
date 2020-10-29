@@ -58,52 +58,6 @@
 		} catch (e) {
 			window.console.log(e);
 		}
-
-		// Make the tokens sortable, using the SortableJS library.
-		var tokensUL = element.parent().find('ul.select2-selection__rendered');
-		var tokensSelect = element.parents('span.inputSpan').find('select');
-		var sortable = Sortable.create(tokensUL[0], {
-			ghostClass: 'pfTokensGhost',
-
-			// Somewhat of a @HACK - the tokens are stored in two
-			// places in the DOM, a <ul> tag (which is displayed)
-			// and a <select> tag (which is what gets submitted).
-			// SortableJS only handles the first of these, so when
-			// a rearrange is done, we rearrange the <select> layout
-			// to match what's in the <ul>.
-			// Is there a simpler way to do this?
-			onEnd: function(event, dragEvent) {
-				var newTokensOrder = [];
-				tokensUL.find('li.select2-selection__choice').not('.sortable-ghost').each( function() {
-					// Remove the "x" from the beginning of
-					// the string.
-					newTokensOrder.push($(this).text().substring(1));
-				});
-				var dropdownItems = {};
-				tokensSelect.find('option').each( function() {
-					var optionName = $(this).text();
-					dropdownItems[optionName] = $(this);
-				} );
-				tokensSelect.prepend(dropdownItems[newTokensOrder[i]]);
-				for ( var i = 1; i < newTokensOrder.length; i++ ){
-					dropdownItems[newTokensOrder[i]].insertAfter(dropdownItems[newTokensOrder[i - 1]]);
-				}
-			}
-		});
-
-		// Make sure that entries added with "local autocompletion"
-		// show up in the order they were entered, not alphabetical
-		// order.
-		// Copied from https://github.com/select2/select2/issues/3106#issuecomment-234702241
-		element.on("select2:select", function (evt) {
-			var elem = evt.params.data.element;
-			var $element = $(elem);
-
-			$element.detach();
-			$(this).append($element);
-			$(this).trigger("change");
-		});
-
 		$(inputData.$container[0]).on("keyup",function(e){
 			if( existingValuesOnly ){
 				return ;
@@ -161,7 +115,6 @@
 		var self = this;
 		var input_id = this.id;
 		var opts = {};
-		opts.language = {};
 		input_id = "#" + input_id;
 		var input_tagname = $(input_id).prop( "tagName" );
 		var autocomplete_opts = this.getAutocompleteOpts();
@@ -169,9 +122,7 @@
 		if ( autocomplete_opts.autocompletedatatype !== undefined ) {
 			opts.ajax = this.getAjaxOpts();
 			opts.minimumInputLength = 1;
-			opts.language.inputTooShort = function() {
-				return mw.msg( "pf-select2-input-too-short", opts.minimumInputLength );
-			};
+			opts.formatInputTooShort = mw.msg( "pf-select2-input-too-short", opts.minimumInputLength );
 		} else if ( input_tagname === "SELECT" ) {
 			opts.data = this.getData( autocomplete_opts.autocompletesettings );
 		}
@@ -191,22 +142,23 @@
 		}
 		opts.templateResult = function( result ) {
 			var term = "";
-			var inputData = $( input_id ).data("select2");
-			if ( inputData.results.lastParams !== undefined ){
-				term = inputData.results.lastParams.term;
+			if( $( input_id ).data("select2").results.lastParams !== undefined ){
+				term = $( input_id ).data("select2").results.lastParams.term;
 			}
-			if ( term === "" || term === undefined ) {
-				term = inputData.$dropdown[0].textContent;
+			if( term === "" || term === undefined ) {
+				term = $( input_id ).data("select2").$dropdown[0].textContent;
+				if( term === undefined || term === "" ) {
+					var lenChild = $( input_id ).data("select2").$selection[0].children	[0].children.length;
+					term = $( input_id ).data("select2").$selection[0].children	[0].children[lenChild-1].children[0].value;
+				}
 			}
-			if ( term === "" || term === undefined ) {
-				var htmlElements = inputData.$selection[0].children[0].children;
-				term = htmlElements[htmlElements.length - 1].children[0].value;
-			}
-			return pf.select2.base.prototype.textHighlight( result.id, term );
+			var text = result.id;
+			var highlightedText = pf.select2.base.prototype.textHighlight( text, term );
+			var markup = highlightedText;
+
+			return markup;
 		};
-		opts.language.searching = function() {
-			return mw.msg( "pf-select2-searching" );
-		};
+		opts.formatSearching = mw.msg( "pf-select2-searching" );
 		opts.placeholder = $(input_id).attr( "placeholder" );
 
 		var size = $(input_id).attr("data-size");
@@ -225,9 +177,7 @@
 		var maxvalues = $(input_id).attr( "maxvalues" );
 		if ( maxvalues !== undefined ) {
 			opts.maximumSelectionLength = maxvalues;
-			opts.language.maximumSelected = function() {
-				return mw.msg( "pf-select2-selection-too-big", maxvalues );
-			};
+			opts.formatSelectionTooBig = mw.msg( "pf-select2-selection-too-big", maxvalues );
 		}
 		// opts.selectOnClose = true;
 		opts.adaptContainerCssClass = function( clazz ) {
@@ -361,11 +311,18 @@
 			processResults: function (data) { // parse the results into the format expected by Select2.
 				if (data.pfautocomplete !== undefined) {
 					data.pfautocomplete.forEach( function(item) {
-						item.id = item.title;
 						if (item.displaytitle !== undefined) {
-							item.text = item.displaytitle;
+							var currentDisplayTitle = item.displaytitle;
+							if ( currentDisplayTitle.indexOf("(") === -1
+								&& currentDisplayTitle.indexOf(")") == -1
+							) {
+								currentDisplayTitle += " ("+ item.title +")";
+							}
+							item.id = currentDisplayTitle;
+							item.text = currentDisplayTitle;
 						} else {
 							item.text = item.title;
+							item.id = item.title;
 						}
 					});
 					return {results: data.pfautocomplete};

@@ -42,11 +42,30 @@ class PFFormField {
 	private $mInputName;
 	private $mIsDisabled;
 
-	// YvdB 28-10-2020
-	// The values below are kinda hacky. They used to determine determine
-	// the display title of pages, and the otherway around.
-	public $valuesSourceType, $valuesSource, $field_name, $tif, $editing;
+	/**
+	 * @var string
+	 */
+	private $valuesSourceType;
 
+	/**
+	 * @var mixed|string|null
+	 */
+	private $valuesSource;
+
+	/**
+	 * @var false|mixed
+	 */
+	private $editing;
+
+	/**
+	 * @var PFTemplateInForm
+	 */
+	private $tif;
+
+	/**
+	 * @var string
+	 */
+	private $field_name;
 
 	/**
 	 * @param PFTemplateField $template_field
@@ -184,10 +203,11 @@ class PFFormField {
 		$f->mFieldArgs = [];
 
 		$field_name = trim( $tag_components[1] );
-		$f->field_name = $field_name;
-		$f->tif = $template_in_form;
-		$f->editing = $isEditing;
 		$template_name = $template_in_form->getTemplateName();
+
+		$f->editing = $isEditing;
+		$f->tif = $template_in_form;
+		$f->field_name = $field_name;
 
 		// See if this field matches one of the fields defined for this
 		// template - if it does, use all available information about
@@ -346,13 +366,15 @@ class PFFormField {
 			}
 		} // end for
 
-//		if ( $valuesSourceType !== null ) {
-//			$f->mPossibleValues = PFValuesUtils::getAutocompleteValues( $valuesSource, $valuesSourceType );
-//			if ( in_array( $valuesSourceType, [ 'category', 'namespace', 'concept' ] ) ) {
-//				global $wgPageFormsUseDisplayTitle;
-//				$f->mUseDisplayTitle = $wgPageFormsUseDisplayTitle;
-//			}
-//		}
+		if ( $valuesSourceType !== null ) {
+			$f->mPossibleValues = PFValuesUtils::getAutocompleteValues( $valuesSource, $valuesSourceType );
+			if ( in_array( $valuesSourceType, [ 'category', 'namespace', 'concept' ] ) ) {
+				global $wgPageFormsUseDisplayTitle;
+				$f->mUseDisplayTitle = $wgPageFormsUseDisplayTitle;
+			}
+			$f->valuesSourceType = $valuesSourceType;
+			$f->valuesSource = $valuesSource;
+		}
 
 		if ( !array_key_exists( 'delimiter', $f->mFieldArgs ) ) {
 			$delimiterFromTemplate = $f->getTemplateField()->getDelimiter();
@@ -364,30 +386,6 @@ class PFFormField {
 			}
 		}
 		$delimiter = $f->mFieldArgs['delimiter'];
-
-		// YvdB 28-10-2020:
-		// Note; this code needs to be executed after the $f->mFieldArgs['delimiter'] has been set, since getValues()
-		// needs to know the field's delimiter property.
-		if ( $valuesSourceType !== null ) {
-			// The previous strategy
-			//  $f->mPossibleValues = PFValuesUtils::getAutocompleteValues( $valuesSource, $valuesSourceType );
-			// caused a field with autocompletion to query ALL possible values in the category/property to
-			// autocomplete on. This results in a lot of queries. For very large autocompletion categories (10.000+ members)
-			// the construction of the form then becomes prohibitively slow. The current strategy only retrieves values
-			// that have actually been set (i.e. are actually present on the form) to prevent that.
-			$f->valuesSource = $valuesSource;
-			$f->valuesSourceType = $valuesSourceType;
-
-			// Set only the values that are currently present
-			$f->mPossibleValues = $f->getValues($template_in_form, $valuesSource, $valuesSourceType, $isEditing);
-
-			// Default PF behaviour
-			if ( in_array( $valuesSourceType, ['category', 'namespace', 'concept' ] ) ) {
-				global $wgPageFormsUseDisplayTitle;
-				$f->mUseDisplayTitle = $wgPageFormsUseDisplayTitle;
-			}
-		}
-
 
 		// If the 'values' parameter was set, separate it based on the
 		// 'delimiter' parameter, if any.
@@ -413,7 +411,10 @@ class PFFormField {
 
 		$mappingType = null;
 		if ( $f->mPossibleValues !== null ) {
-			if ( array_key_exists( 'mapping template', $f->mFieldArgs ) ) {
+			if ( array_key_exists( 'force autocomplete', $f->mFieldArgs ) ) {
+				$f->mPossibleValues = $f->getCurrentValues($template_in_form, $field_name, $isEditing );
+				$mappingType = '';
+			} elseif ( array_key_exists( 'mapping template', $f->mFieldArgs ) ) {
 				$mappingType = 'template';
 			} elseif ( array_key_exists( 'mapping property', $f->mFieldArgs ) ) {
 				$mappingType = 'property';
@@ -421,13 +422,7 @@ class PFFormField {
 				array_key_exists( 'mapping cargo field', $f->mFieldArgs ) ) {
 				$mappingType = 'cargo field';
 			} elseif ( $f->mUseDisplayTitle ) {
-				// YvdB 28-10-2020:
-				// comment..
-				if ( $isEditing ) {
-					$f->mPossibleValues = $f->getValues($template_in_form, $valuesSource, $valuesSourceType, $isEditing);
-				} else {
-					$f->mPossibleValues = PFValuesUtils::disambiguateLabels( $f->mPossibleValues );
-				}
+				$f->mPossibleValues = PFValuesUtils::disambiguateLabels( $f->mPossibleValues );
 			}
 		}
 
@@ -447,6 +442,7 @@ class PFFormField {
 
 			$f->setMappedValues( $mappingType );
 		}
+
 
 		if ( $template_in_form->allowsMultiple() ) {
 			$f->mFieldArgs['part_of_multiple'] = true;
@@ -668,10 +664,7 @@ class PFFormField {
 			$this->setValuesWithMappingCargoField();
 		}
 
-		$this->mPossibleValues = ( $this->valuesSource && $this->valuesSourceType && $this->editing )
-			? $this->getValues($this->tif, $this->valuesSourceType, $this->valuesSourceType, $this->editing )
-			: PFValuesUtils::disambiguateLabels( $this->mPossibleValues );
-
+		$this->mPossibleValues = PFValuesUtils::disambiguateLabels( $this->mPossibleValues );
 	}
 
 	/**
@@ -763,10 +756,7 @@ class PFFormField {
 		if ( $value === false ) {
 			return $label;
 		} else {
-			return ( $this->valuesSourceType && $this->valuesSource )
-				? $this->guessTitleName($label)
-				: $label;
-
+			return $value;
 		}
 	}
 
@@ -1009,13 +999,7 @@ class PFFormField {
 		// a value defined for the form field should always supersede
 		// the coresponding value for the template field
 		if ( $this->mPossibleValues != null ) {
-			// YvdBogert 28-10-2020
-			// Clear possible values so that the autocomplete lookup is always used
-			if ( $this->valuesSourceType ) {
-				$other_args[ 'possible_values' ] = [];
-			} else {
-				$other_args[ 'possible_values' ] = $this->mPossibleValues;
-			}
+			$other_args['possible_values'] = $this->mPossibleValues;
 		} else {
 			$other_args['possible_values'] = $this->template_field->getPossibleValues();
 			if ( $this->hasFieldArg( 'mapping using translate' ) ) {
@@ -1026,7 +1010,6 @@ class PFFormField {
 			} else {
 				$other_args['value_labels'] = $this->template_field->getValueLabels();
 			}
-
 		}
 		$other_args['is_list'] = ( $this->mIsList || $this->template_field->isList() );
 		if ( $this->template_field->isMandatory() ) {
@@ -1063,15 +1046,16 @@ class PFFormField {
 
 	/**
 	 * Retrieves the (known) set values for this field
-	 * @param self $templateInForm
-	 * @param string $valuesSource
-	 * @param string $valuesSourceType
+	 *
+	 * @note YvdBogert: Used to map the display titles int ovalues
+	 *
+	 * @param PFTemplateInForm $templateInForm
+	 * @param string $fieldName
 	 * @param boolean $isEditing
+	 *
 	 * @return array Mapped collection of titles and displaytitles
 	 */
-	public function getValues( PFTemplateInForm $templateInForm, $valuesSource, $valuesSourceType, $isEditing ) {
-		global $wgPageFormsUseDisplayTitle;
-
+	public function getCurrentValues( PFTemplateInForm $templateInForm, $fieldName, $isEditing = true ) {
 		// Switch values source based on type of form action (submit, or editing) since they may be different
 		if ( $isEditing ) {
 			// if the user is currently editing the page through the form, we retrieve the values that are actually used on the page
@@ -1081,176 +1065,32 @@ class PFFormField {
 			$valuesInPage = $templateInForm->getValuesFromSubmit();
 		}
 
-		$values = ( isset ( $valuesInPage[ $this->field_name ] ) )
-			? $valuesInPage[ $this->field_name ]
-			: [];
+		$valuesInPage = ( isset ( $valuesInPage[ $fieldName ] ) ) ? $valuesInPage[ $fieldName ] : false;
 
-		if ( !$values ) {
+		if ( !$valuesInPage ) {
 			return [];
 		}
 
-		// Explode existing values with the delimiter that has been set
-		$values = explode( $this->mFieldArgs['delimiter'], $values );
-		// Filter empty values
-		$values = array_filter( $values, function($value) {
-			return !empty($value) || $value != "";
-		});
-
-		// DisplayTitle has been enabled and the user is currently editing, but the values shown in the form
-		// are original page names, not the display title. We want to 'remap' them, so the user sees displaytitles.
-		if ( $wgPageFormsUseDisplayTitle && $isEditing ) {
-			foreach ($values as $key => $submittedTitle) {
-				$submittedTitle = trim($submittedTitle);
-				$title = Title::newFromText($submittedTitle);
-				if ( $title === null ) {
-					continue;
-				}
-				$displaytitle = $this->getDisplayTitle($title);
-				if ( $displaytitle !== $submittedTitle ) {
-					unset( $values[ $key ] );
-
-					if ( $this->hasDuplicatedDisplayTitle( $title ) ) {
-						$displaytitle .= ' ('.$title->getFullText().')';
-					}
-					$values[ $submittedTitle ] = $displaytitle;
-				}
-
-			}
-		}
-		return $values;
-	}
-
-	/**
-	 * See if the given title object has an displaytitle attachted to it, that has been defined on multiple pages.
-	 *
-	 * @param Title $title
-	 * @return bool
-	 * @throws MWException
-	 */
-	private function hasDuplicatedDisplayTitle( Title $title ) {
-		$displayTitle = $this->getDisplayTitle( $title );
-		$displayTitleWithoutSpaces = explode(' ', $displayTitle);
-
-		$fauxRequest = new FauxRequest([
-			'action' => 'pfautocomplete',
-			$this->valuesSourceType => $this->valuesSource,
-			'substr' => $displayTitleWithoutSpaces[0]
-		]);
-
-		$api = new ApiMain($fauxRequest);
-		$api->execute();
-		$result = $api->getResult()->getResultData(['pfautocomplete']);
-		if ( isset ( $result['_element'] ) ) {
-			unset( $result['_element']);
+		if ( is_string ( $valuesInPage ) ) {
+			$valuesInPage = explode( $this->mFieldArgs['delimiter'], $valuesInPage );
 		}
 
-		$result = array_filter($result, function($value) use ( $displayTitle, $title ) {
-			// Remove current object
-			if ( $value['title'] == $title->getFullText() ) {
-				return false;
-			}
-
-			$valueTitle = Title::newFromText( $value['title'] );
-			if ( $valueTitle->exists() ) {
-				$valueDisplayTitle = $this->getDisplayTitle( $valueTitle );
-				if ( $valueDisplayTitle !== $displayTitle ) {
-					return false;
-				}
-			}
-			return true;
-		});
-
-		return count( $result ) !== 0;
-	}
-
-	/**
-	 * Finds the proper display title for an (augmented) displaytitle used in the form. Queries the pfautocomplete API internally.
-	 * 20200601.rdb - is this a correct interpretation of what the code does?
-	 *
-	 * @note this should probably be a query on the DB it self,
-	 * would be a lot faster and more efficient in mapping the given title
-	 * @param $displayTitle
-	 * @return mixed|string
-	 * @throws MWException
-	 */
-	private function guessTitleName($displayTitle) {
-		$displayTitle = trim($displayTitle);
-		$title = Title::newFromText($displayTitle);
-
-		// There are probably multiple values with the given display title
-		// See if the value between () can be fetched as a title
-		if ( strstr($displayTitle, '(') && strstr($displayTitle, ')') && !$title->exists() ) {
-			// Match everything between the parentheses to see if the value in it
-			// is a title in the wiki.
-			preg_match('((.*)\((.*)\))', $displayTitle, $realTitleMatches);
-			if ( count ( $realTitleMatches ) === 3 && isset ( $realTitleMatches[ 2 ] ) ) {
-				$realTitleString = $realTitleMatches[ 2 ];
-				$realTitle = Title::newFromText( $realTitleString );
-				if ( $realTitle instanceof Title && $realTitle->exists() === true ) {
-					return $realTitleString;
-				}
-			}
+		// Return nothing if no values are found
+		if ( count ( $valuesInPage ) == 0 ) {
+			return [];
 		}
 
-		if ($title->exists() === false) {
-			// @note PageForms doesn't handle spaces in display titles correctly, which results in pages not being found
-			// @todo fix SQL the queries the given string, so it allows spaces
-			if ( strstr($displayTitle, ' ' ) ) {
-				$displayTitle = explode(' ', $displayTitle);
-				$displayTitle = $displayTitle[0];
+		// Do an additional check to see if there are weird values in the value list.
+		// For example $values[is_list] was passed.. that's not needed!
+		foreach ( $valuesInPage as $k => $value ) {
+			if ( !is_int( $k ) ) {
+				unset($valuesInPage[$k]);
+				continue;
 			}
-
-			$fauxRequest = new FauxRequest([
-				'action' => 'pfautocomplete',
-				$this->valuesSourceType => $this->valuesSource,
-				'substr' => $displayTitle
-			]);
-
-			$api = new ApiMain($fauxRequest);
-			$api->execute();
-			$result = $api->getResult()->getResultData(['pfautocomplete']);
-			if ( isset ( $result['_element'] ) ) {
-				unset( $result['_element']);
-			}
-			if (count($result) > 0) {
-				$firstResult = reset($result);
-				return isset($firstResult['title'])
-					? (string)$firstResult['title']
-					: $firstResult;
-			} else {
-				return $displayTitle;
-			}
+			$valuesInPage[$k] = trim( $value );
 		}
-		return $displayTitle;
-	}
 
-	/**
-	 * Returns the display title of the given title
-	 * @note Same as DisplayTitleHooks::getDisplayTitle
-	 * @note Couldn't find some generic function for it within PageForms.
-	 *
-	 * 20200601.rdb - if it's the exact same code, why not perform a call to DisplayTitleHooks::getDisplayTitle?
-	 * 20200602.yvdb - I am not entirely sure if the DisplayTitle extension is always installed when using
-	 *                 $wgPageFormsUseDisplayTitle, since MW has its own way to do so.
-	 *
-	 * @param Title $title
-	 * @return mixed|string
-	 */
-	private function getDisplayTitle( Title $title ) {
-		$pagetitle = $title->getPrefixedText();
-		$title = Title::newFromText( $pagetitle );
-		if ( $title instanceof Title ) {
-			$values = PageProps::getInstance()->getProperties( $title, 'displaytitle' );
-			$id = $title->getArticleID();
-			if ( array_key_exists( $id, $values ) ) {
-				$value = $values[$id];
-				if ( trim( str_replace( '&#160;', '', strip_tags( $value ) ) ) !== '' &&
-					$value !== $pagetitle ) {
-					return $value;
-				}
-			}
-		}
-		return $pagetitle;
+		return PFValuesUtils::getLabelsFromDisplayTitle( $valuesInPage, !$isEditing );
 	}
 
 
