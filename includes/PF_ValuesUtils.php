@@ -868,7 +868,7 @@ class PFValuesUtils {
 				}
 			}
 			$displayTitle = self::getDisplayTitle( $value );
-			$labels[ $value ] = ( $displayTitle ) ? $displayTitle . " ($value)" : $value;
+			$labels[ $value ] = ( $displayTitle && $doReverseLookup ) ? $displayTitle . " ($value)" : $value;
 		}
 		return self::disambiguateLabels( $labels );
 	}
